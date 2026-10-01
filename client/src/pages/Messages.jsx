@@ -56,12 +56,12 @@ export default function Messages() {
   return (
     <div className="card grid h-[70vh] overflow-hidden md:grid-cols-[280px_1fr]">
       {/* list: hidden on phones once a chat is open */}
-      <div className={`overflow-y-auto border-slate-200 md:border-r ${activeId ? 'hidden md:block' : ''}`}>
+      <div className={`scroll-thin overflow-y-auto border-slate-200 md:border-r ${activeId ? 'hidden md:block' : ''}`}>
         <h1 className="border-b border-slate-200 p-4 font-bold">Messages</h1>
         {convos.length === 0 && <p className="p-4 text-sm text-slate-500">No conversations yet. Message a seller from a listing.</p>}
         {convos.map((c) => (
           <button key={c._id} onClick={() => setActiveId(c._id)}
-            className={`block w-full border-b border-slate-100 p-4 text-left hover:bg-sky ${c._id === activeId ? 'bg-sky' : ''}`}>
+            className={`block w-full border-b border-l-4 border-b-slate-100 p-4 text-left transition duration-200 hover:bg-sky ${c._id === activeId ? 'border-l-navy bg-sky' : 'border-l-transparent'}`}>
             <p className="text-sm font-semibold">{other(c)?.fullName}</p>
             <p className="truncate text-xs text-slate-500">{c.listing?.title}</p>
             <p className="truncate text-xs text-slate-400">{c.lastMessage}</p>
@@ -78,12 +78,12 @@ export default function Messages() {
               <button className="text-sm text-navy md:hidden" onClick={() => setActiveId(null)}>Back</button>
               <p className="font-semibold">{other(active)?.fullName}</p>
             </div>
-            <div className="flex-1 space-y-2 overflow-y-auto bg-mist p-4">
+            <div className="scroll-thin flex-1 space-y-2 overflow-y-auto bg-mist p-4">
               {messages.map((m) => {
                 const mine = m.sender === user._id;
                 return (
-                  <div key={m._id} className={`flex ${mine ? 'justify-end' : ''}`}>
-                    <div className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${mine ? 'bg-navy text-white' : 'bg-white border border-slate-200'}`}>
+                  <div key={m._id} className={`flex animate-fade-up ${mine ? 'justify-end' : ''}`}>
+                    <div className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm shadow-sm ${mine ? 'rounded-br-md bg-navy text-white' : 'rounded-bl-md bg-white border border-slate-200'}`}>
                       {m.image && <img src={m.image} alt="Shared" className="mb-1 max-h-48 rounded-lg" />}
                       {m.text}
                     </div>

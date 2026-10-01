@@ -26,9 +26,15 @@ export default function Admin() {
       <h1 className="text-xl font-bold">Admin dashboard</h1>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {cards?.map(([label, n]) => (
-          <div key={label} className="card p-4"><p className="text-3xl font-extrabold text-navy">{n}</p><p className="text-sm text-slate-500">{label}</p></div>
-        ))}
+        {cards
+          ? cards.map(([label, n], i) => (
+              <div key={label} className="card animate-fade-up p-4 transition hover:shadow-md" style={{ animationDelay: `${i * 60}ms` }}>
+                <p className="text-3xl font-extrabold text-navy">{n}</p><p className="text-sm text-slate-500">{label}</p>
+              </div>
+            ))
+          : Array.from({ length: 4 }, (_, i) => (
+              <div key={i} className="card space-y-2 p-4" aria-hidden="true"><div className="skeleton h-8 w-12" /><div className="skeleton h-4 w-24" /></div>
+            ))}
       </div>
 
       <div className="flex gap-2">

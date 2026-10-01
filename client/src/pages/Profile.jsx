@@ -48,7 +48,7 @@ export default function Profile() {
   return (
     <div className="space-y-6">
       <section className="card flex flex-col items-center gap-2 p-6 text-center md:flex-row md:text-left md:gap-6">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-navy text-2xl font-bold text-white">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-navy to-navy-soft text-2xl font-bold text-white shadow-lg shadow-navy/20 ring-4 ring-sky">
           {user.fullName[0]}
         </div>
         <div className="flex-1">

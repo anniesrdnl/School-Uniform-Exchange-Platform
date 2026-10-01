@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { errMsg } from '../api.js';
+import { Spinner } from '../components/Loader.jsx';
 
 const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'];
 
@@ -69,14 +70,14 @@ export default function Register() {
   );
 
   return (
-    <form onSubmit={submit} className="card mx-auto mt-6 max-w-md space-y-4 p-6">
+    <form onSubmit={submit} className="card mx-auto mt-6 max-w-md space-y-4 p-6 shadow-xl shadow-navy/5 md:mt-10 md:p-8">
       <div>
         <h1 className="text-xl font-bold">Create account</h1>
         <p className="text-sm text-slate-500">Join your school community.</p>
       </div>
 
       {error && (
-        <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+        <p role="alert" className="animate-fade-up rounded-lg border border-red-100 bg-red-50 p-3 text-sm text-red-700">
           {error}
         </p>
       )}
@@ -104,7 +105,7 @@ export default function Register() {
       {field('confirmPassword', 'Confirm password', 'password')}
 
       <button className="btn-primary w-full" disabled={busy}>
-        {busy ? 'Creating account…' : 'Create account'}
+        {busy ? <><Spinner /> Creating account…</> : 'Create account'}
       </button>
 
       <p className="text-center text-sm text-slate-600">

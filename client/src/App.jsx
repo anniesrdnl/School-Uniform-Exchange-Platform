@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate } from 'react-router-dom';
+import { Route, Routes, Navigate, Link, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Home from './pages/Home.jsx';
@@ -15,11 +15,14 @@ import { useAuth } from './context/AuthContext.jsx';
 
 export default function App() {
   const { user } = useAuth();
+  const location = useLocation();
 
   return (
     <>
       <Navbar />
-      <main className="mx-auto max-w-6xl px-4 pb-20 pt-6 md:pb-10">
+      <main className="mx-auto max-w-6xl px-4 pb-24 pt-6 md:pb-12">
+        {/* keyed by path so each page fades in on navigation */}
+        <div key={location.pathname} className="animate-fade-up">
         <Routes>
           <Route 
             path="/" 
@@ -37,8 +40,15 @@ export default function App() {
           <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute admin><Admin /></ProtectedRoute>} />
-          <Route path="*" element={<p className="py-20 text-center text-slate-500">Page not found.</p>} />
+          <Route path="*" element={
+            <div className="flex flex-col items-center gap-3 py-24 text-center">
+              <p className="text-7xl font-extrabold text-navy/15">404</p>
+              <p className="text-slate-500">Page not found.</p>
+              <Link to="/" className="btn-outline mt-2">Go home</Link>
+            </div>
+          } />
         </Routes>
+        </div>
       </main>
     </>
   );

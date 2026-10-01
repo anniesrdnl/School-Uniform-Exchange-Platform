@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api, { errMsg } from '../api.js';
+import { Spinner } from '../components/Loader.jsx';
 
 const CATEGORIES = ['Uniform Shirt', 'Pants / Skirt', 'PE Uniform', 'Accessories'];
 const CONDITIONS = ['New', 'Like New', 'Good', 'Fair'];
@@ -38,14 +39,14 @@ export default function Sell() {
   return (
     <form onSubmit={submit} className="card mx-auto max-w-2xl space-y-4 p-6">
       <h1 className="text-xl font-bold">Post a uniform</h1>
-      {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+      {error && <p role="alert" className="animate-fade-up rounded-lg border border-red-100 bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
       <div>
         <label className="label" htmlFor="photos">Photos (up to 5)</label>
         <input id="photos" type="file" accept="image/*" multiple onChange={pick} className="input" />
         {photos.length > 0 && (
           <div className="mt-2 flex gap-2">
-            {photos.map((f) => <img key={f.name} src={URL.createObjectURL(f)} alt="" className="h-16 w-16 rounded-lg object-cover" />)}
+            {photos.map((f) => <img key={f.name} src={URL.createObjectURL(f)} alt="" className="h-16 w-16 animate-fade-up rounded-lg object-cover shadow-sm ring-1 ring-slate-200" />)}
           </div>
         )}
       </div>
@@ -94,7 +95,7 @@ export default function Sell() {
         <textarea id="description" rows={3} className="input" placeholder="Describe the item" value={form.description} onChange={set('description')} />
       </div>
 
-      <button className="btn-primary w-full" disabled={busy}>{busy ? 'Posting…' : 'Post uniform'}</button>
+      <button className="btn-primary w-full" disabled={busy}>{busy ? <><Spinner /> Posting…</> : 'Post uniform'}</button>
     </form>
   );
 }

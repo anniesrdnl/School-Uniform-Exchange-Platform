@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api.js';
 import ListingCard from '../components/ListingCard.jsx';
+import { EmptyState, ListingGridSkeleton, Spinner } from '../components/Loader.jsx';
 
 const CATEGORIES = ['Uniform Shirt', 'Pants / Skirt', 'PE Uniform', 'Accessories'];
 const CONDITIONS = ['New', 'Like New', 'Good', 'Fair'];
@@ -45,7 +46,7 @@ export default function Browse() {
         <button onClick={() => setShowFilters(!showFilters)} className="btn-outline mb-3 w-full md:hidden">
           {showFilters ? 'Hide filters' : 'Show filters'}
         </button>
-        <div className={`card space-y-4 p-4 ${showFilters ? 'block' : 'hidden'} md:block`}>
+        <div className={`card space-y-4 p-4 md:sticky md:top-20 ${showFilters ? 'block animate-fade-up' : 'hidden'} md:block`}>
           <div>
             <label className="label" htmlFor="q">Search</label>
             <input id="q" className="input" defaultValue={params.get('q') || ''}
@@ -79,11 +80,24 @@ export default function Browse() {
       </aside>
 
       <section className="mt-4 md:mt-0">
-        <p className="mb-3 text-sm text-slate-500">{loading ? 'Loading…' : `${data.total} uniform${data.total === 1 ? '' : 's'}`}</p>
-        {!loading && data.items.length === 0 && <p className="py-12 text-center text-slate-500">No uniforms match those filters. Try clearing some.</p>}
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
-          {data.items.map((l) => <ListingCard key={l._id} listing={l} />)}
-        </div>
+        <p className="mb-3 flex items-center gap-2 text-sm text-slate-500">
+          {loading ? <><Spinner className="h-3.5 w-3.5 text-navy" /> Loading…</> : `${data.total} uniform${data.total === 1 ? '' : 's'}`}
+        </p>
+        {loading ? (
+          <ListingGridSkeleton count={8} className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4" />
+        ) : data.items.length === 0 ? (
+          <EmptyState icon={
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-4.35-4.35M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" />
+            </svg>
+          }>No uniforms match those filters. Try clearing some.</EmptyState>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
+            {data.items.map((l, i) => (
+              <div key={l._id} className="animate-fade-up" style={{ animationDelay: `${Math.min(i, 11) * 40}ms` }}><ListingCard listing={l} /></div>
+            ))}
+          </div>
+        )}
         {data.pages > 1 && (
           <div className="mt-6 flex items-center justify-center gap-3">
             <button className="btn-outline" disabled={page <= 1} onClick={() => setParam('page', page - 1)}>Previous</button>

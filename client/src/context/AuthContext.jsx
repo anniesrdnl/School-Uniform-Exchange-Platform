@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import api from '../api.js';
+import { FullScreenLoader } from '../components/Loader.jsx';
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -49,11 +50,7 @@ export function AuthProvider({ children }) {
 
   // Prevent white screen by displaying a fallback spinner/message during initial check
   if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <p className="text-slate-500 font-medium">Loading...</p>
-      </div>
-    );
+    return <FullScreenLoader />;
   }
 
   return (

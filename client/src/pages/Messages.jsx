@@ -54,7 +54,7 @@ export default function Messages() {
   const active = convos.find((c) => c._id === activeId);
 
   return (
-    <div className="card grid h-[70vh] overflow-hidden md:grid-cols-[280px_1fr]">
+    <div className="card -mx-4 grid h-[calc(100dvh-10.5rem-env(safe-area-inset-bottom))] overflow-hidden rounded-none border-x-0 sm:mx-0 sm:rounded-xl sm:border-x md:h-[70vh] md:grid-cols-[280px_1fr]">
       {/* list: hidden on phones once a chat is open */}
       <div className={`scroll-thin overflow-y-auto border-slate-200 md:border-r ${activeId ? 'hidden md:block' : ''}`}>
         <h1 className="border-b border-slate-200 p-4 font-bold">Messages</h1>
@@ -74,16 +74,16 @@ export default function Messages() {
           <p className="m-auto text-sm text-slate-500">Pick a conversation to start chatting.</p>
         ) : (
           <>
-            <div className="flex items-center gap-3 border-b border-slate-200 p-4">
-              <button className="text-sm text-navy md:hidden" onClick={() => setActiveId(null)}>Back</button>
-              <p className="font-semibold">{other(active)?.fullName}</p>
+            <div className="flex items-center gap-2 border-b border-slate-200 px-2 py-2 sm:gap-3 sm:p-4">
+              <button className="rounded-lg px-3 py-2 text-sm font-medium text-navy active:bg-sky md:hidden" onClick={() => setActiveId(null)}>← Back</button>
+              <p className="truncate font-semibold">{other(active)?.fullName}</p>
             </div>
             <div className="scroll-thin flex-1 space-y-2 overflow-y-auto bg-mist p-4">
               {messages.map((m) => {
                 const mine = m.sender === user._id;
                 return (
                   <div key={m._id} className={`flex animate-fade-up ${mine ? 'justify-end' : ''}`}>
-                    <div className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm shadow-sm ${mine ? 'rounded-br-md bg-navy text-white' : 'rounded-bl-md bg-white border border-slate-200'}`}>
+                    <div className={`max-w-[85%] break-words rounded-2xl sm:max-w-[75%] px-3 py-2 text-sm shadow-sm ${mine ? 'rounded-br-md bg-navy text-white' : 'rounded-bl-md bg-white border border-slate-200'}`}>
                       {m.image && <img src={m.image} alt="Shared" className="mb-1 max-h-48 rounded-lg" />}
                       {m.text}
                     </div>
@@ -93,13 +93,13 @@ export default function Messages() {
               <div ref={bottomRef} />
             </div>
             {error && <p role="alert" className="px-4 text-xs text-red-600">{error}</p>}
-            <form onSubmit={send} className="flex items-center gap-2 border-t border-slate-200 p-3">
-              <label className="btn-outline cursor-pointer !px-3" aria-label="Attach photo">
+            <form onSubmit={send} className="flex items-center gap-2 border-t border-slate-200 p-2 sm:p-3">
+              <label className="btn-outline shrink-0 cursor-pointer !px-3" aria-label="Attach photo">
                 Photo
                 <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files[0] && send(null, e.target.files[0])} />
               </label>
               <input className="input" placeholder="Type a message…" value={text} onChange={(e) => setText(e.target.value)} />
-              <button className="btn-primary">Send</button>
+              <button className="btn-primary shrink-0">Send</button>
             </form>
           </>
         )}

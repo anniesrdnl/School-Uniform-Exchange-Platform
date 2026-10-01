@@ -37,7 +37,7 @@ export default function Sell() {
   };
 
   return (
-    <form onSubmit={submit} className="card mx-auto max-w-2xl space-y-4 p-6">
+    <form onSubmit={submit} className="card mx-auto max-w-2xl space-y-4 p-4 sm:p-6">
       <h1 className="text-xl font-bold">Post a uniform</h1>
       {error && <p role="alert" className="animate-fade-up rounded-lg border border-red-100 bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
@@ -45,7 +45,7 @@ export default function Sell() {
         <label className="label" htmlFor="photos">Photos (up to 5)</label>
         <input id="photos" type="file" accept="image/*" multiple onChange={pick} className="input" />
         {photos.length > 0 && (
-          <div className="mt-2 flex gap-2">
+          <div className="mt-2 flex flex-wrap gap-2">
             {photos.map((f) => <img key={f.name} src={URL.createObjectURL(f)} alt="" className="h-16 w-16 animate-fade-up rounded-lg object-cover shadow-sm ring-1 ring-slate-200" />)}
           </div>
         )}

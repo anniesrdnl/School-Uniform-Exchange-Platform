@@ -29,13 +29,13 @@ export default function Home() {
   };
 
   return (
-    <div className="space-y-10">
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-navy via-navy to-navy-soft px-6 py-10 text-white shadow-xl shadow-navy/20 md:px-12 md:py-14">
+    <div className="space-y-8 sm:space-y-10">
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-navy via-navy to-navy-soft px-5 py-8 text-white sm:px-8 sm:py-10 shadow-xl shadow-navy/20 md:px-12 md:py-14">
         {/* decorative rings */}
         <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full border-[40px] border-white/5" aria-hidden="true" />
         <div className="pointer-events-none absolute -bottom-20 right-24 h-48 w-48 rounded-full bg-leaf/20 blur-3xl" aria-hidden="true" />
 
-        <h1 className="relative max-w-xl text-3xl font-extrabold leading-tight md:text-4xl">
+        <h1 className="relative max-w-xl text-2xl font-extrabold sm:text-3xl leading-tight md:text-4xl">
           Pass on the uniform you've outgrown. Find the one you need.
         </h1>
         <p className="relative mt-3 max-w-lg text-white/80">

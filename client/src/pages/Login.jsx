@@ -27,7 +27,7 @@ export default function Login() {
   };
 
   return (
-    <form onSubmit={submit} className="card mx-auto mt-6 max-w-sm space-y-4 p-6 shadow-xl shadow-navy/5 md:mt-12 md:p-8">
+    <form onSubmit={submit} className="card mx-auto mt-2 max-w-sm space-y-4 p-5 sm:mt-6 sm:p-6 shadow-xl shadow-navy/5 md:mt-12 md:p-8">
       <div className="flex flex-col items-center gap-3 text-center">
         <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-navy text-lg font-extrabold text-white shadow-lg shadow-navy/20" aria-hidden="true">S</span>
         <h1 className="text-xl font-bold">Log in</h1>

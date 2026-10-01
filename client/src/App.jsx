@@ -20,7 +20,7 @@ export default function App() {
   return (
     <>
       <Navbar />
-      <main className="mx-auto max-w-6xl px-4 pb-24 pt-6 md:pb-12">
+      <main className="mx-auto max-w-6xl px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-4 sm:pt-6 md:pb-12">
         {/* keyed by path so each page fades in on navigation */}
         <div key={location.pathname} className="animate-fade-up">
         <Routes>

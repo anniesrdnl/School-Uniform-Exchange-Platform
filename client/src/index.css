@@ -38,7 +38,7 @@
 }
 
 html { scroll-behavior: smooth; }
-body { @apply bg-mist text-ink font-sans antialiased; }
+body { @apply bg-mist text-ink font-sans antialiased; overflow-x: clip; -webkit-tap-highlight-color: transparent; }
 ::selection { @apply bg-navy text-white; }
 
 /* Soft brand glow behind every page */
@@ -55,7 +55,8 @@ body::before {
 
 .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold shadow-sm shadow-navy/20 transition duration-200 active:scale-[0.97] disabled:opacity-50 disabled:active:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy bg-navy text-white hover:bg-navy-soft hover:shadow-md hover:shadow-navy/25; }
 .btn-outline { @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition duration-200 active:scale-[0.97] disabled:opacity-50 disabled:active:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy border border-navy text-navy bg-white hover:bg-sky; }
-.input { @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm transition duration-200 placeholder:text-slate-400 hover:border-slate-400 focus:border-navy focus:outline-none focus:ring-4 focus:ring-navy/10; }
+/* text-base on phones stops iOS Safari from zooming in when an input is focused */
+.input { @apply w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-base sm:text-sm transition duration-200 placeholder:text-slate-400 hover:border-slate-400 focus:border-navy focus:outline-none focus:ring-4 focus:ring-navy/10; }
 .label { @apply mb-1 block text-sm font-medium text-slate-700; }
 .card { @apply rounded-xl bg-white border border-slate-200 shadow-sm shadow-slate-900/[0.03]; }
 

@@ -37,15 +37,15 @@ export default function Admin() {
             ))}
       </div>
 
-      <div className="flex gap-2">
+      <div className="scroll-thin -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 [&>*]:shrink-0">
         {TABS.map((t) => (
           <button key={t} onClick={() => setTab(t)} className={tab === t ? 'btn-primary' : 'btn-outline'}>{t}</button>
         ))}
       </div>
 
       {/* wide tables scroll sideways inside their own box on phones */}
-      <div className="card overflow-x-auto">
-        <table className="w-full text-left text-sm">
+      <div className="card scroll-thin overflow-x-auto">
+        <table className="w-full min-w-[560px] text-left text-sm">
           <tbody>
             {rows.length === 0 && <tr><td className="p-4 text-slate-500">Nothing to show.</td></tr>}
 
@@ -53,7 +53,7 @@ export default function Admin() {
               <tr key={u._id} className="border-b border-slate-100">
                 <td className="p-3"><b>{u.fullName}</b><br /><span className="text-xs text-slate-500">{u.studentId} · {u.email}</span></td>
                 <td className="p-3">{u.verified ? 'Verified' : 'Unverified'}{u.banned && ' · Banned'}</td>
-                <td className="space-x-2 p-3 text-right">
+                <td className="space-x-2 whitespace-nowrap p-3 text-right">
                   {u.role !== 'admin' && (<>
                     <button className="btn-outline" onClick={() => act(() => api.patch(`/admin/users/${u._id}`, { verified: !u.verified }))}>{u.verified ? 'Unverify' : 'Verify'}</button>
                     <button className="btn-outline" onClick={() => act(() => api.patch(`/admin/users/${u._id}`, { banned: !u.banned }))}>{u.banned ? 'Unban' : 'Ban'}</button>
@@ -65,7 +65,7 @@ export default function Admin() {
             {tab === 'Listings' && rows.map((l) => (
               <tr key={l._id} className="border-b border-slate-100">
                 <td className="p-3"><b>{l.title}</b><br /><span className="text-xs text-slate-500">by {l.seller?.fullName} · ₱{l.price} · {l.status}</span></td>
-                <td className="p-3 text-right"><button className="btn-outline" onClick={() => act(() => api.delete(`/admin/listings/${l._id}`))}>Remove</button></td>
+                <td className="whitespace-nowrap p-3 text-right"><button className="btn-outline" onClick={() => act(() => api.delete(`/admin/listings/${l._id}`))}>Remove</button></td>
               </tr>
             ))}
 
@@ -73,7 +73,7 @@ export default function Admin() {
               <tr key={r._id} className="border-b border-slate-100">
                 <td className="p-3"><b>{r.targetType}</b> reported by {r.reporter?.fullName}<br /><span className="text-xs text-slate-500">{r.reason}</span></td>
                 <td className="p-3">{r.status}</td>
-                <td className="space-x-2 p-3 text-right">
+                <td className="space-x-2 whitespace-nowrap p-3 text-right">
                   {r.status === 'open' && (<>
                     <button className="btn-outline" onClick={() => act(() => api.patch(`/admin/reports/${r._id}`, { status: 'resolved' }))}>Resolve</button>
                     <button className="btn-outline" onClick={() => act(() => api.patch(`/admin/reports/${r._id}`, { status: 'dismissed' }))}>Dismiss</button>

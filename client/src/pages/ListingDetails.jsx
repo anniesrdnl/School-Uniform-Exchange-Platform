@@ -64,7 +64,7 @@ export default function ListingDetails() {
   };
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="grid gap-5 md:grid-cols-2 md:gap-6">
       <div>
         <div className="aspect-square overflow-hidden rounded-xl bg-sky shadow-lg shadow-navy/10">
           {listing.images[active]
@@ -72,10 +72,10 @@ export default function ListingDetails() {
             : <div className="flex h-full items-center justify-center text-slate-400">No photo</div>}
         </div>
         {listing.images.length > 1 && (
-          <div className="mt-2 flex gap-2">
+          <div className="scroll-thin -mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:px-0">
             {listing.images.map((src, i) => (
               <button key={src} onClick={() => setActive(i)} aria-label={`Photo ${i + 1}`}
-                className={`h-16 w-16 overflow-hidden rounded-lg border-2 transition duration-200 ${i === active ? 'border-navy ring-2 ring-navy/20' : 'border-transparent opacity-70 hover:opacity-100'}`}>
+                className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition duration-200 ${i === active ? 'border-navy ring-2 ring-navy/20' : 'border-transparent opacity-70 hover:opacity-100'}`}>
                 <img src={src} alt="" className="h-full w-full object-cover" />
               </button>
             ))}
@@ -85,7 +85,7 @@ export default function ListingDetails() {
 
       <div className="space-y-4">
         <div>
-          <h1 className="text-2xl font-bold">{listing.title}</h1>
+          <h1 className="text-xl font-bold sm:text-2xl">{listing.title}</h1>
           <p className="text-2xl font-extrabold text-navy">₱{listing.price}</p>
         </div>
 

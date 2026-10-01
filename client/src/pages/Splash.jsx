@@ -7,23 +7,23 @@ const delay = (ms) => ({ animationDelay: `${ms}ms` });
 
 export default function Splash() {
   return (
-    <div className="flex flex-col gap-16 py-6">
-      <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-        <div className="space-y-6">
-          <h1 className="animate-fade-up text-4xl font-extrabold leading-tight tracking-tight text-ink md:text-5xl">
+    <div className="flex flex-col gap-12 py-2 sm:gap-16 sm:py-6">
+      <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-12">
+        <div className="space-y-5 text-center sm:space-y-6 lg:text-left">
+          <h1 className="animate-fade-up text-[2rem] font-extrabold leading-tight tracking-tight text-ink sm:text-4xl md:text-5xl">
             School Uniform <br />
             <span className="bg-gradient-to-r from-navy to-leaf bg-clip-text text-transparent">Exchange Platform System</span>
           </h1>
 
-          <p className="animate-fade-up text-xl font-bold text-navy" style={delay(160)}>
+          <p className="animate-fade-up text-lg font-bold text-navy sm:text-xl" style={delay(160)}>
             Exchange. Reuse. Support Students.
           </p>
 
-          <p className="max-w-md animate-fade-up text-base leading-relaxed text-slate-600" style={delay(240)}>
+          <p className="mx-auto max-w-md animate-fade-up text-base leading-relaxed text-slate-600 lg:mx-0" style={delay(240)}>
             A simple and sustainable way for students to buy, sell, donate, and exchange school uniforms.
           </p>
 
-          <div className="flex animate-fade-up flex-wrap gap-4 pt-2" style={delay(320)}>
+          <div className="flex animate-fade-up flex-col gap-3 pt-2 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4 lg:justify-start" style={delay(320)}>
             <Link to="/register" className="btn-primary group px-8 py-3">
               Get Started
               <span className="transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true">→</span>
@@ -39,8 +39,8 @@ export default function Splash() {
           <div className="absolute -right-6 -top-6 h-40 w-40 rounded-full bg-navy/10 blur-2xl" aria-hidden="true" />
           <div className="absolute -bottom-8 left-8 h-40 w-40 rounded-full bg-leaf/15 blur-2xl" aria-hidden="true" />
 
-          <div className="card relative flex aspect-square w-full max-w-md flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-white to-sky p-6 shadow-xl shadow-navy/10">
-            <div className="absolute left-6 top-6 z-10 flex items-center gap-2 rounded-full border border-leaf/30 bg-white/90 px-3 py-1.5 shadow-sm backdrop-blur-sm">
+          <div className="card relative flex w-full max-w-md flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-white to-sky p-4 shadow-xl shadow-navy/10 sm:aspect-square sm:p-6">
+            <div className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-full border border-leaf/30 bg-white/90 px-3 py-1.5 shadow-sm backdrop-blur-sm sm:left-6 sm:top-6">
               <svg className="h-5 w-5 text-leaf" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M4.083 9h11.834a1 1 0 011 1c0 5.523-4.254 10-9.5 10S1 15.523 1 10a1 1 0 011-1h2.083zm.167-2a5 5 0 019.5 0H4.25z" clipRule="evenodd" />
               </svg>
@@ -49,7 +49,7 @@ export default function Splash() {
               </span>
             </div>
 
-            <div className="mt-8 h-72 w-full animate-float overflow-hidden rounded-xl border border-slate-200 shadow-2xl shadow-navy/20">
+            <div className="mt-10 h-56 w-full animate-float sm:mt-8 sm:h-72 overflow-hidden rounded-xl border border-slate-200 shadow-2xl shadow-navy/20">
               <img
                 src={uniformImg}
                 alt="Stacked folded school uniforms"
@@ -60,7 +60,7 @@ export default function Splash() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 border-t border-slate-200 pt-12 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-2 border-t border-slate-200 pt-8 sm:gap-6 sm:pt-12 md:grid-cols-3">
         {[
           {
             title: 'Save Money', text: 'Affordable uniforms for every student.', color: 'bg-navy',

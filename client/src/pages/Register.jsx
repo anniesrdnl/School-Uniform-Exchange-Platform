@@ -70,7 +70,7 @@ export default function Register() {
   );
 
   return (
-    <form onSubmit={submit} className="card mx-auto mt-6 max-w-md space-y-4 p-6 shadow-xl shadow-navy/5 md:mt-10 md:p-8">
+    <form onSubmit={submit} className="card mx-auto mt-2 max-w-md space-y-4 p-5 sm:mt-6 sm:p-6 shadow-xl shadow-navy/5 md:mt-10 md:p-8">
       <div>
         <h1 className="text-xl font-bold">Create account</h1>
         <p className="text-sm text-slate-500">Join your school community.</p>

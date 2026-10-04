@@ -20,6 +20,7 @@ export default function Register() {
   });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(null); // { email, emailConfirmationRequired } after success
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
@@ -36,7 +37,7 @@ export default function Register() {
 
     try {
       // Sends registration data through your Express backend via AuthContext
-      await register({
+      const data = await register({
         fullName: form.fullName,
         studentId: form.studentId,
         email: form.email,
@@ -46,8 +47,8 @@ export default function Register() {
         confirmPassword: form.confirmPassword, // Included in payload sent to backend
       });
 
-      // Redirect to home/dashboard on success
-      navigate('/');
+      // Show the confirmation screen; the user logs in manually afterwards
+      setDone({ email: form.email, emailConfirmationRequired: data?.emailConfirmationRequired });
     } catch (err) {
       setError(errMsg ? errMsg(err) : (err.response?.data?.message || 'Failed to create account'));
     } finally {
@@ -68,6 +69,29 @@ export default function Register() {
       />
     </div>
   );
+
+  if (done) {
+    return (
+      <div className="card mx-auto mt-2 max-w-md space-y-4 p-5 text-center sm:mt-6 sm:p-6 shadow-xl shadow-navy/5 md:mt-10 md:p-8">
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-2xl text-green-700" aria-hidden="true">✓</span>
+        <h1 className="text-xl font-bold">Account created!</h1>
+        <p role="status" className="text-sm text-slate-600">
+          {done.emailConfirmationRequired ? (
+            <>We sent a verification link to <strong>{done.email}</strong>. Please confirm your email, then log in with your new account.</>
+          ) : (
+            <>Your account for <strong>{done.email}</strong> is ready. Please log in with your registered email and password.</>
+          )}
+        </p>
+        <button
+          type="button"
+          className="btn-primary w-full"
+          onClick={() => navigate('/login', { state: { email: done.email, registered: true } })}
+        >
+          Go to Log in
+        </button>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={submit} className="card mx-auto mt-2 max-w-md space-y-4 p-5 sm:mt-6 sm:p-6 shadow-xl shadow-navy/5 md:mt-10 md:p-8">

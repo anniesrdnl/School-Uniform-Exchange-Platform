@@ -1,20 +1,24 @@
 import { Router } from 'express';
-import User from '../models/User.js';
-import Listing from '../models/Listing.js';
-import Request from '../models/Request.js';
-import Report from '../models/Report.js';
+import { supabase } from '../supabaseServer.js';
+import { check, toClient } from '../config/db.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 
 const router = Router();
 router.use(protect, adminOnly);
 
+const countWhere = async (table, column, value) => {
+  const { count, error } = await supabase.from(table).select('id', { count: 'exact', head: true }).eq(column, value);
+  if (error) throw error;
+  return count;
+};
+
 router.get('/stats', async (_req, res, next) => {
   try {
     const [totalUsers, activeListings, completedExchanges, openReports] = await Promise.all([
-      User.countDocuments({ role: 'student' }),
-      Listing.countDocuments({ status: 'available' }),
-      Request.countDocuments({ status: 'completed' }),
-      Report.countDocuments({ status: 'open' }),
+      countWhere('profiles', 'role', 'student'),
+      countWhere('listings', 'status', 'available'),
+      countWhere('requests', 'status', 'completed'),
+      countWhere('reports', 'status', 'open'),
     ]);
     res.json({ totalUsers, activeListings, completedExchanges, openReports });
   } catch (err) {
@@ -24,8 +28,9 @@ router.get('/stats', async (_req, res, next) => {
 
 router.get('/users', async (req, res, next) => {
   try {
-    const filter = req.query.verified ? { verified: req.query.verified === 'true' } : {};
-    res.json(await User.find(filter).sort({ createdAt: -1 }).limit(200));
+    let query = supabase.from('profiles').select('*');
+    if (req.query.verified) query = query.eq('verified', req.query.verified === 'true');
+    res.json(toClient(check(await query.order('created_at', { ascending: false }).limit(200))));
   } catch (err) {
     next(err);
   }
@@ -37,9 +42,9 @@ router.patch('/users/:id', async (req, res, next) => {
     const update = {};
     if (typeof req.body.verified === 'boolean') update.verified = req.body.verified;
     if (typeof req.body.banned === 'boolean') update.banned = req.body.banned;
-    const user = await User.findByIdAndUpdate(req.params.id, update, { new: true });
+    const user = check(await supabase.from('profiles').update(update).eq('id', req.params.id).select().maybeSingle());
     if (!user) return res.status(404).json({ message: 'User not found.' });
-    res.json(user);
+    res.json(toClient(user));
   } catch (err) {
     next(err);
   }
@@ -47,7 +52,10 @@ router.patch('/users/:id', async (req, res, next) => {
 
 router.get('/listings', async (_req, res, next) => {
   try {
-    res.json(await Listing.find().populate('seller', 'fullName').sort({ createdAt: -1 }).limit(200));
+    const rows = check(await supabase.from('listings')
+      .select('id, title, description, category, size, condition, price, exchange_option, quantity, images, status, created_at, updated_at, seller:profiles!listings_seller_fkey(id, full_name)')
+      .order('created_at', { ascending: false }).limit(200));
+    res.json(toClient(rows));
   } catch (err) {
     next(err);
   }
@@ -55,7 +63,7 @@ router.get('/listings', async (_req, res, next) => {
 
 router.delete('/listings/:id', async (req, res, next) => {
   try {
-    await Listing.findByIdAndDelete(req.params.id);
+    check(await supabase.from('listings').delete().eq('id', req.params.id));
     res.json({ message: 'Listing removed.' });
   } catch (err) {
     next(err);
@@ -64,7 +72,10 @@ router.delete('/listings/:id', async (req, res, next) => {
 
 router.get('/reports', async (_req, res, next) => {
   try {
-    res.json(await Report.find().populate('reporter', 'fullName').sort({ createdAt: -1 }).limit(200));
+    const rows = check(await supabase.from('reports')
+      .select('id, target_type, target_id, reason, status, created_at, updated_at, reporter:profiles!reports_reporter_fkey(id, full_name)')
+      .order('created_at', { ascending: false }).limit(200));
+    res.json(toClient(rows));
   } catch (err) {
     next(err);
   }
@@ -72,7 +83,9 @@ router.get('/reports', async (_req, res, next) => {
 
 router.patch('/reports/:id', async (req, res, next) => {
   try {
-    res.json(await Report.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true }));
+    const report = check(await supabase.from('reports').update({ status: req.body.status }).eq('id', req.params.id).select().maybeSingle());
+    if (!report) return res.status(404).json({ message: 'Report not found.' });
+    res.json(toClient(report));
   } catch (err) {
     next(err);
   }

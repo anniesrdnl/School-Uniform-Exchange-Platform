@@ -38,8 +38,8 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (form) => {
+    // Registration does not log the user in; they sign in afterwards
     const res = await api.post('/auth/register', form);
-    saveSession(res.data);
     return res.data;
   };
 

@@ -8,7 +8,8 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ email: location.state?.email || '', password: '' });
+  const justRegistered = location.state?.registered;
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -32,6 +33,7 @@ export default function Login() {
         <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-navy text-lg font-extrabold text-white shadow-lg shadow-navy/20" aria-hidden="true">S</span>
         <h1 className="text-xl font-bold">Log in</h1>
       </div>
+      {justRegistered && !error && <p role="status" className="animate-fade-up rounded-lg border border-green-100 bg-green-50 p-3 text-sm text-green-700">Registration successful. Log in with your new account.</p>}
       {error && <p role="alert" className="animate-fade-up rounded-lg border border-red-100 bg-red-50 p-3 text-sm text-red-700">{error}</p>}
       <div>
         <label className="label" htmlFor="email">Email address</label>

@@ -7,17 +7,15 @@ import morgan from 'morgan';
 import jwt from 'jsonwebtoken';
 import { Server } from 'socket.io';
 
-import connectDB from './config/db.js';
+import { UPLOAD_DIR } from './config/cloudinary.js';
 import { notFound, errorHandler } from './middleware/error.js';
-import Conversation from './models/Conversation.js';
+import { supabase } from './supabaseServer.js';
 import authRoutes from './routes/auth.js';
 import listingRoutes from './routes/listings.js';
 import requestRoutes from './routes/requests.js';
 import messageRoutes from './routes/messages.js';
 import userRoutes from './routes/users.js';
 import adminRoutes from './routes/admin.js';
-
-await connectDB();
 
 const app = express();
 const server = http.createServer(app);
@@ -40,8 +38,9 @@ io.use((socket, next) => {
 io.on('connection', (socket) => {
   // client asks to join a conversation room; we check they belong to it
   socket.on('conversation:join', async (conversationId) => {
-    const ok = await Conversation.exists({ _id: conversationId, participants: socket.userId });
-    if (ok) socket.join(`conv:${conversationId}`);
+    const { data } = await supabase.from('conversations').select('id')
+      .eq('id', conversationId).contains('participants', [socket.userId]).maybeSingle();
+    if (data) socket.join(`conv:${conversationId}`);
   });
 });
 
@@ -50,6 +49,12 @@ app.use(helmet());
 app.use(cors({ origin }));
 app.use(express.json());
 app.use(morgan('dev'));
+
+// Locally stored images (used when Cloudinary is not configured); allow the client origin to load them
+app.use('/uploads', (_req, res, next) => {
+  res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(UPLOAD_DIR));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 app.use('/api/auth', authRoutes);

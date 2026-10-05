@@ -1,6 +1,7 @@
 import { Route, Routes, Navigate, Link, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import HelpChat, { showsHelpChat } from './components/HelpChat.jsx';
 import Icon from './components/Icon.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
@@ -21,7 +22,10 @@ export default function App() {
   return (
     <>
       <Navbar />
-      <main className="mx-auto max-w-6xl px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-4 sm:pt-6 md:pb-12">
+      {/* extra bottom room where the floating help button sits, so it never covers the end of a page */}
+      <main className={`mx-auto max-w-6xl px-4 pt-4 sm:pt-6 ${showsHelpChat(location.pathname)
+        ? 'pb-[calc(8.5rem+env(safe-area-inset-bottom))] md:pb-28'
+        : 'pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-12'}`}>
         {/* keyed by path so each page fades in on navigation */}
         <div key={location.pathname} className="animate-fade-up">
           <Routes>
@@ -48,6 +52,7 @@ export default function App() {
           </Routes>
         </div>
       </main>
+      <HelpChat />
     </>
   );
 }

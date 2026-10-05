@@ -150,21 +150,23 @@ export default function Splash() {
           <p className="mx-auto mt-5 max-w-md animate-fade-up text-base leading-relaxed text-slate-600 sm:text-lg lg:mx-0" style={delay(360)}>
             A simple, sustainable way to buy, sell, and swap school uniforms with other students on your campus.
           </p>
-          <div className="mt-8 flex animate-fade-up flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start" style={delay(440)}>
-            <Link to="/register" className="btn-primary btn-shine group px-6 py-3 hover:-translate-y-0.5">
+          {/* side by side and compact on phones (wraps only on the narrowest screens), roomier from sm up */}
+          <div className="mt-7 flex animate-fade-up flex-wrap justify-center gap-2.5 sm:mt-8 sm:gap-3 lg:justify-start" style={delay(440)}>
+            <Link to="/register" className="btn-primary btn-shine group px-4 py-2.5 hover:-translate-y-0.5 sm:px-6 sm:py-3">
               Get started
               <Icon name="arrow-right" className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2} />
             </Link>
-            <Link to="/browse" className="btn-outline group px-6 py-3 hover:-translate-y-0.5 hover:shadow-md hover:shadow-navy/10">
+            <Link to="/browse" className="btn-outline group px-4 py-2.5 hover:-translate-y-0.5 hover:shadow-md hover:shadow-navy/10 sm:px-6 sm:py-3">
               <Icon name="search" className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" strokeWidth={2} />
               Browse uniforms
             </Link>
           </div>
-          <ul className="mt-8 flex animate-fade-up flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-medium text-slate-600 lg:justify-start" style={delay(520)}>
+          {/* one centred line on phones: smaller text and ticks so all three fit */}
+          <ul className="mt-6 flex animate-fade-up flex-wrap justify-center gap-x-4 gap-y-2 text-xs font-medium text-slate-600 sm:mt-8 sm:gap-x-6 sm:text-sm lg:justify-start" style={delay(520)}>
             {HIGHLIGHTS.map((h) => (
-              <li key={h} className="flex items-center gap-2">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-navy text-mist">
-                  <Icon name="check" className="h-3 w-3" strokeWidth={3} />
+              <li key={h} className="flex items-center gap-1.5 whitespace-nowrap sm:gap-2">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-navy text-mist sm:h-5 sm:w-5">
+                  <Icon name="check" className="h-2.5 w-2.5 sm:h-3 sm:w-3" strokeWidth={3} />
                 </span>
                 {h}
               </li>

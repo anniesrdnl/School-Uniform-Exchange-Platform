@@ -42,7 +42,13 @@ async function saveLocally(buffer, folder) {
 
 // Uploads an in-memory buffer (from multer) and resolves to the image URL.
 export function uploadBuffer(buffer, folder = 'uniform-exchange') {
-  if (!useCloudinary) return saveLocally(buffer, folder);
+  if (!useCloudinary) {
+    // Hosted servers have ephemeral disks: locally saved photos would vanish on the next restart
+    if (process.env.NODE_ENV === 'production') {
+      return Promise.reject(Object.assign(new Error('Photo uploads are not configured on the server.'), { status: 503 }));
+    }
+    return saveLocally(buffer, folder);
+  }
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       { folder, resource_type: 'image' },

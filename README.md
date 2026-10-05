@@ -1,10 +1,10 @@
-# School Uniform Exchange Platform (MERN)
+# School Uniform Exchange Platform (SUEPS)
 
 A responsive web app where students buy, sell, and swap school uniforms.
 Works on desktop and phones from one codebase.
 
 ## Stack
-MongoDB · Express · React (Vite) · Node.js · Tailwind CSS · Socket.io · JWT · Cloudinary
+Supabase (Postgres + Auth) · Express · React (Vite) · Node.js · Tailwind CSS · Socket.io · JWT · Cloudinary
 
 ## Folder structure
 ```
@@ -14,7 +14,7 @@ uniform-exchange/
 │   ├── seed.js              sample data
 │   ├── config/              db.js, cloudinary.js
 │   ├── middleware/          auth.js (JWT + admin), upload.js (multer), error.js
-│   ├── models/              User, Listing, Request, Conversation, Message, Review, Report
+│   ├── supabase/schema.sql  database tables, triggers, RLS
 │   └── routes/              auth, listings, requests, messages, users, admin
 └── client/
     └── src/
@@ -27,13 +27,13 @@ uniform-exchange/
 
 ## Setup
 
-**Requirements:** Node 18+, and MongoDB (local install or a free MongoDB Atlas cluster).
+**Requirements:** Node 22+, and the Supabase project. Run `server/supabase/schema.sql` once in the Supabase SQL Editor.
 
 ```bash
 # 1. Backend
 cd server
 npm install
-cp .env.example .env        # then edit MONGO_URI, JWT_SECRET, Cloudinary keys
+cp .env.example .env        # then add the Supabase keys, JWT_SECRET, Cloudinary keys
 npm run seed                # optional: sample users + listings
 npm run dev                 # http://localhost:5000
 
@@ -74,6 +74,12 @@ Change the seed passwords before deploying anywhere public.
 
 Socket.io events: client emits `conversation:join`; server emits `message:new`.
 
+## Deployment
+- **Server → Render** via `render.yaml` (New → Blueprint). Set `CLIENT_URL` to the Vercel URL, plus the Supabase and Cloudinary keys.
+  Cloudinary is required in production; the free plan sleeps when idle, so the first request can take ~30 s.
+- **Client → Vercel** via `vercel.json`. Set `VITE_API_URL` to the Render URL (no trailing slash), then redeploy.
+- **Supabase → Authentication → URL Configuration:** set Site URL to the Vercel URL so confirmation emails link there.
+
 ## Exchange flow
 `pending` → seller **accepts** (listing becomes `reserved`) → they meet up → seller marks **completed**
 (listing becomes `sold`) → both sides can leave a review. A seller can decline, a buyer can cancel.
@@ -84,10 +90,8 @@ Socket.io events: client emits `conversation:join`; server emits `message:new`.
 3. Add a "school" field so different schools' uniforms don't mix.
 4. Show request status inside the chat and add unread-message badges.
 5. Edit-listing page, report button on listings, and password reset.
-6. Deploy: client on Vercel/Netlify, server on Render/Railway, database on MongoDB Atlas
-   (set `CLIENT_URL` on the server and point the client's API base URL to the deployed server).
+6. Automated tests.
 
 ## Known limits of this starter
 - Reviews and ratings use a simple `prompt()` for now; replace with a proper form.
-- Deployed setup needs an API base URL change in `client/src/api.js` (and the socket URL), since the dev proxy only exists locally.
 - No automated tests yet.

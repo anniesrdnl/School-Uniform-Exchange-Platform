@@ -19,7 +19,9 @@ import adminRoutes from './routes/admin.js';
 
 const app = express();
 const server = http.createServer(app);
-const origin = process.env.CLIENT_URL || 'http://localhost:5173';
+// CLIENT_URL may list several origins, comma-separated (e.g. the Vercel domain and localhost)
+const origin = (process.env.CLIENT_URL || 'http://localhost:5173')
+  .split(',').map((o) => o.trim().replace(/\/+$/, '')).filter(Boolean);
 
 // ---- Socket.io: real-time chat
 const io = new Server(server, { cors: { origin } });
@@ -45,6 +47,7 @@ io.on('connection', (socket) => {
 });
 
 // ---- Express
+app.set('trust proxy', 1); // hosts like Render terminate HTTPS at a proxy in front of the app
 app.use(helmet());
 app.use(cors({ origin }));
 app.use(express.json());

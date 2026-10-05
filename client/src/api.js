@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: '/api' });
+// Origin of the Express server. Empty locally (Vite proxies /api and /socket.io);
+// set VITE_API_URL to the deployed server's URL in production.
+export const API_URL = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+
+const api = axios.create({ baseURL: `${API_URL}/api` });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');

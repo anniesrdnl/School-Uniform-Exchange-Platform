@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
-import api, { errMsg } from '../api.js';
+import api, { API_URL, errMsg } from '../api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Messages() {
@@ -15,7 +15,7 @@ export default function Messages() {
 
   // one socket connection for the whole page
   useEffect(() => {
-    const socket = io({ auth: { token: localStorage.getItem('token') } });
+    const socket = io(API_URL || undefined, { auth: { token: localStorage.getItem('token') } });
     socketRef.current = socket;
     socket.on('message:new', (msg) => {
       setMessages((prev) => (prev.some((m) => m._id === msg._id) ? prev : [...prev, msg]));

@@ -2,6 +2,9 @@
   "name": "uniform-exchange-server",
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "node --watch server.js",
     "start": "node server.js",

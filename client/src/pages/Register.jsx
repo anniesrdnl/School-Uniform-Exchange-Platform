@@ -4,8 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { errMsg } from '../api.js';
 import { Spinner } from '../components/Loader.jsx';
 import Icon from '../components/Icon.jsx';
-import { LogoMark } from '../components/Logo.jsx';
-import AuthLayout, { AuthHeading } from '../components/AuthLayout.jsx';
+import AuthLayout, { AuthFooter, AuthHeading } from '../components/AuthLayout.jsx';
 import PasswordInput from '../components/PasswordInput.jsx';
 
 const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'];
@@ -63,13 +62,13 @@ export default function Register() {
     </div>
   );
 
-  const layout = { headline: 'Pass it on. Save on the next one.', text: 'Join students who buy, sell, and swap school uniforms on campus.' };
+  const layout = { tag: 'New member', headline: 'Pass it on. Save on the next one.', text: 'Join students who buy, sell, and swap school uniforms on campus.' };
 
   if (done) {
     return (
       <AuthLayout {...layout}>
-        <div className="space-y-4 text-center lg:text-left">
-          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green-50 text-green-700 ring-1 ring-inset ring-green-200 lg:mx-0">
+        <div className="space-y-4">
+          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-green-50 text-green-700 ring-1 ring-inset ring-green-200">
             <Icon name="check" className="h-7 w-7" strokeWidth={2.5} />
           </span>
           <h1 className="page-title">Account created!</h1>
@@ -92,8 +91,7 @@ export default function Register() {
   return (
     <AuthLayout {...layout}>
       <form onSubmit={submit} className="space-y-5">
-        <AuthHeading logo={<LogoMark className="h-14 w-14" />}
-          title="Create your account" subtitle="Free to join. It takes about a minute." />
+        <AuthHeading title="Create your account" subtitle="Free to join. It takes about a minute." />
 
         {error && <p role="alert" className="alert-error animate-fade-up">{error}</p>}
 
@@ -123,9 +121,9 @@ export default function Register() {
           {busy ? <><Spinner /> Creating account…</> : 'Create account'}
         </button>
 
-        <p className="text-center text-sm text-slate-600 lg:text-left">
+        <AuthFooter>
           Already have an account? <Link to="/login" className="font-semibold text-navy hover:underline">Log in</Link>
-        </p>
+        </AuthFooter>
       </form>
     </AuthLayout>
   );

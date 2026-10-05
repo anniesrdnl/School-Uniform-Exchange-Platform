@@ -3,9 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { errMsg } from '../api.js';
 import { Spinner } from '../components/Loader.jsx';
-import { LogoMark } from '../components/Logo.jsx';
 import PasswordInput from '../components/PasswordInput.jsx';
-import AuthLayout, { AuthHeading } from '../components/AuthLayout.jsx';
+import AuthLayout, { AuthFooter, AuthHeading } from '../components/AuthLayout.jsx';
 
 export default function Login() {
   const { login } = useAuth();
@@ -31,11 +30,10 @@ export default function Login() {
   };
 
   return (
-    <AuthLayout headline="Your next uniform might already be on campus."
+    <AuthLayout tag="Member login" headline="Your next uniform might already be on campus."
       text="Pick up where you left off: check your requests, reply to buyers, and find your next uniform.">
       <form onSubmit={submit} className="space-y-5">
-        <AuthHeading logo={<LogoMark className="h-14 w-14" />}
-          title="Welcome back" subtitle="Log in to your account to continue." />
+        <AuthHeading title="Welcome back" subtitle="Log in to your account to continue." />
         {justRegistered && !error && (
           <p role="status" className="alert-success animate-fade-up">
             Registration successful. Log in with your new account.
@@ -53,9 +51,9 @@ export default function Login() {
             onChange={(e) => setForm({ ...form, password: e.target.value })} />
         </div>
         <button className="btn-primary w-full py-3" disabled={busy}>{busy ? <><Spinner /> Logging in…</> : 'Log in'}</button>
-        <p className="text-center text-sm text-slate-600 lg:text-left">
+        <AuthFooter>
           New here? <Link to="/register" className="font-semibold text-navy hover:underline">Create an account</Link>
-        </p>
+        </AuthFooter>
       </form>
     </AuthLayout>
   );

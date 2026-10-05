@@ -90,7 +90,7 @@ export default function Register() {
 
   return (
     <AuthLayout {...layout}>
-      <form onSubmit={submit} className="space-y-5">
+      <form onSubmit={submit} className="space-y-4 sm:space-y-5">
         <AuthHeading title="Create your account" subtitle="Free to join. It takes about a minute." />
 
         {error && <p role="alert" className="alert-error animate-fade-up">{error}</p>}

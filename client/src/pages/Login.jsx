@@ -32,7 +32,7 @@ export default function Login() {
   return (
     <AuthLayout tag="Member login" headline="Your next uniform might already be on campus."
       text="Pick up where you left off: check your requests, reply to buyers, and find your next uniform.">
-      <form onSubmit={submit} className="space-y-5">
+      <form onSubmit={submit} className="space-y-4 sm:space-y-5">
         <AuthHeading title="Welcome back" subtitle="Log in to your account to continue." />
         {justRegistered && !error && (
           <p role="status" className="alert-success animate-fade-up">

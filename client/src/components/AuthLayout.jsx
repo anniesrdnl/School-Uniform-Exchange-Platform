@@ -69,29 +69,30 @@ export default function AuthLayout({ headline, text, tag = 'Members', children }
           </div>
         </aside>
 
-        <div className="relative mx-auto w-full max-w-md animate-fade-up pt-14 [animation-delay:120ms]">
+        {/* Tag geometry: --cut (clipped corners), --hole-y / --hole-r (punched hole). Smaller on phones. */}
+        <div className="relative mx-auto w-full max-w-md animate-fade-up pt-9 [--cut:1.5rem] [--hole-r:0.55rem] [--hole-y:1.4rem] [animation-delay:120ms] sm:pt-14 sm:[--cut:2.25rem] sm:[--hole-r:0.7rem] sm:[--hole-y:1.75rem]">
           {/* the string: a loop coming down from above and threading through the eyelet */}
-          <svg viewBox="0 0 120 84" className="absolute left-1/2 top-0 z-10 h-[5.25rem] w-[7.5rem] -translate-x-1/2 origin-bottom animate-swing text-denim [animation-duration:5s]"
+          <svg viewBox="0 0 120 84" className="absolute left-1/2 top-0 z-10 h-[3.65rem] w-[5.2rem] -translate-x-1/2 sm:h-[5.25rem] sm:w-[7.5rem] origin-bottom animate-swing text-denim [animation-duration:5s]"
             fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
             <path d="M60 82C59 62 42 52 50 32S82 10 92 0" />
             <path d="M60 82C63 60 80 50 71 30S36 9 26 0" opacity="0.7" />
           </svg>
 
           <div className="drop-shadow-[0_24px_40px_rgb(24_38_58/0.14)]">
-            <div className="relative bg-white px-6 pb-7 pt-14 sm:px-10 sm:pb-9"
+            <div className="relative bg-white px-5 pb-5 pt-11 sm:px-10 sm:pb-9 sm:pt-14"
               style={{
-                ...tagShape('2.25rem'),
+                ...tagShape('var(--cut)'),
                 // a real punched hole near the top centre
-                WebkitMaskImage: 'radial-gradient(circle at 50% 1.75rem, transparent 0.7rem, #000 calc(0.7rem + 0.5px))',
-                maskImage: 'radial-gradient(circle at 50% 1.75rem, transparent 0.7rem, #000 calc(0.7rem + 0.5px))',
+                WebkitMaskImage: 'radial-gradient(circle at 50% var(--hole-y), transparent var(--hole-r), #000 calc(var(--hole-r) + 0.5px))',
+                maskImage: 'radial-gradient(circle at 50% var(--hole-y), transparent var(--hole-r), #000 calc(var(--hole-r) + 0.5px))',
               }}>
               {/* metal eyelet around the hole */}
-              <span className="absolute left-1/2 top-7 h-[1.9rem] w-[1.9rem] -translate-x-1/2 -translate-y-1/2 rounded-full border-[4px] border-[#cbcfd4] shadow-[inset_0_1px_2px_rgb(24_38_58/0.25),0_1px_0_rgb(255_255_255/0.8)]" aria-hidden="true" />
+              <span className="absolute left-1/2 top-[var(--hole-y)] h-[calc(var(--hole-r)*2+0.5rem)] w-[calc(var(--hole-r)*2+0.5rem)] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] sm:border-[4px] border-[#cbcfd4] shadow-[inset_0_1px_2px_rgb(24_38_58/0.25),0_1px_0_rgb(255_255_255/0.8)]" aria-hidden="true" />
 
-              <div className="mb-7 flex items-center justify-between gap-3 border-b-2 border-dashed border-aqua pb-4">
+              <div className="mb-5 flex items-center justify-between gap-3 border-b-2 border-dashed border-aqua pb-3 sm:mb-7 sm:pb-4">
                 <span className="flex items-center gap-2">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-[#2e3b4d] to-navy-deep">
-                    <LogoMark className="h-5 w-5 brightness-0 invert" />
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-linear-to-br sm:h-8 sm:w-8 from-[#2e3b4d] to-navy-deep">
+                    <LogoMark className="h-4 w-4 brightness-0 invert sm:h-5 sm:w-5" />
                   </span>
                   <span className="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.1em] text-navy sm:tracking-[0.16em]">Uniform Exchange</span>
                 </span>
@@ -119,5 +120,5 @@ export function AuthHeading({ title, subtitle }) {
 
 // Tag stub at the bottom of the form: a dashed tear line above the switch-account link
 export function AuthFooter({ children }) {
-  return <p className="border-t-2 border-dashed border-aqua pt-5 text-center text-sm text-slate-600">{children}</p>;
+  return <p className="border-t-2 border-dashed border-aqua pt-4 text-center text-sm text-slate-600 sm:pt-5">{children}</p>;
 }

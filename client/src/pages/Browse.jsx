@@ -5,12 +5,33 @@ import ListingCard from '../components/ListingCard.jsx';
 import SearchBar from '../components/SearchBar.jsx';
 import Icon from '../components/Icon.jsx';
 import { EmptyState, ListingGridSkeleton } from '../components/Loader.jsx';
-import { CATEGORIES, CATEGORY_STYLES, CONDITIONS, SIZES, formatPrice } from '../constants.js';
+import { CATEGORIES, CATEGORY_STYLES, CONDITIONS, CONDITION_HINTS, SIZES, formatPrice } from '../constants.js';
 
 // Everything lives in the URL (?q=&category=&size=&condition=&minPrice=&maxPrice=&sort=&page=) so results can be shared
 const FILTER_KEYS = ['category', 'size', 'condition', 'minPrice', 'maxPrice'];
 const SORTS = [['newest', 'Newest'], ['price-asc', 'Price: low to high'], ['price-desc', 'Price: high to low']];
 const GRID = 'grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4';
+
+// One-tap price ranges; a custom min/max form sits under them
+const PRICE_RANGES = [
+  { min: '', max: '200', label: 'Under ₱200' },
+  { min: '200', max: '500', label: '₱200–₱500' },
+  { min: '500', max: '1000', label: '₱500–₱1,000' },
+  { min: '1000', max: '', label: 'Over ₱1,000' },
+];
+
+// A filter group: title on the left, the current choice on the right
+function FilterSection({ id, title, value, children }) {
+  return (
+    <section aria-labelledby={id} className="py-5 first:pt-0 last:pb-0">
+      <div className="mb-3 flex items-baseline justify-between gap-2">
+        <h3 id={id} className="text-sm font-bold text-ink">{title}</h3>
+        <span className="truncate text-xs font-medium text-slate-500">{value}</span>
+      </div>
+      {children}
+    </section>
+  );
+}
 
 // Pill toggle for categories, sizes and conditions (.choice in index.css); aria-pressed tells screen readers which is on
 function Toggle({ active, onClick, children, className = '' }) {
@@ -69,20 +90,13 @@ export default function Browse() {
     (minPrice || maxPrice) && { label: priceLabel, clear: { minPrice: '', maxPrice: '' } },
   ].filter(Boolean);
 
-  // Uncontrolled inputs are keyed by their URL value so removing the filter chip resets them too
-  const priceInput = (key, label) => (
-    <div>
-      <label className="mb-1 block text-xs font-semibold text-slate-600" htmlFor={key}>{label}</label>
-      <div className="relative">
-        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500" aria-hidden="true">₱</span>
-        <input id={key} key={get(key)} type="number" min="0" inputMode="numeric" className="input pl-7" placeholder="0"
-          defaultValue={get(key)} onBlur={(e) => setParam(key, e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && setParam(key, e.target.value)} />
-      </div>
-    </div>
-  );
-
-  const legend = 'mb-2.5 text-sm font-bold text-ink';
+  const activeRange = PRICE_RANGES.find((r) => r.min === minPrice && r.max === maxPrice);
+  const resetPanel = () => update({ size: '', condition: '', minPrice: '', maxPrice: '' });
+  const applyCustomPrice = (e) => {
+    e.preventDefault();
+    const f = new FormData(e.currentTarget);
+    update({ minPrice: f.get('minPrice').trim(), maxPrice: f.get('maxPrice').trim() });
+  };
 
   return (
     <div className="space-y-6">
@@ -105,41 +119,75 @@ export default function Browse() {
         </div>
       </header>
 
-      <div className="lg:grid lg:grid-cols-[15.5rem_1fr] lg:items-start lg:gap-8">
+      <div className="lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
         {/* Filters: sticky sidebar on laptops and up, opened with the Filters button on smaller screens */}
         <aside id="filters" aria-label="Filters"
           className={`card mb-5 p-5 lg:sticky lg:top-24 lg:mb-0 lg:block ${showFilters ? 'block animate-fade-up' : 'hidden'}`}>
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="font-bold text-ink">Filters</h2>
-            {chips.length > 0 && (
-              <button type="button" onClick={clearAll} className="rounded text-sm font-semibold text-navy hover:underline">Clear all</button>
+          <div className="mb-5 flex items-center justify-between border-b border-aqua/70 pb-4">
+            <h2 className="flex items-center gap-2 font-bold text-ink">
+              <Icon name="filter" className="h-4 w-4 text-navy" /> Filters
+              {panelFilters > 0 && <span className="chip bg-navy px-2 text-mist">{panelFilters}</span>}
+            </h2>
+            {panelFilters > 0 && (
+              <button type="button" onClick={resetPanel} className="rounded text-sm font-semibold text-navy hover:underline">Reset</button>
             )}
           </div>
-          <div className="space-y-6">
-            <fieldset>
-              <legend className={legend}>Size</legend>
-              <div className="grid grid-cols-3 gap-2">
+
+          <div className="divide-y divide-aqua/70">
+            <FilterSection id="f-size" title="Size" value={size || 'Any'}>
+              {/* same segmented style as the site's other switches; tapping the selected size clears it */}
+              <div className="grid grid-cols-6 gap-1 rounded-xl bg-frost p-1">
                 {SIZES.map((s) => (
-                  <Toggle key={s} active={size === s} onClick={() => toggle('size', s)} className="px-0">{s}</Toggle>
+                  <button key={s} type="button" onClick={() => toggle('size', s)} aria-pressed={size === s} aria-label={`Size ${s}`}
+                    className={`rounded-lg py-2 text-xs font-semibold transition duration-200 active:scale-95 ${size === s ? 'bg-white text-navy shadow-sm shadow-navy/10' : 'text-slate-600 hover:bg-white/60 hover:text-navy'}`}>
+                    {s}
+                  </button>
                 ))}
               </div>
-            </fieldset>
-            <fieldset>
-              <legend className={legend}>Condition</legend>
-              <div className="flex flex-wrap gap-2">
-                {CONDITIONS.map((c) => (
-                  <Toggle key={c} active={condition === c} onClick={() => toggle('condition', c)}>{c}</Toggle>
+            </FilterSection>
+
+            <FilterSection id="f-condition" title="Condition" value={condition || 'Any'}>
+              <div role="radiogroup" aria-labelledby="f-condition" className="-mx-2 space-y-0.5">
+                {['', ...CONDITIONS].map((c) => (
+                  <label key={c || 'any'} className="relative flex cursor-pointer items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-frost has-[:checked]:bg-frost">
+                    <input type="radio" name="condition" value={c} checked={condition === c} onChange={() => setParam('condition', c)} className="peer sr-only" />
+                    <span aria-hidden="true"
+                      className="h-[18px] w-[18px] shrink-0 rounded-full border-2 border-slate-300 bg-white transition-all peer-checked:border-[5px] peer-checked:border-navy peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-navy" />
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold text-ink">{c || 'Any condition'}</span>
+                      {c && <span className="block text-xs text-slate-500">{CONDITION_HINTS[c]}</span>}
+                    </span>
+                  </label>
                 ))}
               </div>
-            </fieldset>
-            <fieldset>
-              <legend className={legend}>Price</legend>
-              <div className="grid grid-cols-2 gap-2">
-                {priceInput('minPrice', 'Min')}
-                {priceInput('maxPrice', 'Max')}
+            </FilterSection>
+
+            <FilterSection id="f-price" title="Price" value={minPrice || maxPrice ? priceLabel : 'Any'}>
+              <div className="grid grid-cols-2 gap-1.5">
+                {PRICE_RANGES.map((r) => {
+                  const on = activeRange === r;
+                  return (
+                    <button key={r.label} type="button" aria-pressed={on} onClick={() => update(on ? { minPrice: '', maxPrice: '' } : { minPrice: r.min, maxPrice: r.max })}
+                      className={`rounded-lg px-2 py-2 text-xs font-semibold ring-1 ring-inset transition duration-200 active:scale-95 ${on ? 'bg-navy text-mist ring-navy' : 'bg-white text-slate-700 ring-aqua hover:bg-frost hover:text-navy'}`}>
+                      {r.label}
+                    </button>
+                  );
+                })}
               </div>
-              <p className="mt-2 text-xs text-slate-500">Press Enter or tap outside the box to apply.</p>
-            </fieldset>
+              {/* custom range: keyed by the URL values so presets and removed chips refresh the boxes */}
+              <form onSubmit={applyCustomPrice} aria-label="Custom price range" className="mt-3 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+                {[['minPrice', 'Min', 'Minimum price'], ['maxPrice', 'Max', 'Maximum price']].map(([key, placeholder, label], i) => (
+                  <div key={key} className={`relative min-w-0 ${i ? 'col-start-3' : ''}`}>
+                    <label htmlFor={key} className="sr-only">{label}</label>
+                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500" aria-hidden="true">₱</span>
+                    <input id={key} name={key} key={get(key)} defaultValue={get(key)} type="number" min="0" inputMode="numeric"
+                      placeholder={placeholder} className="input no-spin py-2 pl-7" />
+                  </div>
+                ))}
+                <span className="col-start-2 row-start-1 text-slate-400" aria-hidden="true">–</span>
+                <button className="btn-outline col-span-3 py-2">Apply price</button>
+              </form>
+            </FilterSection>
           </div>
         </aside>
 

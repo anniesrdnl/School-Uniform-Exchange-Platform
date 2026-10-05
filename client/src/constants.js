@@ -2,6 +2,7 @@
 // Keep in sync with the check constraints in server/supabase/schema.sql.
 export const CATEGORIES = ['Uniform Shirt', 'Pants / Skirt', 'PE Uniform', 'Accessories'];
 export const CONDITIONS = ['New', 'Like New', 'Good', 'Fair'];
+export const CONDITION_HINTS = { New: 'Never worn', 'Like New': 'Worn a few times, no visible wear', Good: 'Normal wear, no damage', Fair: 'Visible wear such as fading' };
 export const EXCHANGE_OPTIONS = ['Buy Only', 'Exchange Only', 'Buy or Exchange'];
 export const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 

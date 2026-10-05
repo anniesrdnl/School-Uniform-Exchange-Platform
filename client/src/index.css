@@ -60,13 +60,15 @@
 
 /* Components live in a layer so utilities on the same element (px-6, rounded-none…) can override them */
 @layer components {
-  .btn-primary, .btn-outline, .btn-soft, .btn-cream {
+  .btn-primary, .btn-outline, .btn-soft, .btn-light, .btn-ghost-light {
     @apply inline-flex items-center justify-center gap-2 rounded-xl border border-transparent px-4 py-2.5 text-sm font-semibold transition duration-200 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy;
   }
   .btn-primary { @apply bg-navy text-white shadow-sm shadow-navy/20 hover:bg-navy-deep hover:shadow-md hover:shadow-navy/25; }
   .btn-outline { @apply border-denim bg-white text-navy hover:border-navy/50 hover:bg-frost; }
   .btn-soft { @apply bg-aqua text-navy hover:bg-powder; }
-  .btn-cream { @apply bg-cream text-navy hover:bg-white focus-visible:outline-cream; }
+  /* For dark (navy) backgrounds */
+  .btn-light { @apply bg-white text-navy shadow-sm hover:bg-frost focus-visible:outline-white; }
+  .btn-ghost-light { @apply border-white/30 text-white hover:border-white/60 hover:bg-white/10 focus-visible:outline-white; }
   .btn-sm { @apply rounded-lg px-3 py-1.5 text-xs; }
 
   /* text-base on phones stops iOS Safari from zooming in when an input is focused */
@@ -79,13 +81,6 @@
   .card { @apply rounded-2xl border border-aqua/70 bg-white shadow-[0_1px_2px_rgb(15_26_43/0.04),0_8px_24px_-12px_rgb(28_46_74/0.12)]; }
   .chip { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold; }
 
-  /* Highlighter stroke behind a word in a heading */
-  .marker {
-    background: linear-gradient(transparent 58%, var(--color-aqua) 58%, var(--color-aqua) 92%, transparent 92%);
-    padding: 0 0.08em;
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
-  }
 
   /* Placeholder block that shimmers while content loads */
   .skeleton {

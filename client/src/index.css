@@ -3,19 +3,19 @@
 @theme {
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 
-  /* Brand palette: Midnight Blue #1C2E4A, Dusty Blue #52677D, Ivory #BDC4D4, Deep Navy #0F1A2B, Buttercream #D1CFC9.
+  /* Brand palette (teal): #CEFEF1, #A6D6C9, #4CA7A1, #1F5F63, #0D2B36, #001722.
      Token names predate this palette and are kept so class names across the app stay the same. */
-  --color-navy: #1c2e4a;      /* Midnight Blue: primary actions, links, headings accents (13:1 on white) */
-  --color-navy-deep: #0f1a2b; /* Deep Navy: hover/pressed state of navy */
-  --color-ink: #0f1a2b;       /* Deep Navy: body text */
-  --color-denim: #52677d;     /* Dusty Blue: interactive borders (outline buttons, hovered inputs) */
-  --color-powder: #bdc4d4;    /* Ivory: decorative shapes, focus rings, soft-button hover */
-  --color-cream: #d1cfc9;     /* Buttercream: warm accent tiles and chips */
+  --color-ink: #001722;       /* darkest: body text (17:1 on the page background) */
+  --color-navy-deep: #0d2b36; /* hover/pressed state of navy */
+  --color-navy: #1f5f63;      /* deep teal: primary buttons, links, dark panels (7.3:1 with white) */
+  --color-denim: #4ca7a1;     /* teal: borders and accents only; too light for text (2.9:1 on white) */
+  --color-powder: #a6d6c9;    /* sage: decorative shapes, focus rings, soft-button hover */
+  --color-cream: #cefef1;     /* mint: highlight chips and tiles */
 
-  /* Ivory is too dark for large backgrounds, so these are Ivory mixed with white */
-  --color-aqua: #d4d9e3;      /* 65% Ivory: light fills, active pills, avatar tiles */
-  --color-frost: #e8eaf0;     /* 35% Ivory: subtle fills, hover backgrounds */
-  --color-mist: #f7f8fa;      /* 12% Ivory: page background */
+  /* #A6D6C9 is too strong for large areas, so these are it mixed with white */
+  --color-aqua: #cfe7e0;      /* light fills, active pills, avatar tiles, card borders */
+  --color-frost: #e4f3ef;     /* subtle fills, hover backgrounds */
+  --color-mist: #f4faf8;      /* page background */
 
   --animate-fade-up: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-fade-in: fade-in 0.4s ease-out both;
@@ -53,8 +53,8 @@
     z-index: -1;
     pointer-events: none;
     background:
-      radial-gradient(44rem 26rem at 100% 0%, rgb(189 196 212 / 0.35), transparent 70%),
-      radial-gradient(34rem 22rem at 0% 100%, rgb(209 207 201 / 0.35), transparent 70%);
+      radial-gradient(44rem 26rem at 100% 0%, rgb(166 214 201 / 0.35), transparent 70%),
+      radial-gradient(34rem 22rem at 0% 100%, rgb(206 254 241 / 0.5), transparent 70%);
   }
 }
 
@@ -78,19 +78,19 @@
   /* PasswordInput has its own show/hide button, so hide Edge's built-in one */
   .input::-ms-reveal, .input::-ms-clear { display: none; }
   .label { @apply mb-1.5 block text-sm font-semibold text-slate-700; }
-  .card { @apply rounded-2xl border border-aqua/70 bg-white shadow-[0_1px_2px_rgb(15_26_43/0.04),0_8px_24px_-12px_rgb(28_46_74/0.12)]; }
+  .card { @apply rounded-2xl border border-aqua/70 bg-white shadow-[0_1px_2px_rgb(0_23_34/0.04),0_8px_24px_-12px_rgb(31_95_99/0.12)]; }
   .chip { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold; }
 
 
   /* Placeholder block that shimmers while content loads */
   .skeleton {
     @apply rounded-md animate-shimmer;
-    background: linear-gradient(90deg, #e8eaf0 25%, #f4f5f8 50%, #e8eaf0 75%);
+    background: linear-gradient(90deg, #e4f3ef 25%, #f2f9f7 50%, #e4f3ef 75%);
     background-size: 200% 100%;
   }
 
   /* Thin, quiet scrollbars for chat and tables */
-  .scroll-thin { scrollbar-width: thin; scrollbar-color: #bdc4d4 transparent; }
+  .scroll-thin { scrollbar-width: thin; scrollbar-color: #a6d6c9 transparent; }
 }
 
 @media (prefers-reduced-motion: reduce) {

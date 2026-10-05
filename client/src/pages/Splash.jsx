@@ -6,7 +6,7 @@ import Icon from '../components/Icon.jsx';
 const delay = (ms) => ({ animationDelay: `${ms}ms` });
 
 // Shared type styles: bold (not extra-bold) headings in sentence case read friendlier at large sizes
-const eyebrow = 'text-sm font-semibold text-denim';
+const eyebrow = 'text-sm font-semibold text-navy';
 const sectionTitle = 'mt-2 text-balance text-2xl font-bold leading-tight tracking-[-0.015em] text-ink sm:text-[2rem]';
 
 const HIGHLIGHTS = ['Free to join', 'Buy or swap', 'Chat with sellers'];
@@ -33,7 +33,7 @@ export default function Splash() {
             For students, by students
           </p>
           <h1 className="mt-5 animate-fade-up text-4xl font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-5xl lg:text-[3.5rem]" style={delay(80)}>
-            Exchange. <span className="text-denim">Reuse.</span>
+            Exchange. <span className="text-navy">Reuse.</span>
             <br />
             Support students.
           </h1>

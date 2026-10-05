@@ -32,7 +32,8 @@ export default function ListingCard({ listing }) {
           {seller && (
             <span className="flex min-w-0 items-center gap-1.5 text-xs text-slate-500">
               <Avatar name={seller.fullName} src={seller.avatar} className="h-5 w-5 text-[10px]" />
-              <span className="truncate">{seller.fullName?.split(' ')[0]}</span>
+              {/* avatar only on very narrow phones, where the name would crowd the price */}
+              <span className="truncate max-[359px]:hidden">{seller.fullName?.split(' ')[0]}</span>
             </span>
           )}
         </div>

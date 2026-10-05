@@ -80,7 +80,7 @@ export default function Splash() {
         <ul className="card divide-y divide-aqua/70">
           {BENEFITS.map((b) => (
             <li key={b.title} className="flex gap-4 p-5 sm:gap-5 sm:p-7">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-frost text-navy ring-1 ring-inset ring-aqua">
+              <span className="icon-tile h-11 w-11">
                 <Icon name={b.icon} className="h-5 w-5" />
               </span>
               <div>

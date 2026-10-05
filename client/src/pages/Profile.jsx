@@ -9,8 +9,9 @@ import { formatPrice } from '../constants.js';
 
 // Small listing photo for request and listing rows
 function Thumb({ src }) {
-  return src
-    ? <img src={src} alt="" className="h-12 w-12 shrink-0 rounded-xl object-cover ring-1 ring-aqua" />
+  const [broken, setBroken] = useState(false); // missing photo: show the placeholder, not a broken-image icon
+  return src && !broken
+    ? <img src={src} alt="" onError={() => setBroken(true)} className="h-12 w-12 shrink-0 rounded-xl object-cover ring-1 ring-aqua" />
     : <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-frost text-slate-500"><Icon name="photo" className="h-5 w-5" /></span>;
 }
 
@@ -81,7 +82,7 @@ export default function Profile() {
           <div className="absolute -bottom-12 right-28 h-28 w-28 rounded-full bg-cream" />
         </div>
         <div className="flex flex-col items-center gap-4 px-5 pb-5 text-center sm:px-6 md:flex-row md:items-end md:text-left">
-          <Avatar name={user.fullName} src={user.avatar} className="-mt-10 h-20 w-20 text-2xl ring-4 ring-white" />
+          <Avatar name={user.fullName} src={user.avatar} className="relative -mt-10 h-20 w-20 text-2xl ring-4 ring-white" />
           <div className="min-w-0 flex-1">
             <h1 className="break-words text-xl font-extrabold tracking-tight sm:text-2xl">{user.fullName}</h1>
             <p className="text-sm text-slate-600">{[user.studentId, user.program, user.yearLevel].filter(Boolean).join(' · ')}</p>

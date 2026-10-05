@@ -45,18 +45,19 @@ export default function Home() {
             className="w-full min-w-0 bg-transparent py-2.5 text-base text-ink placeholder:text-slate-500 focus:outline-none sm:text-sm" />
           <button className="btn-primary shrink-0">Search</button>
         </form>
-        <Link to="/sell" className="relative mt-4 inline-flex items-center gap-1.5 rounded-lg text-sm font-semibold text-navy hover:underline">
+        <Link to="/sell" className="relative mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-lg text-sm font-semibold text-navy hover:underline">
           <Icon name="plus-circle" className="h-5 w-5" /> Sell a uniform
         </Link>
       </section>
 
       <section aria-labelledby="categories-heading">
         <h2 id="categories-heading" className="mb-3 text-lg font-bold">Shop by category</h2>
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+        {/* 2 columns until there is room for 4; icon sits above the label on phones so long names never get squeezed */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {CATEGORIES.map((c, i) => (
             <Link key={c} to={`/browse?category=${encodeURIComponent(c)}`} style={{ animationDelay: `${i * 70}ms` }}
-              className="card group flex animate-fade-up items-center gap-3 p-3 text-sm font-semibold transition duration-300 hover:-translate-y-0.5 hover:border-powder hover:shadow-md hover:shadow-navy/5 sm:p-4">
-              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-navy transition duration-300 group-hover:scale-105 ${CATEGORY_STYLES[c].tile}`}>
+              className="card group flex animate-fade-up flex-col items-start gap-2.5 p-3.5 text-sm font-semibold transition duration-300 hover:-translate-y-0.5 hover:border-powder hover:shadow-md hover:shadow-navy/5 sm:flex-row sm:items-center sm:gap-3 sm:p-4">
+              <span className="icon-tile h-10 w-10 transition duration-300 group-hover:scale-105 group-hover:bg-aqua sm:h-11 sm:w-11">
                 <Icon name={CATEGORY_STYLES[c].icon} className="h-6 w-6" />
               </span>
               <span className="min-w-0 leading-snug transition group-hover:text-navy">{c}</span>
@@ -66,9 +67,9 @@ export default function Home() {
       </section>
 
       <section aria-labelledby="recent-heading">
-        <div className="mb-3 flex items-baseline justify-between">
+        <div className="mb-3 flex items-center justify-between">
           <h2 id="recent-heading" className="text-lg font-bold">Recently listed</h2>
-          <Link to="/browse" className="group inline-flex items-center gap-1 text-sm font-semibold text-navy">
+          <Link to="/browse" className="group -my-2 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-navy">
             See all <Icon name="arrow-right" className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>

@@ -85,7 +85,7 @@ export default function ListingDetails() {
 
   return (
     <div className="space-y-4">
-      <Link to="/browse" className="inline-flex items-center gap-1.5 rounded text-sm font-semibold text-navy hover:underline">
+      <Link to="/browse" className="-my-2 inline-flex min-h-11 items-center gap-1.5 rounded text-sm font-semibold text-navy hover:underline">
         <Icon name="arrow-left" className="h-4 w-4" /> Back to browse
       </Link>
 

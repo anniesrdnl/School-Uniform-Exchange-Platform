@@ -79,6 +79,8 @@
   .input::-ms-reveal, .input::-ms-clear { display: none; }
   .label { @apply mb-1.5 block text-sm font-semibold text-slate-700; }
   .card { @apply rounded-2xl border border-aqua/70 bg-white shadow-[0_1px_2px_rgb(0_23_34/0.04),0_8px_24px_-12px_rgb(31_95_99/0.12)]; }
+  /* Square icon holder used by category cards, stats and feature lists: one colour everywhere */
+  .icon-tile { @apply flex shrink-0 items-center justify-center rounded-xl bg-frost text-navy ring-1 ring-inset ring-aqua; }
   .chip { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold; }
 
 

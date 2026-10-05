@@ -25,10 +25,10 @@ export default function Admin() {
   const act = async (fn) => { await fn(); loadRows(); loadStats(); };
 
   const cards = stats && [
-    ['Total users', stats.totalUsers, 'users', 'bg-aqua'],
-    ['Active listings', stats.activeListings, 'tag', 'bg-cream'],
-    ['Completed exchanges', stats.completedExchanges, 'recycle', 'bg-powder'],
-    ['Open reports', stats.openReports, 'flag', 'bg-frost'],
+    ['Total users', stats.totalUsers, 'users'],
+    ['Active listings', stats.activeListings, 'tag'],
+    ['Completed exchanges', stats.completedExchanges, 'recycle'],
+    ['Open reports', stats.openReports, 'flag'],
   ];
 
   return (
@@ -40,9 +40,9 @@ export default function Admin() {
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
         {cards
-          ? cards.map(([label, n, icon, tile], i) => (
+          ? cards.map(([label, n, icon], i) => (
               <div key={label} className="card flex animate-fade-up items-center gap-3 p-4" style={{ animationDelay: `${i * 60}ms` }}>
-                <span className={`hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl text-navy sm:flex ${tile}`}><Icon name={icon} className="h-6 w-6" /></span>
+                <span className="icon-tile hidden h-11 w-11 sm:flex"><Icon name={icon} className="h-6 w-6" /></span>
                 <div className="min-w-0">
                   <p className="text-2xl font-extrabold text-navy">{n}</p>
                   <p className="text-xs text-slate-600 sm:text-sm">{label}</p>
@@ -63,8 +63,9 @@ export default function Admin() {
         ))}
       </div>
 
-      {/* wide tables scroll sideways inside their own box on phones */}
-      <div className="card scroll-thin overflow-x-auto">
+      {/* wide tables scroll sideways inside their own box on phones. "relative" keeps the sr-only header label
+          positioned inside this box; without it, it escaped and widened the whole page on phones */}
+      <div className="card scroll-thin relative overflow-x-auto">
         <table className="w-full min-w-[560px] text-left text-sm">
           <thead className="bg-frost/60 text-xs uppercase tracking-wide text-slate-600">
             <tr>

@@ -36,8 +36,8 @@ export default function UserMenu({ user, onLogout }) {
   return (
     <div ref={ref} className="relative">
       <button ref={buttonRef} onClick={() => setOpen(!open)} aria-expanded={open} aria-controls={panelId}
-        className={`control px-1.5 sm:pr-3 ${open ? 'bg-frost ring-denim/50' : ''}`}>
-        <Avatar name={user.fullName} src={user.avatar} className="h-7 w-7 text-xs" />
+        className={`control rounded-full px-1 sm:pr-3 ${open ? 'bg-frost ring-denim/50' : ''}`}>
+        <Avatar name={user.fullName} src={user.avatar} className="h-8 w-8 text-xs" />
         <span className="hidden max-w-28 truncate text-sm font-semibold text-ink sm:block">{user.fullName?.split(' ')[0]}</span>
         <Icon name="chevron-down" className={`hidden h-4 w-4 text-slate-500 transition-transform sm:block ${open ? 'rotate-180' : ''}`} strokeWidth={2} />
         <span className="sr-only">Account menu</span>

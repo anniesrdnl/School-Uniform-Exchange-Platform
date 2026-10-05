@@ -44,6 +44,13 @@ export default function HelpChat() {
 
   useEffect(() => setOpen(false), [pathname]); // following an answer's link closes the panel
 
+  // "Ask our assistant" in the header strip opens the panel
+  useEffect(() => {
+    const openHelp = () => setOpen(true);
+    window.addEventListener('sueps:open-help', openHelp);
+    return () => window.removeEventListener('sueps:open-help', openHelp);
+  }, []);
+
   // Braces matter: newer browsers return a Promise from scrollIntoView, which React would call as a cleanup and crash
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: 'end' });

@@ -9,14 +9,19 @@ export function LogoMark({ className = 'h-11 w-11' }) {
   return <img src={logoSrc} alt="" width={256} height={256} draggable={false} className={`shrink-0 scale-[1.25] object-contain ${className}`} />;
 }
 
-// Mark + full name stacked on two lines so it fits beside the nav actions on phones
+// Header brand: the mark in white on a Midnight tile, then the name. Below lg the name stacks on two lines
+// (room for the nav); from lg it sits on one line with the tagline underneath.
 export default function Logo() {
   return (
-    <span className="flex items-center gap-2.5">
-      <LogoMark />
-      <span className="flex flex-col text-[13px] font-extrabold leading-[1.15] tracking-tight text-navy sm:text-sm">
-        <span>School Uniform</span>
-        <span>Exchange Platform</span>
+    <span className="group flex items-center gap-2.5 lg:gap-3">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-[#1b4266] to-navy-deep shadow-md shadow-navy/25 transition duration-300 group-hover:-rotate-6 group-hover:scale-105">
+        <LogoMark className="h-6 w-6 brightness-0 invert" />
+      </span>
+      <span className="flex flex-col leading-tight">
+        <span className="whitespace-nowrap text-[13px] font-extrabold leading-[1.15] tracking-tight text-navy sm:text-sm lg:text-[15px]">
+          School Uniform <br className="lg:hidden" />Exchange Platform
+        </span>
+        <span className="mt-0.5 hidden text-[11px] font-medium tracking-wide text-slate-500 lg:block">Exchange • Reuse • Support students</span>
       </span>
     </span>
   );

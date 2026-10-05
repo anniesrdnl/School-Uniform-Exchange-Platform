@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import Icon from './Icon.jsx';
 import Logo from './Logo.jsx';
 import Avatar from './Avatar.jsx';
 import UserMenu from './UserMenu.jsx';
+import { showsHelpChat } from './HelpChat.jsx';
 
 // Phone tab: solid icon + Midnight label when active, outline icon when not (shape changes too, not just colour)
 function Tab({ tab, user }) {
@@ -38,12 +39,18 @@ function CenterButton({ tab }) {
   );
 }
 
+// Header actions: round icon buttons, and the call to action as a raised Midnight pill.
+// No display class in these: each use adds flex/inline-flex (or hidden + a breakpoint) itself.
+const iconBtn = 'h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-600 transition duration-200 hover:bg-frost hover:text-navy active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy';
+const cta = 'btn-shine h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-linear-to-b from-[#1b4266] to-navy px-4 text-sm font-semibold text-white shadow-lg shadow-navy/30 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-navy/35 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:h-11 sm:px-6';
+
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   // Logged-in users are redirected from / to /home, so Home must point there to ever show as active
   const home = user ? '/home' : '/';
-  // The header lifts off the page (soft shadow) once you scroll
+  const { pathname } = useLocation();
+  // Once you scroll, the info strip folds away and the card's shadow deepens
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -77,40 +84,65 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Same colour as the page: see-through at the top, frosted Pearl once content scrolls underneath */}
-      <header className={`sticky top-0 z-30 pt-[env(safe-area-inset-top)] transition-[background-color,box-shadow] duration-300 ${scrolled
-        ? 'bg-mist/85 shadow-[0_12px_32px_-18px_rgb(16_46_74/0.2)] backdrop-blur-md'
-        : 'bg-transparent'}`}>
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 lg:px-8 md:grid md:grid-cols-[1fr_auto_1fr]">
-          <Link to="/" className="shrink-0 justify-self-start rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy">
-            <Logo />
-          </Link>
+      {/* Floating white card: a slim info strip on top (desktop, folds away on scroll), then brand, links and actions */}
+      <header className="sticky top-0 z-30 px-3 pt-[calc(0.75rem+env(safe-area-inset-top))] sm:px-4 lg:px-8">
+        <div className={`mx-auto max-w-7xl rounded-2xl bg-white ring-1 ring-navy/5 transition-shadow duration-300 ${scrolled
+          ? 'shadow-xl shadow-navy/10'
+          : 'shadow-lg shadow-navy/5'}`}>
+          <div className={`hidden overflow-hidden rounded-t-2xl bg-linear-to-r from-cream/80 via-white to-frost transition-[max-height,opacity] duration-300 md:block ${scrolled
+            ? 'max-h-0 opacity-0'
+            : 'max-h-10 opacity-100'}`}>
+            <div className="flex h-9 items-center justify-between gap-4 px-6 text-xs text-slate-600">
+              <div className="flex items-center gap-6">
+                <span className="flex items-center gap-1.5"><Icon name="shield" className="h-3.5 w-3.5 text-navy" /> Safe meetups on campus</span>
+                <span className="flex items-center gap-1.5"><Icon name="recycle" className="h-3.5 w-3.5 text-navy" /> Free to join · buy, sell or swap</span>
+              </div>
+              {showsHelpChat(pathname) && (
+                <button type="button" onClick={() => window.dispatchEvent(new Event('sueps:open-help'))}
+                  className="group flex items-center gap-1.5 rounded-full font-medium transition-colors hover:text-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy">
+                  <Icon name="help" className="h-3.5 w-3.5 text-navy" /> Need help? <span className="underline-offset-2 group-hover:underline">Ask our assistant</span>
+                </button>
+              )}
+            </div>
+          </div>
 
-          {/* underline tabs: the bar under the current page sits on the header's bottom edge */}
-          <nav aria-label="Main" className="hidden h-16 items-stretch md:flex">
-            {links.map((l) => (
-              <NavLink key={l.label} to={l.to} end={l.end} className={({ isActive }) => `tab px-4 after:inset-x-4 ${isActive ? 'tab-on' : ''}`}>
-                {l.label}
-              </NavLink>
-            ))}
-          </nav>
+          <div className="flex h-16 items-center justify-between gap-3 px-3 sm:px-5 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:px-6">
+            <Link to="/" className="shrink-0 justify-self-start rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy">
+              <Logo />
+            </Link>
 
-          <div className="flex items-center justify-end gap-2">
-            {user ? (
-              <>
-                <Link to="/sell" className="btn-primary hidden h-10 pl-3 pr-4 hover:shadow-md md:inline-flex">
-                  <Icon name="plus" className="h-4 w-4" strokeWidth={2.2} /> Sell
-                </Link>
-                <UserMenu user={user} onLogout={() => { logout(); navigate('/'); }} />
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="control hidden whitespace-nowrap min-[360px]:inline-flex">
-                  Log in
-                </Link>
-                <Link to="/register" className="btn-primary h-10 whitespace-nowrap px-4 hover:shadow-md">Sign up</Link>
-              </>
-            )}
+            {/* plain text links; a short Midnight bar grows under the current page */}
+            <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
+              {links.map((l) => (
+                <NavLink key={l.label} to={l.to} end={l.end}
+                  className={({ isActive }) => `relative rounded-full px-3 py-2 text-sm font-semibold transition-colors duration-200 after:absolute after:inset-x-3 after:bottom-0.5 lg:px-4 lg:after:inset-x-4 after:h-0.5 after:rounded-full after:bg-navy after:transition-transform after:duration-200 focus-visible:outline-2 focus-visible:outline-navy ${isActive
+                    ? 'text-navy after:scale-x-100'
+                    : 'text-slate-500 after:scale-x-0 hover:text-navy hover:after:scale-x-50'}`}>
+                  {l.label}
+                </NavLink>
+              ))}
+            </nav>
+
+            <div className="flex items-center justify-end gap-1 sm:gap-2">
+              <Link to="/browse" aria-label="Search uniforms" title="Search uniforms" className={`${iconBtn} hidden lg:flex`}>
+                <Icon name="search" className="h-5 w-5" />
+              </Link>
+              {user ? (
+                <>
+                  <UserMenu user={user} onLogout={() => { logout(); navigate('/'); }} />
+                  <Link to="/sell" className={`${cta} hidden md:inline-flex`}>
+                    <Icon name="plus" className="h-4 w-4" strokeWidth={2.2} /> Sell
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" aria-label="Log in" title="Log in" className={`${iconBtn} flex`}>
+                    <Icon name="user" className="h-5 w-5" />
+                  </Link>
+                  <Link to="/register" className={`${cta} inline-flex`}>Sign up</Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </header>

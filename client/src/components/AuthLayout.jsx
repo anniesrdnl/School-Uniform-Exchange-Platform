@@ -11,8 +11,8 @@ const STEPS = [
 // Split screen for login/register: photo + navy story panel on desktop, plain centred card on smaller screens
 export default function AuthLayout({ headline, text, children }) {
   return (
-    // centred in the viewport below the 64px header + page padding (8.5rem) and the header's 1px border
-    <div className="lg:flex lg:min-h-[calc(100dvh-8.5rem-1px)] lg:items-center">
+    // centred in the viewport below the header card (0.75rem gap + 2.25rem strip + 4rem row) and the page padding (4.5rem)
+    <div className="lg:flex lg:min-h-[calc(100dvh-11.5rem)] lg:items-center">
       <div className="card mx-auto grid w-full max-w-lg overflow-hidden lg:min-h-[38rem] lg:max-w-5xl lg:grid-cols-2">
         <aside className="hidden flex-col bg-navy text-white lg:flex">
           <div className="relative min-h-56 flex-1 overflow-hidden">

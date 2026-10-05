@@ -11,7 +11,7 @@ import { CATEGORIES, CATEGORY_STYLES, CONDITIONS, CONDITION_HINTS, SIZES, format
 // Everything lives in the URL (?q=&category=&size=&condition=&minPrice=&maxPrice=&sort=&page=) so results can be shared
 const FILTER_KEYS = ['category', 'size', 'condition', 'minPrice', 'maxPrice'];
 const SORTS = [['newest', 'Newest first'], ['price-asc', 'Price: low to high'], ['price-desc', 'Price: high to low']];
-const GRID = 'grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4';
+const GRID = 'grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4 2xl:grid-cols-5';
 
 // One-tap price ranges; a custom min/max form sits under them
 const PRICE_RANGES = [

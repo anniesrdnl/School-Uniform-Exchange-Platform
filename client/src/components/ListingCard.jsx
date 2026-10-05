@@ -11,7 +11,7 @@ export default function ListingCard({ listing }) {
   const cover = !broken && images?.[0];
   return (
     <Link to={`/listings/${_id}`}
-      className="card group flex h-full flex-col overflow-hidden transition duration-300 hover:-translate-y-1 hover:border-powder hover:shadow-lg hover:shadow-navy/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy">
+      className="card @container group flex h-full flex-col overflow-hidden transition duration-300 hover:-translate-y-1 hover:border-powder hover:shadow-lg hover:shadow-navy/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy">
       <div className={`relative aspect-square overflow-hidden bg-frost ${cover && !loaded ? 'skeleton rounded-none' : ''}`}>
         {cover
           ? <img src={cover} alt={title} onLoad={() => setLoaded(true)} onError={() => setBroken(true)} loading="lazy"
@@ -25,15 +25,15 @@ export default function ListingCard({ listing }) {
         )}
       </div>
       <div className="flex flex-1 flex-col gap-0.5 p-2.5 sm:p-3">
-        <h3 className="truncate text-sm font-semibold transition group-hover:text-navy">{title}</h3>
+        <h3 className="truncate text-[13px] font-semibold transition group-hover:text-navy @min-[11rem]:text-sm">{title}</h3>
         <p className="truncate text-xs text-slate-500">Size {size}{category && ` · ${category}`}</p>
         <div className="mt-auto flex items-center justify-between gap-2 pt-1.5 sm:pt-2">
-          <p className="text-base font-bold text-navy">{formatPrice(price)}</p>
+          <p className="text-sm font-bold text-navy @min-[11rem]:text-base">{formatPrice(price)}</p>
           {seller && (
             <span className="flex min-w-0 items-center gap-1.5 text-xs text-slate-500">
               <Avatar name={seller.fullName} src={seller.avatar} className="h-5 w-5 text-[10px]" />
-              {/* avatar only on very narrow phones, where the name would crowd the price */}
-              <span className="truncate max-[359px]:hidden">{seller.fullName?.split(' ')[0]}</span>
+              {/* avatar only when the card is narrow, where the name would crowd the price */}
+              <span className="hidden truncate @min-[10.5rem]:inline">{seller.fullName?.split(' ')[0]}</span>
             </span>
           )}
         </div>

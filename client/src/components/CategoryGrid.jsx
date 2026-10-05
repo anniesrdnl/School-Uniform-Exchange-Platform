@@ -6,7 +6,8 @@ import Reveal from './Reveal.jsx';
 import { CATEGORIES, CATEGORY_STYLES } from '../constants.js';
 
 // Category cards with live listing counts (Home and the landing page). Each links to Browse filtered by it.
-// 2 columns until there is room for 4; on phones a slim row (small icon beside the name) keeps it compact.
+// 2 columns until there is room for 4. Each card adapts to its own width (container query): icon beside the name
+// when the card is at least 10rem wide, stacked above it in narrower cards so long names never get squeezed.
 export default function CategoryGrid() {
   const [counts, setCounts] = useState({});
 
@@ -18,9 +19,9 @@ export default function CategoryGrid() {
   return (
     <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
       {CATEGORIES.map((c, i) => (
-        <Reveal key={c} delay={i * 80}>
+        <Reveal key={c} delay={i * 80} className="@container">
           <Link to={`/browse?category=${encodeURIComponent(c)}`}
-            className="card group flex h-full items-center gap-2.5 p-3 transition duration-300 hover:-translate-y-1 hover:border-powder hover:shadow-lg hover:shadow-navy/10 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:gap-3 sm:p-4">
+            className="card group flex h-full flex-col items-start gap-2 p-3 transition @min-[10rem]:flex-row @min-[10rem]:items-center @min-[10rem]:gap-2.5 duration-300 hover:-translate-y-1 hover:border-powder hover:shadow-lg hover:shadow-navy/10 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:gap-3 sm:p-4">
             <span className="icon-tile h-9 w-9 transition duration-300 group-hover:-rotate-6 group-hover:scale-110 group-hover:bg-navy group-hover:text-mist group-hover:ring-navy sm:h-12 sm:w-12">
               <Icon name={CATEGORY_STYLES[c].icon} className="h-5 w-5 sm:h-6 sm:w-6" />
             </span>
@@ -30,7 +31,7 @@ export default function CategoryGrid() {
                 ? <span className="skeleton mt-1.5 block h-3 w-14" />
                 : counts[c] !== null && <span className="mt-0.5 block text-xs text-slate-500">{counts[c]} {counts[c] === 1 ? 'listing' : 'listings'}</span>}
             </span>
-            <Icon name="arrow-right" className="hidden h-4 w-4 shrink-0 -translate-x-2 text-navy opacity-0 transition duration-300 group-hover:translate-x-0 group-hover:opacity-100 sm:block" />
+            <Icon name="arrow-right" className="hidden h-4 w-4 shrink-0 -translate-x-2 text-navy opacity-0 transition duration-300 group-hover:translate-x-0 group-hover:opacity-100 @min-[14rem]:block" />
           </Link>
         </Reveal>
       ))}

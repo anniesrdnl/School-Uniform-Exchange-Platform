@@ -60,7 +60,8 @@ export default function HelpChat() {
 
   const close = () => {
     setOpen(false);
-    launcherRef.current?.focus();
+    // next frame: on short screens the launcher is hidden while the panel is open, so it must reappear first
+    requestAnimationFrame(() => launcherRef.current?.focus());
   };
 
   // A topic chip passes its FAQ id so the exact answer is used; typed text goes through the matcher
@@ -85,7 +86,7 @@ export default function HelpChat() {
       {open && (
         <section id={panelId} role="dialog" aria-labelledby={titleId}
           onKeyDown={(e) => e.key === 'Escape' && close()}
-          className="fixed inset-x-3 bottom-[calc(8.5rem+env(safe-area-inset-bottom))] top-20 z-40 flex animate-fade-up flex-col overflow-hidden rounded-3xl bg-white shadow-2xl shadow-navy/25 ring-1 ring-navy/5 sm:inset-x-auto sm:right-4 sm:top-auto sm:h-[34rem] sm:max-h-[calc(100dvh-12rem)] sm:w-[23rem] md:bottom-24 md:right-6">
+          className="fixed inset-x-3 bottom-[calc(8.5rem+env(safe-area-inset-bottom))] top-20 z-40 [@media(max-height:32rem)]:bottom-3! [@media(max-height:32rem)]:top-3! [@media(max-height:32rem)]:h-auto! [@media(max-height:32rem)]:max-h-none! flex animate-fade-up flex-col overflow-hidden rounded-3xl bg-white shadow-2xl shadow-navy/25 ring-1 ring-navy/5 sm:inset-x-auto sm:right-4 sm:top-auto sm:h-[34rem] sm:max-h-[calc(100dvh-12rem)] sm:w-[23rem] md:bottom-24 md:right-6">
           {/* Midnight header with white text; the soft circles are decoration */}
           <header className="relative isolate flex items-center gap-3 overflow-hidden bg-navy px-4 py-4 text-white">
             <span className="pointer-events-none absolute -right-8 -top-16 -z-10 h-36 w-36 rounded-full bg-white/10" aria-hidden="true" />
@@ -173,10 +174,11 @@ export default function HelpChat() {
       )}
 
       {/* Logo-only launcher with no backing circle; the accessible name says what it does since there is no visible text.
-          The logo bobs gently above a soft white aura that slowly breathes. */}
+          The logo bobs gently above a soft white aura that slowly breathes. On short screens the open panel fills the
+          height and has its own close button, so the launcher steps aside instead of covering the message box. */}
       <button ref={launcherRef} type="button" onClick={() => (open ? close() : setOpen(true))}
         aria-expanded={open} aria-controls={open ? panelId : undefined} aria-label={open ? 'Close help assistant' : 'Open help assistant'}
-        className="group fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-3 z-40 flex h-12 w-12 items-center justify-center rounded-full transition duration-200 hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy md:bottom-6 md:right-6 md:h-16 md:w-16">
+        className={`group fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-3 z-40 flex h-12 w-12 items-center justify-center rounded-full transition duration-200 hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy md:bottom-6 md:right-6 md:h-16 md:w-16 ${open ? '[@media(max-height:32rem)]:hidden' : ''}`}>
         <span className="absolute -inset-2 animate-breathe rounded-full bg-white/70 blur-[2px] transition-colors duration-300 group-hover:bg-white/90" aria-hidden="true" />
         <span className="relative animate-float drop-shadow-[0_6px_10px_rgb(24_38_58/0.25)] [animation-duration:6s]">
           {open

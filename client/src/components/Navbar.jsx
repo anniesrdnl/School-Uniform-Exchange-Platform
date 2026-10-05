@@ -86,10 +86,10 @@ export default function Navbar() {
     <>
       {/* Floating white card: a slim info strip on top (desktop, folds away on scroll), then brand, links and actions */}
       <header className="sticky top-0 z-30 px-3 pt-[calc(0.5rem+env(safe-area-inset-top))] sm:px-4 sm:pt-[calc(0.75rem+env(safe-area-inset-top))] lg:px-8">
-        <div className={`mx-auto max-w-7xl rounded-2xl bg-white ring-1 ring-navy/5 transition-shadow duration-300 ${scrolled
+        <div className={`mx-auto max-w-7xl rounded-2xl bg-white 2xl:max-w-[88rem] ring-1 ring-navy/5 transition-shadow duration-300 ${scrolled
           ? 'shadow-xl shadow-navy/10'
           : 'shadow-lg shadow-navy/5'}`}>
-          <div className={`hidden overflow-hidden rounded-t-2xl bg-linear-to-r from-cream/80 via-white to-frost transition-[max-height,opacity] duration-300 md:block ${scrolled
+          <div className={`hidden overflow-hidden rounded-t-2xl bg-linear-to-r [@media(max-height:40rem)]:hidden! from-cream/80 via-white to-frost transition-[max-height,opacity] duration-300 md:block ${scrolled
             ? 'max-h-0 opacity-0'
             : 'max-h-10 opacity-100'}`}>
             <div className="flex h-9 items-center justify-between gap-4 px-6 text-xs text-slate-600">

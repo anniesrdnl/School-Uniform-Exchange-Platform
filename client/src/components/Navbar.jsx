@@ -75,7 +75,10 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`sticky top-0 z-30 border-b transition-shadow duration-300 ${scrolled ? 'border-aqua shadow-[0_10px_30px_-12px_rgb(16_46_74/0.18)]' : 'border-aqua/70'} bg-white/85 pt-[env(safe-area-inset-top)] backdrop-blur-md supports-[backdrop-filter]:bg-white/75`}>
+      {/* Same colour as the page: see-through at the top, frosted Pearl once content scrolls underneath */}
+      <header className={`sticky top-0 z-30 pt-[env(safe-area-inset-top)] transition-[background-color,box-shadow] duration-300 ${scrolled
+        ? 'bg-mist/85 shadow-[0_12px_32px_-18px_rgb(16_46_74/0.2)] backdrop-blur-md'
+        : 'bg-transparent'}`}>
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 lg:px-8 md:grid md:grid-cols-[1fr_auto_1fr]">
           <Link to="/" className="shrink-0 justify-self-start rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy">
             <Logo />

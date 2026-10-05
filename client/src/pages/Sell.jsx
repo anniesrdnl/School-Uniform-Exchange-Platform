@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api, { errMsg } from '../api.js';
 import { Spinner } from '../components/Loader.jsx';
 import Icon from '../components/Icon.jsx';
+import shrinkImage from '../shrinkImage.js';
 import { CATEGORIES, CONDITIONS, EXCHANGE_OPTIONS, SIZES } from '../constants.js';
 
 const MAX_PHOTOS = 5;
@@ -57,7 +58,7 @@ export default function Sell() {
     try {
       const body = new FormData();
       Object.entries(form).forEach(([k, v]) => body.append(k, v));
-      photos.forEach((f) => body.append('photos', f));
+      (await Promise.all(photos.map(shrinkImage))).forEach((f) => body.append('photos', f));
       const { data } = await api.post('/listings', body);
       navigate(`/listings/${data._id}`);
     } catch (err) {

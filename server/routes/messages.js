@@ -62,7 +62,7 @@ router.get('/conversations/:id/messages', async (req, res, next) => {
   }
 });
 
-// Send a message (text and/or one photo). Also pushed live via Socket.io.
+// Send a message (text and/or one photo). The other person's chat page picks it up by polling.
 router.post('/conversations/:id/messages', upload.single('photo'), async (req, res, next) => {
   try {
     const convo = await getMyConversation(req.params.id, req.user.id);
@@ -77,7 +77,6 @@ router.post('/conversations/:id/messages', upload.single('photo'), async (req, r
     check(await supabase.from('conversations')
       .update({ last_message: text || 'Sent a photo', last_message_at: new Date().toISOString() }).eq('id', convo.id));
 
-    req.app.get('io').to(`conv:${convo.id}`).emit('message:new', message);
     res.status(201).json(message);
   } catch (err) {
     next(err);

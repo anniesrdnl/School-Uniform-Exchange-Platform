@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { io } from 'socket.io-client';
-import api, { API_URL, errMsg } from '../api.js';
+import api, { errMsg } from '../api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import Icon from '../components/Icon.jsx';
 import Avatar from '../components/Avatar.jsx';
+import shrinkImage from '../shrinkImage.js';
+
+const POLL_MS = 3000;
 
 export default function Messages() {
   const { user } = useAuth();
@@ -13,31 +15,28 @@ export default function Messages() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
   const [error, setError] = useState('');
-  const socketRef = useRef(null);
   const bottomRef = useRef(null);
 
-  // one socket connection for the whole page
+  // Serverless hosting (Vercel) can't hold open sockets, so new messages arrive by polling.
   useEffect(() => {
-    const socket = io(API_URL || undefined, { auth: { token: localStorage.getItem('token') } });
-    socketRef.current = socket;
-    socket.on('message:new', (msg) => {
-      setMessages((prev) => (prev.some((m) => m._id === msg._id) ? prev : [...prev, msg]));
-    });
-    return () => socket.disconnect();
+    const load = () => api.get('/messages/conversations').then((r) => setConvos(r.data)).catch(() => {});
+    load();
+    const timer = setInterval(load, POLL_MS * 3);
+    return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    api.get('/messages/conversations').then((r) => setConvos(r.data));
-  }, []);
-
-  // open a conversation: join its room + load history
+  // open a conversation: load its history, then keep checking for new messages
   useEffect(() => {
     if (!activeId) return;
-    socketRef.current?.emit('conversation:join', activeId);
-    api.get(`/messages/conversations/${activeId}/messages`).then((r) => setMessages(r.data));
+    setMessages([]);
+    const load = () => api.get(`/messages/conversations/${activeId}/messages`)
+      .then((r) => setMessages((prev) => (r.data.length === prev.length ? prev : r.data))).catch(() => {});
+    load();
+    const timer = setInterval(load, POLL_MS);
+    return () => clearInterval(timer);
   }, [activeId]);
 
-  useEffect(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), [messages]);
+  useEffect(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), [messages.length]);
 
   const send = async (e, file) => {
     e?.preventDefault();
@@ -45,8 +44,9 @@ export default function Messages() {
     try {
       const body = new FormData();
       body.append('text', text);
-      if (file) body.append('photo', file);
-      await api.post(`/messages/conversations/${activeId}/messages`, body);
+      if (file) body.append('photo', await shrinkImage(file));
+      const { data } = await api.post(`/messages/conversations/${activeId}/messages`, body);
+      setMessages((prev) => (prev.some((m) => m._id === data._id) ? prev : [...prev, data]));
       setText('');
     } catch (err) {
       setError(errMsg(err));

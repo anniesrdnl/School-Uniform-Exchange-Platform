@@ -141,12 +141,13 @@ export default function HelpChat() {
         </section>
       )}
 
+      {/* Logo-only launcher; the accessible name says what it does since there is no visible text */}
       <button ref={launcherRef} type="button" onClick={() => (open ? close() : setOpen(true))}
-        aria-expanded={open} aria-controls={open ? panelId : undefined}
-        className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 z-40 flex h-12 items-center gap-2 rounded-full bg-navy px-3.5 text-sm font-semibold text-white shadow-lg shadow-navy/30 transition duration-200 hover:bg-navy-deep active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy md:bottom-6 md:right-6 md:h-14 md:px-5">
-        <Icon name={open ? 'x' : 'help'} className="h-6 w-6" strokeWidth={1.8} />
-        {/* icon-only on phones; the label stays available to screen readers */}
-        <span className={open ? 'sr-only' : 'sr-only sm:not-sr-only'}>{open ? 'Close help' : 'Help'}</span>
+        aria-expanded={open} aria-controls={open ? panelId : undefined} aria-label={open ? 'Close help assistant' : 'Open help assistant'}
+        className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-lg shadow-navy/20 ring-1 ring-aqua transition duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:ring-denim/50 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy md:bottom-6 md:right-6 md:h-16 md:w-16">
+        {open
+          ? <Icon name="x" className="h-6 w-6 text-navy" strokeWidth={2} />
+          : <LogoMark className="h-9 w-9 md:h-10 md:w-10" />}
       </button>
     </>
   );

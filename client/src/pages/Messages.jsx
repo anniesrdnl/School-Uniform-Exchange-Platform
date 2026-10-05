@@ -36,7 +36,11 @@ export default function Messages() {
     return () => clearInterval(timer);
   }, [activeId]);
 
-  useEffect(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), [messages.length]);
+  // Braces matter: newer browsers return a Promise from scrollIntoView, and React
+  // would try to call that Promise as the effect's cleanup and crash.
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages.length]);
 
   const send = async (e, file) => {
     e?.preventDefault();

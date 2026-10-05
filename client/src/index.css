@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
 
   /* Brand palette: Pearl #FFF7E6 and Midnight #102E4A. Every other shade is a blend of the two (or a
      darker Midnight), so the site stays strictly two-tone.

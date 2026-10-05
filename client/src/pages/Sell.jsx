@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api, { errMsg } from '../api.js';
 import { Spinner } from '../components/Loader.jsx';
 import Icon from '../components/Icon.jsx';
+import Reveal from '../components/Reveal.jsx';
 import shrinkImage from '../shrinkImage.js';
 import { CATEGORIES, CONDITIONS, EXCHANGE_OPTIONS, SIZES } from '../constants.js';
 
@@ -80,7 +81,7 @@ export default function Sell() {
       <form onSubmit={submit} className="card divide-y divide-aqua/70">
         {error && <p role="alert" className="alert-error m-5 animate-fade-up sm:m-6">{error}</p>}
 
-        <section className="space-y-3 p-5 sm:p-6" aria-labelledby="photos-title">
+        <Reveal as="section" delay={0} className="space-y-3 p-5 sm:p-6" aria-labelledby="photos-title">
           <div className="flex items-baseline justify-between">
             <h2 id="photos-title" className={sectionTitle}>Photos</h2>
             <span className="text-xs text-slate-500">{photos.length}/{MAX_PHOTOS}</span>
@@ -108,9 +109,9 @@ export default function Sell() {
               ))}
             </ul>
           )}
-        </section>
+        </Reveal>
 
-        <section className="space-y-4 p-5 sm:p-6" aria-labelledby="details-title">
+        <Reveal as="section" delay={100} className="space-y-4 p-5 sm:p-6" aria-labelledby="details-title">
           <h2 id="details-title" className={sectionTitle}>Details</h2>
           <div>
             <label className="label" htmlFor="title">Title</label>
@@ -137,9 +138,9 @@ export default function Sell() {
               value={form.description} onChange={set('description')} />
             <p className="mt-1 text-right text-xs text-slate-500">{form.description.length}/1000</p>
           </div>
-        </section>
+        </Reveal>
 
-        <section className="space-y-4 p-5 sm:p-6" aria-labelledby="pricing-title">
+        <Reveal as="section" delay={200} className="space-y-4 p-5 sm:p-6" aria-labelledby="pricing-title">
           <h2 id="pricing-title" className={sectionTitle}>Price & exchange</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -152,7 +153,7 @@ export default function Sell() {
             </div>
           </div>
           <PillGroup name="exchangeOption" label="Open to" options={EXCHANGE_OPTIONS} value={form.exchangeOption} onChange={set('exchangeOption')} cols="sm:grid-cols-3" />
-        </section>
+        </Reveal>
 
         <div className="flex flex-col-reverse gap-2 p-5 sm:flex-row sm:justify-end sm:p-6">
           <button type="button" className="btn-outline" onClick={() => navigate(-1)}>Cancel</button>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../api.js';
 import Icon from '../components/Icon.jsx';
+import Reveal from '../components/Reveal.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import { formatPrice } from '../constants.js';
 
@@ -65,7 +66,7 @@ export default function Admin() {
 
       {/* wide tables scroll sideways inside their own box on phones. "relative" keeps the sr-only header label
           positioned inside this box; without it, it escaped and widened the whole page on phones */}
-      <div className="card scroll-thin relative overflow-x-auto">
+      <Reveal className="card scroll-thin relative overflow-x-auto">
         <table className="w-full min-w-[560px] text-left text-sm">
           <thead className="bg-frost/60 text-xs uppercase tracking-wide text-slate-600">
             <tr>
@@ -117,7 +118,7 @@ export default function Admin() {
             ))}
           </tbody>
         </table>
-      </div>
+      </Reveal>
     </div>
   );
 }

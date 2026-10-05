@@ -15,9 +15,9 @@ export default function AuthLayout({ headline, text, children }) {
     <div className="lg:flex lg:min-h-[calc(100dvh-8.5rem-1px)] lg:items-center">
       <div className="card mx-auto grid w-full max-w-lg overflow-hidden lg:min-h-[38rem] lg:max-w-5xl lg:grid-cols-2">
         <aside className="hidden flex-col bg-navy text-white lg:flex">
-          <div className="relative min-h-56 flex-1">
+          <div className="relative min-h-56 flex-1 overflow-hidden">
             <img src={uniformImg} alt="Folded navy and white school uniforms stacked on a table"
-              className="absolute inset-0 h-full w-full object-cover" />
+              className="absolute inset-0 h-full w-full animate-kenburns object-cover" />
           </div>
 
           <div className="shrink-0 p-8 xl:p-10">
@@ -26,8 +26,8 @@ export default function AuthLayout({ headline, text, children }) {
             <p className="mt-2 max-w-sm text-sm leading-relaxed text-aqua">{text}</p>
 
             <ol className="mt-6 grid grid-cols-3 gap-4 border-t border-white/15 pt-6">
-              {STEPS.map((s) => (
-                <li key={s.title} className="min-w-0">
+              {STEPS.map((s, i) => (
+                <li key={s.title} className="min-w-0 animate-fade-up" style={{ animationDelay: `${300 + i * 120}ms` }}>
                   <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-aqua">
                     <Icon name={s.icon} className="h-5 w-5" />
                   </span>

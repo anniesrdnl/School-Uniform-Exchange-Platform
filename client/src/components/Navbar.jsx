@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import Icon from './Icon.jsx';
@@ -16,7 +17,7 @@ function Tab({ tab, user }) {
             {tab.avatar
               ? <Avatar name={user.fullName} src={user.avatar}
                   className={`h-7 w-7 text-xs ring-2 ring-offset-2 ring-offset-white transition ${isActive ? 'ring-navy' : 'ring-transparent'}`} />
-              : <Icon name={tab.icon} solid={isActive} className="h-6 w-6" strokeWidth={1.7} />}
+              : <Icon name={tab.icon} solid={isActive} className={`h-6 w-6 ${isActive ? 'animate-pop' : ''}`} strokeWidth={1.7} />}
           </span>
           <span className="max-w-full truncate px-1">{tab.label}</span>
         </>
@@ -41,6 +42,14 @@ export default function Navbar() {
   const navigate = useNavigate();
   // Logged-in users are redirected from / to /home, so Home must point there to ever show as active
   const home = user ? '/home' : '/';
+  // The header lifts off the page (soft shadow) once you scroll
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   // Desktop centre links; Sell and the account menu sit on the right
   const links = [
@@ -66,7 +75,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-aqua/70 bg-white/85 pt-[env(safe-area-inset-top)] backdrop-blur-md supports-[backdrop-filter]:bg-white/75">
+      <header className={`sticky top-0 z-30 border-b transition-shadow duration-300 ${scrolled ? 'border-aqua shadow-[0_10px_30px_-12px_rgb(16_46_74/0.18)]' : 'border-aqua/70'} bg-white/85 pt-[env(safe-area-inset-top)] backdrop-blur-md supports-[backdrop-filter]:bg-white/75`}>
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 lg:px-8 md:grid md:grid-cols-[1fr_auto_1fr]">
           <Link to="/" className="shrink-0 justify-self-start rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy">
             <Logo />

@@ -4,6 +4,7 @@ import api from '../api.js';
 import ListingCard from '../components/ListingCard.jsx';
 import SearchBar from '../components/SearchBar.jsx';
 import Icon from '../components/Icon.jsx';
+import Reveal from '../components/Reveal.jsx';
 import { EmptyState, ListingGridSkeleton } from '../components/Loader.jsx';
 import { CATEGORIES, CATEGORY_STYLES, CONDITIONS, CONDITION_HINTS, SIZES, formatPrice } from '../constants.js';
 
@@ -242,7 +243,7 @@ export default function Browse() {
             ) : (
               <div className={GRID}>
                 {data.items.map((l, i) => (
-                  <div key={l._id} className="animate-fade-up" style={{ animationDelay: `${Math.min(i, 11) * 40}ms` }}><ListingCard listing={l} /></div>
+                  <Reveal key={l._id} delay={(i % 4) * 60}><ListingCard listing={l} /></Reveal>
                 ))}
               </div>
             )}

@@ -3,6 +3,7 @@ import Navbar from './components/Navbar.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import HelpChat, { showsHelpChat } from './components/HelpChat.jsx';
 import Icon from './components/Icon.jsx';
+import Backdrop from './components/Backdrop.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
@@ -21,6 +22,7 @@ export default function App() {
 
   return (
     <>
+      <Backdrop />
       <Navbar />
       {/* extra bottom room where the floating help button sits, so it never covers the end of a page */}
       <main className={`mx-auto max-w-7xl px-4 pt-4 sm:pt-6 lg:px-8 ${showsHelpChat(location.pathname)

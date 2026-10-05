@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import api, { errMsg } from '../api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import Icon from '../components/Icon.jsx';
+import Reveal from '../components/Reveal.jsx';
 import Avatar from '../components/Avatar.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import { formatPrice } from '../constants.js';
@@ -17,7 +18,7 @@ function Thumb({ src }) {
 
 function Section({ title, action, empty, children }) {
   return (
-    <section>
+    <Reveal as="section">
       <div className="mb-3 flex items-center justify-between gap-2">
         <h2 className="section-title">{title}</h2>
         {action}
@@ -25,7 +26,7 @@ function Section({ title, action, empty, children }) {
       <div className="card divide-y divide-aqua/60 overflow-hidden">
         {children?.length ? children : <p className="p-5 text-sm text-slate-600">{empty}</p>}
       </div>
-    </section>
+    </Reveal>
   );
 }
 

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import uniformImg from '../assets/uniforms.jpg';
 import Icon from '../components/Icon.jsx';
+import Reveal from '../components/Reveal.jsx';
 
 // Staggers entrance animations without extra state
 const delay = (ms) => ({ animationDelay: `${ms}ms` });
@@ -58,9 +59,11 @@ export default function Splash() {
         </div>
 
         <figure className="relative mx-auto w-full max-w-lg animate-fade-up pb-6 lg:max-w-none" style={delay(160)}>
-          <img src={uniformImg} alt="Folded navy and white school uniforms stacked on a table"
-            className="aspect-[4/3] w-full rounded-3xl object-cover shadow-xl shadow-navy/15 ring-1 ring-navy/5" />
-          <figcaption className="absolute bottom-0 left-4 right-4 flex items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-lg shadow-navy/10 ring-1 ring-aqua sm:left-6 sm:right-auto">
+          <div className="overflow-hidden rounded-3xl shadow-xl shadow-navy/15 ring-1 ring-navy/5">
+            <img src={uniformImg} alt="Folded navy and white school uniforms stacked on a table"
+              className="aspect-[4/3] w-full animate-kenburns object-cover" />
+          </div>
+          <figcaption className="absolute bottom-0 left-4 right-4 flex animate-float items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-lg shadow-navy/10 ring-1 ring-aqua sm:left-6 sm:right-auto">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-frost text-navy">
               <Icon name="recycle" className="h-5 w-5" />
             </span>
@@ -69,7 +72,7 @@ export default function Splash() {
         </figure>
       </section>
 
-      <section aria-labelledby="why-heading" className="grid gap-10 lg:grid-cols-[1fr_1.25fr] lg:items-center lg:gap-16">
+      <Reveal as="section" aria-labelledby="why-heading" className="grid gap-10 lg:grid-cols-[1fr_1.25fr] lg:items-center lg:gap-16">
         <div className="text-center lg:text-left">
           <p className={eyebrow}>Why students use it</p>
           <h2 id="why-heading" className={sectionTitle}>Good for your budget, your school, and the planet.</h2>
@@ -78,41 +81,41 @@ export default function Splash() {
           </p>
         </div>
         <ul className="card divide-y divide-aqua/70">
-          {BENEFITS.map((b) => (
-            <li key={b.title} className="flex gap-4 p-5 sm:gap-5 sm:p-7">
-              <span className="icon-tile h-11 w-11">
+          {BENEFITS.map((b, i) => (
+            <Reveal as="li" key={b.title} delay={120 + i * 110} className="group flex gap-4 p-5 sm:gap-5 sm:p-7">
+              <span className="icon-tile h-11 w-11 transition duration-300 group-hover:-rotate-6 group-hover:scale-110 group-hover:bg-navy group-hover:text-mist group-hover:ring-navy">
                 <Icon name={b.icon} className="h-5 w-5" />
               </span>
               <div>
                 <h3 className="text-lg font-semibold text-ink">{b.title}</h3>
                 <p className="mt-1 text-base leading-relaxed text-slate-600">{b.text}</p>
               </div>
-            </li>
+            </Reveal>
           ))}
         </ul>
-      </section>
+      </Reveal>
 
-      <section aria-labelledby="how-heading">
+      <Reveal as="section" aria-labelledby="how-heading">
         <div className="mx-auto max-w-2xl text-center">
           <p className={eyebrow}>How it works</p>
           <h2 id="how-heading" className={sectionTitle}>From your closet to a classmate in three steps.</h2>
         </div>
         <ol className="mt-12 grid gap-8 md:grid-cols-3 md:gap-10">
           {STEPS.map((s, i) => (
-            <li key={s.title} className="border-t border-powder pt-6">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-navy text-sm font-bold text-white" aria-hidden="true">
+            <Reveal as="li" key={s.title} delay={i * 140} className="group border-t border-powder pt-6">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-navy text-sm font-bold text-white transition duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-navy/25" aria-hidden="true">
                 {i + 1}
               </span>
               <h3 className="mt-4 text-lg font-semibold text-ink">
                 <span className="sr-only">Step {i + 1}: </span>{s.title}
               </h3>
               <p className="mt-1.5 text-base leading-relaxed text-slate-600">{s.text}</p>
-            </li>
+            </Reveal>
           ))}
         </ol>
-      </section>
+      </Reveal>
 
-      <section aria-labelledby="cta-heading" className="rounded-3xl bg-navy px-6 py-10 text-center text-white sm:px-12 sm:py-14 md:text-left">
+      <Reveal as="section" aria-labelledby="cta-heading" className="rounded-3xl bg-navy px-6 py-10 text-center text-white sm:px-12 sm:py-14 md:text-left">
         <div className="flex flex-col items-center gap-8 md:flex-row md:justify-between">
           <div className="max-w-xl">
             <h2 id="cta-heading" className="text-2xl font-bold leading-tight tracking-[-0.015em] sm:text-3xl">Outgrown your uniform?</h2>
@@ -123,7 +126,7 @@ export default function Splash() {
             <Link to="/browse" className="btn-ghost-light px-6 py-3">Browse uniforms</Link>
           </div>
         </div>
-      </section>
+      </Reveal>
     </div>
   );
 }

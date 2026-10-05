@@ -4,6 +4,7 @@ import api, { errMsg } from '../api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { EmptyState } from '../components/Loader.jsx';
 import Icon from '../components/Icon.jsx';
+import Reveal from '../components/Reveal.jsx';
 import Avatar from '../components/Avatar.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import { formatPrice, timeAgo } from '../constants.js';
@@ -243,10 +244,10 @@ export default function ListingDetails() {
         </aside>
 
         {listing.description && (
-          <section aria-labelledby="about-heading" className={LAYOUT.about}>
+          <Reveal as="section" aria-labelledby="about-heading" className={LAYOUT.about}>
             <h2 id="about-heading" className="section-title">About this uniform</h2>
             <p className="mt-2 max-w-prose whitespace-pre-line break-words text-base leading-relaxed text-slate-700">{listing.description}</p>
-          </section>
+          </Reveal>
         )}
       </div>
     </div>

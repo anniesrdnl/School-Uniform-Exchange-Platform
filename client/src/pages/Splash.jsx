@@ -133,7 +133,7 @@ export default function Splash() {
             <span className="inline-block animate-fade-up" style={delay(80)}>Exchange.</span>{' '}
             <span className="inline-block animate-fade-up" style={delay(180)}>
               <span className="animate-sheen bg-clip-text text-transparent"
-                style={{ backgroundImage: 'linear-gradient(90deg, #5b5f6c, #141b2d 50%, #5b5f6c)', backgroundSize: '200% auto' }}>
+                style={{ backgroundImage: 'linear-gradient(90deg, #486687, #0e3661 50%, #486687)', backgroundSize: '200% auto' }}>
                 Reuse.
               </span>
             </span>

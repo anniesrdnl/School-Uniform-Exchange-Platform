@@ -180,7 +180,7 @@ export default function HelpChat() {
         aria-expanded={open} aria-controls={open ? panelId : undefined} aria-label={open ? 'Close help assistant' : 'Open help assistant'}
         className={`group fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-3 z-40 flex h-12 w-12 items-center justify-center rounded-full transition duration-200 hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy md:bottom-6 md:right-6 md:h-16 md:w-16 ${open ? '[@media(max-height:32rem)]:hidden' : ''}`}>
         <span className="absolute -inset-2 animate-breathe rounded-full bg-white/70 blur-[2px] transition-colors duration-300 group-hover:bg-white/90" aria-hidden="true" />
-        <span className="relative animate-float drop-shadow-[0_6px_10px_rgb(20_27_45/0.25)] [animation-duration:6s]">
+        <span className="relative animate-float drop-shadow-[0_6px_10px_rgb(14_54_97/0.25)] [animation-duration:6s]">
           {open
             ? <Icon name="x" className="h-8 w-8 text-navy" strokeWidth={2.2} />
             : <LogoMark className="h-10 w-10 md:h-14 md:w-14" />}

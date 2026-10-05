@@ -1,14 +1,11 @@
-import Icon from './Icon.jsx';
+import logoSrc from '../assets/logo-mark.png';
 
 export const BRAND = 'School Uniform Exchange Platform';
 
-// Brand mark (shirt in a navy tile); kept in sync with the boot screen in index.html
-export function LogoMark({ className = 'h-9 w-9 rounded-xl', iconClass = 'h-5 w-5' }) {
-  return (
-    <span className={`flex shrink-0 items-center justify-center bg-navy text-white shadow-sm shadow-navy/25 ${className}`} aria-hidden="true">
-      <Icon name="shirt" className={iconClass} strokeWidth={1.8} />
-    </span>
-  );
+// Brand mark: assets/logo-mark.png is logo.png trimmed and resized to 256px (logo.png is 500 KB, too heavy to load
+// on every page). Decorative: the brand name is always next to it. Kept in sync with the boot screen in index.html.
+export function LogoMark({ className = 'h-11 w-11' }) {
+  return <img src={logoSrc} alt="" width={256} height={256} draggable={false} className={`shrink-0 object-contain ${className}`} />;
 }
 
 // Mark + full name stacked on two lines so it fits beside the nav actions on phones

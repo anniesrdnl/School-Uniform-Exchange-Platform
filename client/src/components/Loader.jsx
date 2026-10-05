@@ -4,7 +4,7 @@ import { BRAND, LogoMark } from './Logo.jsx';
 export function FullScreenLoader() {
   return (
     <div role="status" aria-label="Loading" className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-mist">
-      <LogoMark className="h-16 w-16 animate-pulse rounded-2xl shadow-xl" iconClass="h-8 w-8" />
+      <LogoMark className="h-20 w-20 animate-pulse" />
       <p className="px-6 text-center text-sm font-extrabold tracking-tight text-navy">{BRAND}</p>
       <div className="h-1 w-28 overflow-hidden rounded-full bg-frost">
         <div className="h-full w-2/5 animate-slide rounded-full bg-navy" />

@@ -157,10 +157,10 @@ export default function Home() {
           <div className="absolute -right-24 -top-32 h-96 w-96 animate-drift rounded-full bg-denim/50 blur-3xl" />
           <div className="absolute -bottom-40 left-1/4 h-80 w-80 animate-drift rounded-full bg-cream/15 blur-3xl [animation-delay:-8s]" />
           <div className="absolute inset-0"
-            style={{ backgroundImage: 'radial-gradient(rgb(255 247 230 / 0.13) 1px, transparent 1px)', backgroundSize: '22px 22px', maskImage: 'linear-gradient(100deg, transparent 35%, #000)' }} />
+            style={{ backgroundImage: 'radial-gradient(rgb(248 249 250 / 0.13) 1px, transparent 1px)', backgroundSize: '22px 22px', maskImage: 'linear-gradient(100deg, transparent 35%, #000)' }} />
           {/* soft light that follows the mouse */}
           <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover/hero:opacity-100"
-            style={{ background: 'radial-gradient(32rem circle at calc(var(--mx) * 100%) calc(var(--my) * 100%), rgb(255 247 230 / 0.09), transparent 65%)' }} />
+            style={{ background: 'radial-gradient(32rem circle at calc(var(--mx) * 100%) calc(var(--my) * 100%), rgb(248 249 250 / 0.09), transparent 65%)' }} />
         </div>
 
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_22rem] xl:grid-cols-[minmax(0,1fr)_25rem]">

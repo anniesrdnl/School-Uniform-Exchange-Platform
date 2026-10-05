@@ -42,7 +42,7 @@ function CenterButton({ tab }) {
 // Header actions: round icon buttons, and the call to action as a raised Midnight pill.
 // No display class in these: each use adds flex/inline-flex (or hidden + a breakpoint) itself.
 const iconBtn = 'h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-600 transition duration-200 hover:bg-frost hover:text-navy active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy';
-const cta = 'btn-shine h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-linear-to-b from-[#1b4266] to-navy px-4 text-sm font-semibold text-white shadow-lg shadow-navy/30 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-navy/35 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:h-11 sm:px-6';
+const cta = 'btn-shine h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-linear-to-b from-[#2e3b4d] to-navy px-4 text-sm font-semibold text-white shadow-lg shadow-navy/30 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-navy/35 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:h-11 sm:px-6';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -149,7 +149,7 @@ export default function Navbar() {
 
       {/* Bottom tab bar: phones only. The white shape is a separate layer so the notch can be masked out of it
           while drop-shadow (on the nav) still follows the notched outline */}
-      <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 drop-shadow-[0_-6px_16px_rgb(16_46_74/0.10)] md:hidden">
+      <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 drop-shadow-[0_-6px_16px_rgb(24_38_58/0.10)] md:hidden">
         <div className="tabbar-notch absolute inset-0 rounded-t-[1.75rem] bg-white" aria-hidden="true" />
         <ul className="relative grid px-2 pb-[env(safe-area-inset-bottom)]" style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
           {tabs.map((t) => (

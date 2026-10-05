@@ -17,7 +17,7 @@ function Rack() {
     <div className="relative mt-12 h-[18.5rem] w-full max-w-xl" aria-label="How it works" role="group">
       <span className="absolute -left-1 top-0 h-9 w-2.5 rounded-full bg-navy-deep" aria-hidden="true" />
       <span className="absolute -right-1 top-0 h-9 w-2.5 rounded-full bg-navy-deep" aria-hidden="true" />
-      <span className="absolute inset-x-0 top-3 h-2.5 rounded-full bg-linear-to-b from-[#2a4f73] to-navy-deep shadow-md shadow-navy/30" aria-hidden="true" />
+      <span className="absolute inset-x-0 top-3 h-2.5 rounded-full bg-linear-to-b from-[#3a4657] to-navy-deep shadow-md shadow-navy/30" aria-hidden="true" />
 
       <ol className="absolute inset-x-5 top-0 grid grid-cols-3 gap-5">
         {STEPS.map((s, i) => (
@@ -29,7 +29,7 @@ function Rack() {
                 <path d="M12 30V20c0-4 6-5 6-11a6 6 0 1 0-12 0" />
               </svg>
               <span className={`w-px bg-denim/60 ${s.drop}`} aria-hidden="true" />
-              <div className="drop-shadow-[0_14px_22px_rgb(16_46_74/0.16)] transition duration-300 group-hover:-translate-y-1 group-hover:scale-[1.04]">
+              <div className="drop-shadow-[0_14px_22px_rgb(24_38_58/0.16)] transition duration-300 group-hover:-translate-y-1 group-hover:scale-[1.04]">
                 <div style={tagShape('1.1rem')}
                   className={`relative w-36 px-4 pb-4 pt-8 xl:w-40 ${s.dark ? 'bg-navy text-white' : 'bg-white text-ink'}`}>
                   <span className={`absolute left-1/2 top-3 h-2.5 w-2.5 -translate-x-1/2 rounded-full ring-2 ${s.dark ? 'bg-mist ring-white/40' : 'bg-mist ring-powder'}`} aria-hidden="true" />
@@ -77,7 +77,7 @@ export default function AuthLayout({ headline, text, tag = 'Members', children }
             <path d="M60 82C63 60 80 50 71 30S36 9 26 0" opacity="0.7" />
           </svg>
 
-          <div className="drop-shadow-[0_24px_40px_rgb(16_46_74/0.14)]">
+          <div className="drop-shadow-[0_24px_40px_rgb(24_38_58/0.14)]">
             <div className="relative bg-white px-6 pb-7 pt-14 sm:px-10 sm:pb-9"
               style={{
                 ...tagShape('2.25rem'),
@@ -86,11 +86,11 @@ export default function AuthLayout({ headline, text, tag = 'Members', children }
                 maskImage: 'radial-gradient(circle at 50% 1.75rem, transparent 0.7rem, #000 calc(0.7rem + 0.5px))',
               }}>
               {/* metal eyelet around the hole */}
-              <span className="absolute left-1/2 top-7 h-[1.9rem] w-[1.9rem] -translate-x-1/2 -translate-y-1/2 rounded-full border-[4px] border-[#cfd3d6] shadow-[inset_0_1px_2px_rgb(16_46_74/0.25),0_1px_0_rgb(255_255_255/0.8)]" aria-hidden="true" />
+              <span className="absolute left-1/2 top-7 h-[1.9rem] w-[1.9rem] -translate-x-1/2 -translate-y-1/2 rounded-full border-[4px] border-[#cbcfd4] shadow-[inset_0_1px_2px_rgb(24_38_58/0.25),0_1px_0_rgb(255_255_255/0.8)]" aria-hidden="true" />
 
               <div className="mb-7 flex items-center justify-between gap-3 border-b-2 border-dashed border-aqua pb-4">
                 <span className="flex items-center gap-2">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-[#1b4266] to-navy-deep">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-[#2e3b4d] to-navy-deep">
                     <LogoMark className="h-5 w-5 brightness-0 invert" />
                   </span>
                   <span className="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.1em] text-navy sm:tracking-[0.16em]">Uniform Exchange</span>

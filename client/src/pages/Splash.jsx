@@ -133,7 +133,7 @@ export default function Splash() {
             <span className="inline-block animate-fade-up" style={delay(80)}>Exchange.</span>{' '}
             <span className="inline-block animate-fade-up" style={delay(180)}>
               <span className="animate-sheen bg-clip-text text-transparent"
-                style={{ backgroundImage: 'linear-gradient(90deg, #586a79, #102e4a 50%, #586a79)', backgroundSize: '200% auto' }}>
+                style={{ backgroundImage: 'linear-gradient(90deg, #5b6574, #18263a 50%, #5b6574)', backgroundSize: '200% auto' }}>
                 Reuse.
               </span>
             </span>
@@ -244,11 +244,11 @@ export default function Splash() {
           <div className="absolute -right-20 -top-28 h-80 w-80 animate-drift rounded-full bg-denim/50 blur-3xl" />
           <div className="absolute -bottom-32 left-1/4 h-72 w-72 animate-drift rounded-full bg-cream/15 blur-3xl [animation-delay:-8s]" />
           <div className="absolute inset-0"
-            style={{ backgroundImage: 'radial-gradient(rgb(255 247 230 / 0.12) 1px, transparent 1px)', backgroundSize: '22px 22px', maskImage: 'linear-gradient(100deg, transparent 30%, #000)' }} />
+            style={{ backgroundImage: 'radial-gradient(rgb(248 249 250 / 0.12) 1px, transparent 1px)', backgroundSize: '22px 22px', maskImage: 'linear-gradient(100deg, transparent 30%, #000)' }} />
           <Icon name="recycle" className="absolute -bottom-16 -right-12 h-72 w-72 animate-[spin_60s_linear_infinite] text-white/5" strokeWidth={1} />
           {/* soft light that follows the mouse */}
           <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover/cta:opacity-100"
-            style={{ background: 'radial-gradient(28rem circle at calc(var(--mx) * 100%) calc(var(--my) * 100%), rgb(255 247 230 / 0.1), transparent 65%)' }} />
+            style={{ background: 'radial-gradient(28rem circle at calc(var(--mx) * 100%) calc(var(--my) * 100%), rgb(248 249 250 / 0.1), transparent 65%)' }} />
         </div>
         <div className="flex flex-col items-center gap-8 md:flex-row md:justify-between">
           <div className="max-w-xl">

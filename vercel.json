@@ -1,6 +1,6 @@
 {
   "framework": null,
-  "installCommand": "npm ci --prefix client && npm ci --prefix server",
+  "installCommand": "npm ci --prefix client --include=dev && npm ci --prefix server",
   "buildCommand": "npm run build --prefix client",
   "outputDirectory": "client/dist",
   "rewrites": [

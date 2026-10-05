@@ -24,10 +24,10 @@ export default function ListingCard({ listing }) {
           <span className="chip absolute left-2 top-2 bg-white/95 text-navy shadow-sm">{condition}</span>
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-0.5 p-3">
+      <div className="flex flex-1 flex-col gap-0.5 p-2.5 sm:p-3">
         <h3 className="truncate text-sm font-semibold transition group-hover:text-navy">{title}</h3>
         <p className="truncate text-xs text-slate-500">Size {size}{category && ` · ${category}`}</p>
-        <div className="mt-auto flex items-center justify-between gap-2 pt-2">
+        <div className="mt-auto flex items-center justify-between gap-2 pt-1.5 sm:pt-2">
           <p className="text-base font-bold text-navy">{formatPrice(price)}</p>
           {seller && (
             <span className="flex min-w-0 items-center gap-1.5 text-xs text-slate-500">

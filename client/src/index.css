@@ -210,10 +210,10 @@
     background-size: 200% 100%;
   }
 
-  /* Phone tab bar: circular cut-out at the top centre for the raised Sell button (4rem wide, so ~0.55rem gap) */
+  /* Phone tab bar: circular cut-out at the top centre for the raised button (3.75rem wide, so ~0.5rem gap) */
   .tabbar-notch {
-    -webkit-mask-image: radial-gradient(circle at 50% 0, transparent 2.55rem, #000 calc(2.55rem + 0.5px));
-    mask-image: radial-gradient(circle at 50% 0, transparent 2.55rem, #000 calc(2.55rem + 0.5px));
+    -webkit-mask-image: radial-gradient(circle at 50% 0, transparent 2.4rem, #000 calc(2.4rem + 0.5px));
+    mask-image: radial-gradient(circle at 50% 0, transparent 2.4rem, #000 calc(2.4rem + 0.5px));
   }
 
   /* Scroll reveal (see Reveal.jsx): hidden and slightly lower until it enters the screen */

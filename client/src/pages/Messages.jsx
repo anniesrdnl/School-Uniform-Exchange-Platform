@@ -61,7 +61,7 @@ export default function Messages() {
   const active = convos.find((c) => c._id === activeId);
 
   return (
-    <div className="card -mx-4 grid h-[calc(100dvh-12.75rem-env(safe-area-inset-bottom))] overflow-hidden rounded-none border-x-0 sm:mx-0 sm:rounded-2xl sm:border-x md:h-[72vh] md:grid-cols-[300px_1fr]">
+    <div className="card -mx-4 grid h-[calc(100dvh-11.4rem-env(safe-area-inset-bottom))] overflow-hidden rounded-none border-x-0 sm:mx-0 sm:rounded-2xl sm:border-x md:h-[72vh] md:grid-cols-[300px_1fr]">
       {/* list: hidden on phones once a chat is open */}
       <div className={`scroll-thin overflow-y-auto border-aqua/70 md:border-r ${activeId ? 'hidden md:block' : ''}`}>
         <h1 className="sticky top-0 border-b border-aqua/70 bg-white p-4 text-lg font-bold">Messages</h1>

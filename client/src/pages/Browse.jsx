@@ -11,7 +11,7 @@ import { CATEGORIES, CATEGORY_STYLES, CONDITIONS, CONDITION_HINTS, SIZES, format
 // Everything lives in the URL (?q=&category=&size=&condition=&minPrice=&maxPrice=&sort=&page=) so results can be shared
 const FILTER_KEYS = ['category', 'size', 'condition', 'minPrice', 'maxPrice'];
 const SORTS = [['newest', 'Newest first'], ['price-asc', 'Price: low to high'], ['price-desc', 'Price: high to low']];
-const GRID = 'grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4';
+const GRID = 'grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4';
 
 // One-tap price ranges; a custom min/max form sits under them
 const PRICE_RANGES = [
@@ -87,8 +87,8 @@ export default function Browse() {
   };
 
   return (
-    <div className="space-y-6">
-      <header className="space-y-5">
+    <div className="space-y-4 sm:space-y-6">
+      <header className="space-y-3.5 sm:space-y-5">
         <div>
           <h1 className="page-title">Browse uniforms</h1>
           <p className="page-subtitle">Second-hand uniforms from students on your campus.</p>
@@ -98,7 +98,7 @@ export default function Browse() {
 
         {/* underline tabs (same style as the header links); the row scrolls sideways on phones */}
         <div role="group" aria-label="Category"
-          className="relative -mx-4 flex h-11 overflow-x-auto px-4 shadow-[inset_0_-1px_0_var(--color-aqua)] [scrollbar-width:none] sm:mx-0 sm:px-0">
+          className="relative -mx-4 flex h-10 overflow-x-auto px-4 sm:h-11 shadow-[inset_0_-1px_0_var(--color-aqua)] [scrollbar-width:none] sm:mx-0 sm:px-0">
           {[['', 'All', 'grid'], ...CATEGORIES.map((c) => [c, c, CATEGORY_STYLES[c].icon])].map(([value, label, icon]) => (
             <button key={label} type="button" aria-pressed={category === value} onClick={() => setParam('category', value)}
               className={`tab group first:pl-0 first:after:left-0 ${category === value ? 'tab-on' : ''}`}>
@@ -112,7 +112,7 @@ export default function Browse() {
       <div className="lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
         {/* Filters: sticky sidebar on laptops and up, opened with the Filters button on smaller screens */}
         <aside id="filters" aria-label="Filters"
-          className={`card mb-5 p-5 lg:sticky lg:top-24 lg:mb-0 lg:block ${showFilters ? 'block animate-fade-up' : 'hidden'}`}>
+          className={`card mb-4 p-4 sm:mb-5 sm:p-5 lg:sticky lg:top-24 lg:mb-0 lg:block ${showFilters ? 'block animate-fade-up' : 'hidden'}`}>
           <div className="mb-5 flex items-center justify-between border-b border-aqua/70 pb-4">
             <h2 className="flex items-center gap-2 font-bold text-ink">
               <Icon name="filter" className="h-4 w-4 text-navy" /> Filters

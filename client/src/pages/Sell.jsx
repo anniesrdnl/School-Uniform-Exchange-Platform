@@ -72,7 +72,7 @@ export default function Sell() {
   const sectionTitle = 'section-title';
 
   return (
-    <div className="mx-auto max-w-2xl space-y-5">
+    <div className="mx-auto max-w-2xl space-y-4 sm:space-y-5">
       <header>
         <h1 className="page-title">Post a uniform</h1>
         <p className="page-subtitle">Clear photos and honest details help your listing find a new owner faster.</p>
@@ -81,7 +81,7 @@ export default function Sell() {
       <form onSubmit={submit} className="card divide-y divide-aqua/70">
         {error && <p role="alert" className="alert-error m-5 animate-fade-up sm:m-6">{error}</p>}
 
-        <Reveal as="section" delay={0} className="space-y-3 p-5 sm:p-6" aria-labelledby="photos-title">
+        <Reveal as="section" delay={0} className="space-y-3 p-4 sm:p-6" aria-labelledby="photos-title">
           <div className="flex items-baseline justify-between">
             <h2 id="photos-title" className={sectionTitle}>Photos</h2>
             <span className="text-xs text-slate-500">{photos.length}/{MAX_PHOTOS}</span>
@@ -111,7 +111,7 @@ export default function Sell() {
           )}
         </Reveal>
 
-        <Reveal as="section" delay={100} className="space-y-4 p-5 sm:p-6" aria-labelledby="details-title">
+        <Reveal as="section" delay={100} className="space-y-3.5 p-4 sm:space-y-4 sm:p-6" aria-labelledby="details-title">
           <h2 id="details-title" className={sectionTitle}>Details</h2>
           <div>
             <label className="label" htmlFor="title">Title</label>
@@ -140,7 +140,7 @@ export default function Sell() {
           </div>
         </Reveal>
 
-        <Reveal as="section" delay={200} className="space-y-4 p-5 sm:p-6" aria-labelledby="pricing-title">
+        <Reveal as="section" delay={200} className="space-y-3.5 p-4 sm:space-y-4 sm:p-6" aria-labelledby="pricing-title">
           <h2 id="pricing-title" className={sectionTitle}>Price & exchange</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -155,7 +155,7 @@ export default function Sell() {
           <PillGroup name="exchangeOption" label="Open to" options={EXCHANGE_OPTIONS} value={form.exchangeOption} onChange={set('exchangeOption')} cols="sm:grid-cols-3" />
         </Reveal>
 
-        <div className="flex flex-col-reverse gap-2 p-5 sm:flex-row sm:justify-end sm:p-6">
+        <div className="flex flex-col-reverse gap-2 p-4 sm:flex-row sm:justify-end sm:p-6">
           <button type="button" className="btn-outline" onClick={() => navigate(-1)}>Cancel</button>
           <button className="btn-primary sm:px-6" disabled={busy}>{busy ? <><Spinner /> Posting…</> : 'Post uniform'}</button>
         </div>

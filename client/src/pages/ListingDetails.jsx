@@ -155,12 +155,12 @@ export default function ListingDetails() {
       </nav>
 
       {/* rows: [gallery][description takes the rest], so the tall panel never stretches the gap under the photo */}
-      <div className="grid gap-6 lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-x-10 lg:gap-y-8">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-x-10 lg:gap-y-8">
         <div className={LAYOUT.gallery}>
           <Gallery images={listing.images} title={listing.title} />
         </div>
 
-        <aside aria-label="Price and request" className={`card p-5 sm:p-6 ${LAYOUT.panel}`}>
+        <aside aria-label="Price and request" className={`card p-4 sm:p-6 ${LAYOUT.panel}`}>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge status={listing.status} />

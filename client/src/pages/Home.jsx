@@ -150,9 +150,9 @@ export default function Home() {
   const browseLink = category ? `/browse?category=${encodeURIComponent(category)}` : '/browse';
 
   return (
-    <div className="space-y-12 sm:space-y-14">
+    <div className="space-y-8 sm:space-y-14">
       <section onPointerMove={track} onPointerLeave={untrack}
-        className="group/hero relative isolate overflow-hidden rounded-3xl bg-navy px-5 py-9 text-white shadow-xl shadow-navy/20 [--mx:0.5] [--my:0.5] sm:px-10 sm:py-12 lg:px-14 lg:py-14">
+        className="group/hero relative isolate overflow-hidden rounded-3xl bg-navy px-4 py-6 text-white shadow-xl shadow-navy/20 [--mx:0.5] [--my:0.5] sm:px-10 sm:py-12 lg:px-14 lg:py-14">
         <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
           <div className="absolute -right-24 -top-32 h-96 w-96 animate-drift rounded-full bg-denim/50 blur-3xl" />
           <div className="absolute -bottom-40 left-1/4 h-80 w-80 animate-drift rounded-full bg-cream/15 blur-3xl [animation-delay:-8s]" />
@@ -177,19 +177,19 @@ export default function Home() {
             </p>
 
             <SearchBar id="home-search" onSearch={(v) => navigate(v ? `/browse?q=${encodeURIComponent(v)}` : '/browse')}
-              className="relative mt-7 max-w-xl animate-fade-up [animation-delay:240ms]" />
+              className="relative mt-5 max-w-xl animate-fade-up [animation-delay:240ms] sm:mt-7" />
 
-            <div className="mt-4 flex animate-fade-up flex-wrap items-center gap-2 [animation-delay:320ms]">
+            <div className="mt-3 flex animate-fade-up flex-wrap items-center gap-1.5 [animation-delay:320ms] sm:mt-4 sm:gap-2">
               <span className="mr-1 text-sm text-mist/70">Popular:</span>
               {POPULAR.map((q) => (
                 <Link key={q} to={`/browse?q=${encodeURIComponent(q)}`}
-                  className="rounded-full bg-white/10 px-3 py-1.5 text-sm font-medium text-mist ring-1 ring-inset ring-white/15 transition duration-200 hover:-translate-y-0.5 hover:bg-white/20 hover:ring-white/35 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream">
+                  className="rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-mist sm:px-3 sm:py-1.5 sm:text-sm ring-1 ring-inset ring-white/15 transition duration-200 hover:-translate-y-0.5 hover:bg-white/20 hover:ring-white/35 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream">
                   {q}
                 </Link>
               ))}
             </div>
 
-            <div className="mt-8 flex animate-fade-up flex-wrap items-center gap-x-6 gap-y-4 [animation-delay:400ms]">
+            <div className="mt-5 flex animate-fade-up flex-wrap items-center gap-x-5 gap-y-3 [animation-delay:400ms] sm:mt-8 sm:gap-x-6 sm:gap-y-4">
               <Link to="/sell" className="btn-light group/sell h-11 px-5 hover:-translate-y-0.5 hover:shadow-lg">
                 <Icon name="plus-circle" className="h-5 w-5 transition-transform duration-300 group-hover/sell:rotate-90" /> Sell a uniform
               </Link>
@@ -224,7 +224,7 @@ export default function Home() {
               See all <Icon name="arrow-right" className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
-          <div role="group" aria-label="Show category" className="relative -mx-4 mb-5 mt-2 flex h-11 overflow-x-auto px-4 shadow-[inset_0_-1px_0_var(--color-aqua)] [scrollbar-width:none] sm:mx-0 sm:px-0">
+          <div role="group" aria-label="Show category" className="relative -mx-4 mb-4 mt-1 flex h-10 overflow-x-auto sm:mb-5 sm:mt-2 sm:h-11 px-4 shadow-[inset_0_-1px_0_var(--color-aqua)] [scrollbar-width:none] sm:mx-0 sm:px-0">
             {[['', 'All'], ...CATEGORIES.map((c) => [c, c])].map(([value, label]) => (
               <button key={label} type="button" aria-pressed={category === value} onClick={() => setCategory(value)}
                 className={`tab first:pl-0 first:after:left-0 ${category === value ? 'tab-on' : ''}`}>
@@ -242,29 +242,29 @@ export default function Home() {
               ? <EmptyState icon={<Icon name="shirt" className="h-6 w-6" />} title={category ? `No ${category} listings yet` : 'No listings yet'}>
                   Be the first to <Link to="/sell" className="font-semibold text-navy underline-offset-2 hover:underline">post one</Link>.
                 </EmptyState>
-              : <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+              : <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-4">
                   {items.map((l, i) => (
                     <Reveal key={`${category}-${l._id}`} delay={(i % 4) * 70}><ListingCard listing={l} /></Reveal>
                   ))}
                 </div>}
       </section>
 
-      <Reveal as="section" aria-labelledby="sell-heading" className="relative isolate overflow-hidden rounded-3xl bg-cream px-5 py-9 sm:px-10 sm:py-11">
+      <Reveal as="section" aria-labelledby="sell-heading" className="relative isolate overflow-hidden rounded-3xl bg-cream px-4 py-6 sm:px-10 sm:py-11">
         <div className="pointer-events-none absolute -right-16 -top-20 -z-10 h-56 w-56 rounded-full bg-white/50" aria-hidden="true" />
         <div className="pointer-events-none absolute -bottom-28 -left-20 -z-10 h-56 w-56 rounded-full bg-aqua/60" aria-hidden="true" />
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,19rem)_1fr] lg:items-center lg:gap-12">
+        <div className="grid gap-5 sm:gap-8 lg:grid-cols-[minmax(0,19rem)_1fr] lg:items-center lg:gap-12">
           <div>
             <p className="text-sm font-semibold text-navy">Outgrown a uniform?</p>
             <h2 id="sell-heading" className="mt-1 text-2xl font-bold tracking-[-0.015em] text-ink sm:text-3xl">Give it another school year.</h2>
             <p className="mt-2 text-sm text-slate-700 sm:text-base">It only takes a few steps, and it helps another student save.</p>
-            <Link to="/sell" className="btn-primary group mt-6 h-11 px-5 hover:-translate-y-0.5">
+            <Link to="/sell" className="btn-primary group mt-4 h-10 px-5 hover:-translate-y-0.5 sm:mt-6 sm:h-11">
               Start selling <Icon name="arrow-right" className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
           </div>
           <ol className="grid gap-3 sm:grid-cols-3">
             {STEPS.map(([icon, title, text], i) => (
               <Reveal as="li" key={title} delay={150 + i * 120}>
-                <div className="group h-full rounded-2xl bg-white/75 p-4 ring-1 ring-inset ring-navy/5 transition duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-lg hover:shadow-navy/10">
+                <div className="group h-full rounded-2xl bg-white/75 p-3.5 ring-1 sm:p-4 ring-inset ring-navy/5 transition duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-lg hover:shadow-navy/10">
                   <div className="flex items-center justify-between">
                     <span className="icon-tile h-11 w-11 transition duration-300 group-hover:-rotate-6 group-hover:scale-110 group-hover:bg-navy group-hover:text-mist group-hover:ring-navy">
                       <Icon name={icon} className="h-5 w-5" />

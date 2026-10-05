@@ -76,7 +76,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <section className="card overflow-hidden">
         <div className="relative h-20 overflow-hidden bg-aqua sm:h-24" aria-hidden="true">
           <div className="absolute -right-8 -top-10 h-36 w-36 rounded-full bg-powder" />

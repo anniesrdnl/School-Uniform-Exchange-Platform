@@ -20,7 +20,7 @@ export default function SearchBar({ id, defaultValue = '', onSearch, className =
 
   return (
     <form onSubmit={submit} role="search"
-      className={`group relative flex h-14 items-center gap-1 rounded-2xl bg-white pl-4 pr-1.5 shadow-sm shadow-navy/5 ring-1 ring-aqua transition duration-200 focus-within:shadow-md focus-within:ring-2 focus-within:ring-navy/40 ${className}`}>
+      className={`group relative flex h-12 items-center gap-1 rounded-2xl bg-white pl-3.5 pr-1 sm:h-14 sm:pl-4 sm:pr-1.5 shadow-sm shadow-navy/5 ring-1 ring-aqua transition duration-200 focus-within:shadow-md focus-within:ring-2 focus-within:ring-navy/40 ${className}`}>
       <Icon name="search" className="h-5 w-5 shrink-0 text-slate-400 transition-colors group-focus-within:text-navy" />
       <label htmlFor={id} className="sr-only">Search uniforms</label>
       <input ref={inputRef} id={id} type="search" enterKeyHint="search" autoComplete="off" value={value} onChange={(e) => setValue(e.target.value)}
@@ -32,7 +32,7 @@ export default function SearchBar({ id, defaultValue = '', onSearch, className =
           <Icon name="x" className="h-4 w-4" strokeWidth={2} />
         </button>
       )}
-      <button className="btn-primary h-11 shrink-0 px-5">Search</button>
+      <button className="btn-primary h-10 shrink-0 px-4 sm:h-11 sm:px-5">Search</button>
     </form>
   );
 }

@@ -85,7 +85,7 @@ export default function HelpChat() {
       {open && (
         <section id={panelId} role="dialog" aria-labelledby={titleId}
           onKeyDown={(e) => e.key === 'Escape' && close()}
-          className="fixed inset-x-3 bottom-[calc(9.5rem+env(safe-area-inset-bottom))] top-24 z-40 flex animate-fade-up flex-col overflow-hidden rounded-3xl bg-white shadow-2xl shadow-navy/25 ring-1 ring-navy/5 sm:inset-x-auto sm:right-4 sm:top-auto sm:h-[34rem] sm:max-h-[calc(100dvh-12rem)] sm:w-[23rem] md:bottom-24 md:right-6">
+          className="fixed inset-x-3 bottom-[calc(8.5rem+env(safe-area-inset-bottom))] top-20 z-40 flex animate-fade-up flex-col overflow-hidden rounded-3xl bg-white shadow-2xl shadow-navy/25 ring-1 ring-navy/5 sm:inset-x-auto sm:right-4 sm:top-auto sm:h-[34rem] sm:max-h-[calc(100dvh-12rem)] sm:w-[23rem] md:bottom-24 md:right-6">
           {/* Midnight header with white text; the soft circles are decoration */}
           <header className="relative isolate flex items-center gap-3 overflow-hidden bg-navy px-4 py-4 text-white">
             <span className="pointer-events-none absolute -right-8 -top-16 -z-10 h-36 w-36 rounded-full bg-white/10" aria-hidden="true" />
@@ -176,12 +176,12 @@ export default function HelpChat() {
           The logo bobs gently above a soft white aura that slowly breathes. */}
       <button ref={launcherRef} type="button" onClick={() => (open ? close() : setOpen(true))}
         aria-expanded={open} aria-controls={open ? panelId : undefined} aria-label={open ? 'Close help assistant' : 'Open help assistant'}
-        className="group fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full transition duration-200 hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy md:bottom-6 md:right-6 md:h-16 md:w-16">
+        className="group fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-3 z-40 flex h-12 w-12 items-center justify-center rounded-full transition duration-200 hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy md:bottom-6 md:right-6 md:h-16 md:w-16">
         <span className="absolute -inset-2 animate-breathe rounded-full bg-white/70 blur-[2px] transition-colors duration-300 group-hover:bg-white/90" aria-hidden="true" />
         <span className="relative animate-float drop-shadow-[0_6px_10px_rgb(24_38_58/0.25)] [animation-duration:6s]">
           {open
             ? <Icon name="x" className="h-8 w-8 text-navy" strokeWidth={2.2} />
-            : <LogoMark className="h-12 w-12 md:h-14 md:w-14" />}
+            : <LogoMark className="h-10 w-10 md:h-14 md:w-14" />}
         </span>
       </button>
     </>

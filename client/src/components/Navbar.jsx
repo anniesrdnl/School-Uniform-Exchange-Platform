@@ -11,7 +11,7 @@ import { showsHelpChat } from './HelpChat.jsx';
 function Tab({ tab, user }) {
   return (
     <NavLink to={tab.to} end={tab.end}
-      className={({ isActive }) => `group flex h-[4.25rem] min-w-0 flex-col items-center justify-center gap-1 text-[11px] font-semibold transition-colors duration-200 ${isActive ? 'text-navy' : 'text-slate-500 hover:text-navy'}`}>
+      className={({ isActive }) => `group flex h-[3.85rem] min-w-0 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors duration-200 ${isActive ? 'text-navy' : 'text-slate-500 hover:text-navy'}`}>
       {({ isActive }) => (
         <>
           <span className="flex h-7 w-7 items-center justify-center transition-transform duration-200 group-hover:-translate-y-0.5 group-active:scale-90">
@@ -32,7 +32,7 @@ function Tab({ tab, user }) {
 function CenterButton({ tab }) {
   return (
     <NavLink to={tab.to} end={tab.end}
-      className={({ isActive }) => `absolute left-1/2 top-0 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-0.5 rounded-full text-[11px] font-semibold text-mist shadow-md shadow-navy/25 transition duration-200 hover:-translate-y-[calc(50%+3px)] hover:shadow-lg active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${isActive ? 'bg-navy-deep ring-2 ring-inset ring-mist/40' : 'bg-navy hover:bg-navy-deep'}`}>
+      className={({ isActive }) => `absolute left-1/2 top-0 flex h-[3.75rem] w-[3.75rem] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-0.5 rounded-full text-[11px] font-semibold text-mist shadow-md shadow-navy/25 transition duration-200 hover:-translate-y-[calc(50%+3px)] hover:shadow-lg active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${isActive ? 'bg-navy-deep ring-2 ring-inset ring-mist/40' : 'bg-navy hover:bg-navy-deep'}`}>
       <Icon name={tab.icon} className="h-6 w-6" strokeWidth={2.2} />
       {tab.label}
     </NavLink>
@@ -42,7 +42,7 @@ function CenterButton({ tab }) {
 // Header actions: round icon buttons, and the call to action as a raised Midnight pill.
 // No display class in these: each use adds flex/inline-flex (or hidden + a breakpoint) itself.
 const iconBtn = 'h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-600 transition duration-200 hover:bg-frost hover:text-navy active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy';
-const cta = 'btn-shine h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-linear-to-b from-[#2e3b4d] to-navy px-4 text-sm font-semibold text-white shadow-lg shadow-navy/30 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-navy/35 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:h-11 sm:px-6';
+const cta = 'btn-shine h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-linear-to-b from-[#2e3b4d] to-navy px-4 text-sm font-semibold text-white shadow-lg shadow-navy/30 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-navy/35 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:h-11 sm:px-6';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -85,7 +85,7 @@ export default function Navbar() {
   return (
     <>
       {/* Floating white card: a slim info strip on top (desktop, folds away on scroll), then brand, links and actions */}
-      <header className="sticky top-0 z-30 px-3 pt-[calc(0.75rem+env(safe-area-inset-top))] sm:px-4 lg:px-8">
+      <header className="sticky top-0 z-30 px-3 pt-[calc(0.5rem+env(safe-area-inset-top))] sm:px-4 sm:pt-[calc(0.75rem+env(safe-area-inset-top))] lg:px-8">
         <div className={`mx-auto max-w-7xl rounded-2xl bg-white ring-1 ring-navy/5 transition-shadow duration-300 ${scrolled
           ? 'shadow-xl shadow-navy/10'
           : 'shadow-lg shadow-navy/5'}`}>
@@ -106,7 +106,7 @@ export default function Navbar() {
             </div>
           </div>
 
-          <div className="flex h-16 items-center justify-between gap-3 px-3 sm:px-5 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:px-6">
+          <div className="flex h-14 items-center justify-between gap-3 px-3 sm:h-16 sm:px-5 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:px-6">
             <Link to="/" className="shrink-0 justify-self-start rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy">
               <Logo />
             </Link>

@@ -65,13 +65,13 @@ function Steps() {
   }, [active, paused]);
 
   return (
-    <ol className="mt-12 grid gap-4 md:grid-cols-3 md:gap-6" onMouseLeave={() => setPaused(false)}>
+    <ol className="mt-6 grid gap-3 sm:mt-12 sm:gap-4 md:grid-cols-3 md:gap-6" onMouseLeave={() => setPaused(false)}>
       {STEPS.map((s, i) => {
         const on = i === active;
         const timing = on && !paused;
         return (
           <li key={s.title} onMouseEnter={() => { setActive(i); setPaused(true); }}
-            className={`relative overflow-hidden rounded-2xl p-6 pt-7 ring-1 transition duration-300 sm:p-7 sm:pt-8 ${on
+            className={`relative overflow-hidden rounded-2xl p-5 pt-6 ring-1 transition duration-300 sm:p-7 sm:pt-8 ${on
               ? 'bg-white shadow-xl shadow-navy/10 ring-aqua'
               : 'bg-white/40 ring-aqua/70 hover:bg-white/70'}`}>
             <span className="absolute inset-x-0 top-0 h-1 bg-aqua/70" aria-hidden="true">
@@ -116,8 +116,8 @@ export default function Splash() {
   };
 
   return (
-    <div className="space-y-24 py-2 sm:space-y-32 sm:py-8">
-      <section className="relative isolate grid items-center gap-14 lg:grid-cols-2 lg:gap-16">
+    <div className="space-y-14 py-1 sm:space-y-32 sm:py-8">
+      <section className="relative isolate grid items-center gap-10 sm:gap-14 lg:grid-cols-2 lg:gap-16">
         <Floaters />
 
         <div className="text-center lg:text-left">
@@ -192,7 +192,7 @@ export default function Splash() {
       </section>
 
       <section aria-labelledby="category-heading">
-        <Reveal className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <Reveal className="mb-5 flex flex-col gap-1 sm:mb-8 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
           <div>
             <p className={eyebrow}>Browse by category</p>
             <h2 id="category-heading" className={sectionTitle}>Everything for the school year.</h2>
@@ -214,10 +214,10 @@ export default function Splash() {
             Most uniforms are outgrown long before they wear out. Passing them on keeps them in use and keeps costs down for everyone.
           </p>
         </Reveal>
-        <ul className="mt-10 grid gap-4 md:grid-cols-3 md:gap-6">
+        <ul className="mt-6 grid gap-3 sm:mt-10 sm:gap-4 md:grid-cols-3 md:gap-6">
           {BENEFITS.map((b, i) => (
             <Reveal as="li" key={b.title} delay={i * 110}>
-              <div className="card group relative h-full overflow-hidden p-6 transition duration-300 hover:-translate-y-1.5 hover:border-powder hover:shadow-xl hover:shadow-navy/10 sm:p-7">
+              <div className="card group relative h-full overflow-hidden p-5 transition duration-300 hover:-translate-y-1.5 hover:border-powder hover:shadow-xl hover:shadow-navy/10 sm:p-7">
                 <span className="icon-tile h-12 w-12 transition duration-300 group-hover:-rotate-6 group-hover:scale-110 group-hover:bg-navy group-hover:text-mist group-hover:ring-navy">
                   <Icon name={b.icon} className="h-6 w-6" />
                 </span>
@@ -239,7 +239,7 @@ export default function Splash() {
       </Reveal>
 
       <Reveal as="section" aria-labelledby="cta-heading" onPointerMove={track}
-        className="group/cta relative isolate overflow-hidden rounded-3xl bg-navy px-6 py-12 text-center text-white shadow-xl shadow-navy/20 [--mx:0.5] [--my:0.5] sm:px-12 sm:py-16 md:text-left">
+        className="group/cta relative isolate overflow-hidden rounded-3xl bg-navy px-5 py-8 text-center text-white shadow-xl shadow-navy/20 [--mx:0.5] [--my:0.5] sm:px-12 sm:py-16 md:text-left">
         <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
           <div className="absolute -right-20 -top-28 h-80 w-80 animate-drift rounded-full bg-denim/50 blur-3xl" />
           <div className="absolute -bottom-32 left-1/4 h-72 w-72 animate-drift rounded-full bg-cream/15 blur-3xl [animation-delay:-8s]" />

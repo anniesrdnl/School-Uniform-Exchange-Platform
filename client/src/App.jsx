@@ -26,9 +26,9 @@ export default function App() {
       <Navbar />
       {/* overflow-x-clip: decorative shapes that lean past the edge (rotating, tilting) never cause sideways scrolling.
           extra bottom room where the floating help button sits, so it never covers the end of a page */}
-      <main className={`mx-auto max-w-7xl overflow-x-clip px-4 pt-4 sm:pt-6 lg:px-8 ${showsHelpChat(location.pathname)
-        ? 'pb-[calc(9.5rem+env(safe-area-inset-bottom))] md:pb-28'
-        : 'pb-[calc(7rem+env(safe-area-inset-bottom))] md:pb-12'}`}>
+      <main className={`mx-auto max-w-7xl overflow-x-clip px-4 pt-3 sm:pt-6 lg:px-8 ${showsHelpChat(location.pathname)
+        ? 'pb-[calc(8.5rem+env(safe-area-inset-bottom))] md:pb-28'
+        : 'pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:pb-12'}`}>
         {/* keyed by path so each page fades in on navigation */}
         <div key={location.pathname} className="animate-fade-up">
           <Routes>

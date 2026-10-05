@@ -5,6 +5,7 @@ import { errMsg } from '../api.js';
 import { Spinner } from '../components/Loader.jsx';
 import Icon from '../components/Icon.jsx';
 import { LogoMark } from '../components/Logo.jsx';
+import AuthLayout, { AuthHeading } from '../components/AuthLayout.jsx';
 
 const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'];
 
@@ -54,67 +55,70 @@ export default function Register() {
     </div>
   );
 
+  const layout = { headline: 'Pass it on. Save on the next one.', text: 'Join students who buy, sell, and swap school uniforms on campus.' };
+
   if (done) {
     return (
-      <div className="card mx-auto mt-2 max-w-md space-y-4 p-6 text-center sm:mt-8 sm:p-8 md:mt-12">
-        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green-50 text-green-700 ring-1 ring-inset ring-green-200">
-          <Icon name="check" className="h-7 w-7" strokeWidth={2.5} />
-        </span>
-        <h1 className="text-2xl font-extrabold tracking-tight">Account created!</h1>
-        <p role="status" className="text-sm text-slate-600">
-          {done.emailConfirmationRequired ? (
-            <>We sent a verification link to <strong className="text-ink">{done.email}</strong>. Please confirm your email, then log in with your new account.</>
-          ) : (
-            <>Your account for <strong className="text-ink">{done.email}</strong> is ready. Please log in with your registered email and password.</>
-          )}
-        </p>
-        <button type="button" className="btn-primary w-full py-3"
-          onClick={() => navigate('/login', { state: { email: done.email, registered: true } })}>
-          Go to log in
-        </button>
-      </div>
+      <AuthLayout {...layout}>
+        <div className="space-y-4 text-center lg:text-left">
+          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green-50 text-green-700 ring-1 ring-inset ring-green-200 lg:mx-0">
+            <Icon name="check" className="h-7 w-7" strokeWidth={2.5} />
+          </span>
+          <h1 className="text-2xl font-extrabold tracking-tight lg:text-3xl">Account created!</h1>
+          <p role="status" className="text-sm leading-relaxed text-slate-600">
+            {done.emailConfirmationRequired ? (
+              <>We sent a verification link to <strong className="text-ink">{done.email}</strong>. Please confirm your email, then log in with your new account.</>
+            ) : (
+              <>Your account for <strong className="text-ink">{done.email}</strong> is ready. Please log in with your registered email and password.</>
+            )}
+          </p>
+          <button type="button" className="btn-primary w-full py-3"
+            onClick={() => navigate('/login', { state: { email: done.email, registered: true } })}>
+            Go to log in
+          </button>
+        </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <form onSubmit={submit} className="card mx-auto mt-2 max-w-lg space-y-5 p-6 sm:mt-8 sm:p-8 md:mt-10">
-      <div className="flex flex-col items-center gap-3 text-center">
-        <LogoMark className="h-12 w-12 rounded-2xl" iconClass="h-6 w-6" />
-        <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Create your account</h1>
-          <p className="mt-1 text-sm text-slate-600">Join your school's uniform exchange.</p>
+    <AuthLayout {...layout}>
+      <form onSubmit={submit} className="space-y-5">
+        <AuthHeading logo={<LogoMark className="h-12 w-12 rounded-2xl" iconClass="h-6 w-6" />}
+          title="Create your account" subtitle="Join your school's uniform exchange." />
+
+        {error && <p role="alert" className="animate-fade-up rounded-xl bg-red-50 p-3 text-sm text-red-700 ring-1 ring-inset ring-red-200">{error}</p>}
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {field('fullName', 'Full name', 'text', { autoComplete: 'name' })}
+          {field('studentId', 'Student ID')}
         </div>
-      </div>
-
-      {error && <p role="alert" className="animate-fade-up rounded-xl bg-red-50 p-3 text-sm text-red-700 ring-1 ring-inset ring-red-200">{error}</p>}
-
-      {field('fullName', 'Full name', 'text', { autoComplete: 'name' })}
-      <div className="grid gap-4 sm:grid-cols-2">
-        {field('studentId', 'Student ID')}
         {field('email', 'Email address', 'email', { autoComplete: 'email' })}
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        {field('program', 'Program / Course')}
-        <div>
-          <label className="label" htmlFor="yearLevel">Year level</label>
-          <select id="yearLevel" className="input" value={form.yearLevel} onChange={set('yearLevel')}>
-            {YEARS.map((y) => <option key={y}>{y}</option>)}
-          </select>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {field('program', 'Program / Course')}
+          <div>
+            <label className="label" htmlFor="yearLevel">Year level</label>
+            <select id="yearLevel" className="input" value={form.yearLevel} onChange={set('yearLevel')}>
+              {YEARS.map((y) => <option key={y}>{y}</option>)}
+            </select>
+          </div>
         </div>
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        {field('password', 'Password', 'password', { autoComplete: 'new-password', minLength: 6 })}
-        {field('confirmPassword', 'Confirm password', 'password', { autoComplete: 'new-password', minLength: 6 })}
-      </div>
-      <p className="-mt-2 text-xs text-slate-500">Use at least 6 characters.</p>
+        <div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {field('password', 'Password', 'password', { autoComplete: 'new-password', minLength: 6, 'aria-describedby': 'password-hint' })}
+            {field('confirmPassword', 'Confirm password', 'password', { autoComplete: 'new-password', minLength: 6 })}
+          </div>
+          <p id="password-hint" className="mt-1.5 text-xs text-slate-500">Use at least 6 characters.</p>
+        </div>
 
-      <button className="btn-primary w-full py-3" disabled={busy}>
-        {busy ? <><Spinner /> Creating account…</> : 'Create account'}
-      </button>
+        <button className="btn-primary w-full py-3" disabled={busy}>
+          {busy ? <><Spinner /> Creating account…</> : 'Create account'}
+        </button>
 
-      <p className="text-center text-sm text-slate-600">
-        Already have an account? <Link to="/login" className="font-semibold text-navy hover:underline">Log in</Link>
-      </p>
-    </form>
+        <p className="text-center text-sm text-slate-600 lg:text-left">
+          Already have an account? <Link to="/login" className="font-semibold text-navy hover:underline">Log in</Link>
+        </p>
+      </form>
+    </AuthLayout>
   );
 }

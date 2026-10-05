@@ -62,7 +62,7 @@ export default function Navbar() {
       </header>
 
       {/* Bottom tab bar: phones only */}
-      <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 flex border-t border-aqua/70 bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_rgb(31_95_99/0.06)] backdrop-blur md:hidden">
+      <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 flex border-t border-aqua/70 bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_rgb(37_96_104/0.06)] backdrop-blur md:hidden">
         {tabs.map((t) => (
           <NavLink key={t.to} to={t.to} end={t.end}
             className={({ isActive }) => `flex min-w-0 flex-1 flex-col items-center gap-1 pb-2 pt-1.5 text-[11px] font-semibold transition active:scale-95 ${isActive ? 'text-navy' : 'text-slate-500'}`}>

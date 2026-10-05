@@ -3,19 +3,20 @@
 @theme {
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 
-  /* Brand palette (teal): #CEFEF1, #A6D6C9, #4CA7A1, #1F5F63, #0D2B36, #001722.
+  /* Brand palette: sky #91D2D9, cream #EFF2E4, pistachio #D7D9A3, with the warm dark brown from the same
+     palette card for text. The palette has no dark colour, so buttons use a deeper shade of the sky blue.
      Token names predate this palette and are kept so class names across the app stay the same. */
-  --color-ink: #001722;       /* darkest: body text (17:1 on the page background) */
-  --color-navy-deep: #0d2b36; /* hover/pressed state of navy */
-  --color-navy: #1f5f63;      /* deep teal: primary buttons, links, dark panels (7.3:1 with white) */
-  --color-denim: #4ca7a1;     /* teal: borders and accents only; too light for text (2.9:1 on white) */
-  --color-powder: #a6d6c9;    /* sage: decorative shapes, focus rings, soft-button hover */
-  --color-cream: #cefef1;     /* mint: highlight chips and tiles */
+  --color-ink: #3b3330;       /* warm dark brown: body text (10.9:1 on the page background) */
+  --color-navy: #256068;      /* deep sky blue: primary buttons, links, dark panels (7.1:1 with white) */
+  --color-navy-deep: #1a464c; /* hover/pressed state of navy */
+  --color-denim: #5aaab4;     /* mid sky: borders and accents only; too light for text (2.7:1 on white) */
+  --color-powder: #91d2d9;    /* sky: decorative shapes, focus rings, soft-button hover */
+  --color-cream: #d7d9a3;     /* pistachio: highlight chips and tiles */
 
-  /* #A6D6C9 is too strong for large areas, so these are it mixed with white */
-  --color-aqua: #cfe7e0;      /* light fills, active pills, avatar tiles, card borders */
-  --color-frost: #e4f3ef;     /* subtle fills, hover backgrounds */
-  --color-mist: #f4faf8;      /* page background */
+  /* Sky blue mixed with white for fills, and cream as the page background */
+  --color-aqua: #c8e9ec;      /* 50% sky: light fills, active pills, avatar tiles, card borders */
+  --color-frost: #e7f5f7;     /* 22% sky: subtle fills, hover backgrounds */
+  --color-mist: #eff2e4;      /* cream: page background */
 
   --animate-fade-up: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-fade-in: fade-in 0.4s ease-out both;
@@ -53,8 +54,8 @@
     z-index: -1;
     pointer-events: none;
     background:
-      radial-gradient(44rem 26rem at 100% 0%, rgb(166 214 201 / 0.35), transparent 70%),
-      radial-gradient(34rem 22rem at 0% 100%, rgb(206 254 241 / 0.5), transparent 70%);
+      radial-gradient(44rem 26rem at 100% 0%, rgb(145 210 217 / 0.3), transparent 70%),
+      radial-gradient(34rem 22rem at 0% 100%, rgb(215 217 163 / 0.35), transparent 70%);
   }
 }
 
@@ -78,7 +79,7 @@
   /* PasswordInput has its own show/hide button, so hide Edge's built-in one */
   .input::-ms-reveal, .input::-ms-clear { display: none; }
   .label { @apply mb-1.5 block text-sm font-semibold text-slate-700; }
-  .card { @apply rounded-2xl border border-aqua/70 bg-white shadow-[0_1px_2px_rgb(0_23_34/0.04),0_8px_24px_-12px_rgb(31_95_99/0.12)]; }
+  .card { @apply rounded-2xl border border-aqua/70 bg-white shadow-[0_1px_2px_rgb(59_51_48/0.04),0_8px_24px_-12px_rgb(37_96_104/0.12)]; }
   /* Square icon holder used by category cards, stats and feature lists: one colour everywhere */
   .icon-tile { @apply flex shrink-0 items-center justify-center rounded-xl bg-frost text-navy ring-1 ring-inset ring-aqua; }
   .chip { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold; }
@@ -87,12 +88,12 @@
   /* Placeholder block that shimmers while content loads */
   .skeleton {
     @apply rounded-md animate-shimmer;
-    background: linear-gradient(90deg, #e4f3ef 25%, #f2f9f7 50%, #e4f3ef 75%);
+    background: linear-gradient(90deg, #e7f5f7 25%, #f3fafb 50%, #e7f5f7 75%);
     background-size: 200% 100%;
   }
 
   /* Thin, quiet scrollbars for chat and tables */
-  .scroll-thin { scrollbar-width: thin; scrollbar-color: #a6d6c9 transparent; }
+  .scroll-thin { scrollbar-width: thin; scrollbar-color: #91d2d9 transparent; }
 }
 
 @media (prefers-reduced-motion: reduce) {

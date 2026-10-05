@@ -26,13 +26,14 @@ function Tab({ tab, user }) {
   );
 }
 
-// Raised Sell button that sits in the notch cut out of the bar (.tabbar-notch in index.css)
-function SellButton() {
+// Raised centre button that sits in the notch cut out of the bar (.tabbar-notch in index.css):
+// Sell when logged in, Browse when logged out
+function CenterButton({ tab }) {
   return (
-    <NavLink to="/sell"
+    <NavLink to={tab.to} end={tab.end}
       className={({ isActive }) => `absolute left-1/2 top-0 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-0.5 rounded-full text-[11px] font-semibold text-mist shadow-md shadow-navy/25 transition duration-200 hover:-translate-y-[calc(50%+3px)] hover:shadow-lg active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${isActive ? 'bg-navy-deep ring-2 ring-inset ring-mist/40' : 'bg-navy hover:bg-navy-deep'}`}>
-      <Icon name="plus" className="h-6 w-6" strokeWidth={2.2} />
-      Sell
+      <Icon name={tab.icon} className="h-6 w-6" strokeWidth={2.2} />
+      {tab.label}
     </NavLink>
   );
 }
@@ -58,18 +59,19 @@ export default function Navbar() {
     ...(user ? [{ to: '/messages', label: 'Messages' }] : []),
   ];
 
-  // Phone tab bar: Sell takes the raised centre slot when logged in
+  // Phone tab bar: same notched design either way. The middle button is raised:
+  // Sell when logged in, Browse (the logged-out bar keeps its three buttons) when logged out
   const tabs = user
     ? [
         { to: home, label: 'Home', icon: 'home', end: true },
         { to: '/browse', label: 'Browse', icon: 'search' },
-        { center: true },
+        { to: '/sell', label: 'Sell', icon: 'plus', center: true },
         { to: '/messages', label: 'Messages', icon: 'chat' },
         { to: '/profile', label: 'Profile', avatar: true },
       ]
     : [
         { to: home, label: 'Home', icon: 'home', end: true },
-        { to: '/browse', label: 'Browse', icon: 'search' },
+        { to: '/browse', label: 'Browse', icon: 'search', center: true },
         { to: '/login', label: 'Log in', icon: 'user' },
       ];
 
@@ -116,11 +118,11 @@ export default function Navbar() {
       {/* Bottom tab bar: phones only. The white shape is a separate layer so the notch can be masked out of it
           while drop-shadow (on the nav) still follows the notched outline */}
       <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 drop-shadow-[0_-6px_16px_rgb(16_46_74/0.10)] md:hidden">
-        <div className={`absolute inset-0 rounded-t-[1.75rem] bg-white ${user ? 'tabbar-notch' : ''}`} aria-hidden="true" />
+        <div className="tabbar-notch absolute inset-0 rounded-t-[1.75rem] bg-white" aria-hidden="true" />
         <ul className="relative grid px-2 pb-[env(safe-area-inset-bottom)]" style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
           {tabs.map((t) => (
-            <li key={t.center ? 'sell' : t.label} className="relative">
-              {t.center ? <SellButton /> : <Tab tab={t} user={user} />}
+            <li key={t.label} className="relative">
+              {t.center ? <CenterButton tab={t} /> : <Tab tab={t} user={user} />}
             </li>
           ))}
         </ul>

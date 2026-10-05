@@ -88,11 +88,17 @@
   .page-subtitle { @apply mt-1 text-sm text-slate-600 sm:text-base; }
   .section-title { @apply text-lg font-bold text-ink; }
 
-  /* Selectable choice (Browse filters, Sell form options): white pill, filled Midnight when selected.
-     .choice-on marks a selected <button>; a <label> wrapping a checked radio gets the same look via :has */
+  /* Selectable choice (Sell form options): white pill, filled Midnight when the radio inside is checked */
   .choice { @apply relative inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-aqua transition duration-200 hover:bg-frost hover:text-navy hover:ring-denim/50 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy; }
-  .choice-on, .choice:has(:checked) { @apply bg-navy text-mist shadow-sm shadow-navy/20 ring-navy hover:bg-navy hover:text-mist hover:ring-navy; }
+  .choice:has(:checked) { @apply bg-navy text-mist shadow-sm shadow-navy/20 ring-navy hover:bg-navy hover:text-mist hover:ring-navy; }
   .choice:has(:focus-visible) { @apply outline-2 outline-offset-2 outline-navy; }
+
+  /* Toolbar control (sort, Filters toggle, Log in, account button): one 40px outlined style everywhere */
+  .control { @apply inline-flex h-10 shrink-0 items-center gap-2 rounded-xl bg-white px-3 text-sm font-semibold text-ink ring-1 ring-inset ring-aqua transition duration-200 hover:bg-frost hover:ring-denim/50 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy; }
+
+  /* Underline tab (header links, Browse categories): a Midnight bar slides in under the current one */
+  .tab { @apply relative inline-flex shrink-0 items-center gap-2 px-3 text-sm font-semibold text-slate-500 transition-colors duration-200 hover:text-navy after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:scale-x-0 after:rounded-full after:bg-navy after:transition-transform after:duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-navy; }
+  .tab-on { @apply text-navy after:scale-x-100; }
 
   /* Inline messages (form errors, success notices) */
   .alert-error { @apply rounded-xl bg-red-50 p-3 text-sm text-red-700 ring-1 ring-inset ring-red-200; }

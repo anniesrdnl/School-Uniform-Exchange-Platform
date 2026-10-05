@@ -13,7 +13,6 @@ export default function Home() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
-  const [q, setQ] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,10 +22,6 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, []);
 
-  const search = (e) => {
-    e.preventDefault();
-    navigate(`/browse?q=${encodeURIComponent(q)}`);
-  };
 
   return (
     <div className="space-y-10">
@@ -38,7 +33,7 @@ export default function Home() {
         <h1 className="relative mt-1 max-w-xl text-2xl font-bold leading-tight tracking-[-0.015em] text-ink sm:text-3xl md:text-4xl">
           Find the uniform you need, or pass on the one you've outgrown.
         </h1>
-        <SearchBar onSubmit={search} id="home-search" value={q} onChange={(e) => setQ(e.target.value)} className="relative mt-6 max-w-xl" />
+        <SearchBar id="home-search" onSearch={(v) => navigate(v ? `/browse?q=${encodeURIComponent(v)}` : '/browse')} className="relative mt-6 max-w-xl" />
         <Link to="/sell" className="relative mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-lg text-sm font-semibold text-navy hover:underline">
           <Icon name="plus-circle" className="h-5 w-5" /> Sell a uniform
         </Link>

@@ -9,7 +9,7 @@ import { CATEGORIES, CATEGORY_STYLES, CONDITIONS, CONDITION_HINTS, SIZES, format
 
 // Everything lives in the URL (?q=&category=&size=&condition=&minPrice=&maxPrice=&sort=&page=) so results can be shared
 const FILTER_KEYS = ['category', 'size', 'condition', 'minPrice', 'maxPrice'];
-const SORTS = [['newest', 'Newest'], ['price-asc', 'Price: low to high'], ['price-desc', 'Price: high to low']];
+const SORTS = [['newest', 'Newest first'], ['price-asc', 'Price: low to high'], ['price-desc', 'Price: high to low']];
 const GRID = 'grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4';
 
 // One-tap price ranges; a custom min/max form sits under them
@@ -30,15 +30,6 @@ function FilterSection({ id, title, value, children }) {
       </div>
       {children}
     </section>
-  );
-}
-
-// Pill toggle for categories, sizes and conditions (.choice in index.css); aria-pressed tells screen readers which is on
-function Toggle({ active, onClick, children, className = '' }) {
-  return (
-    <button type="button" onClick={onClick} aria-pressed={active} className={`choice ${active ? 'choice-on' : ''} ${className}`}>
-      {children}
-    </button>
   );
 }
 
@@ -73,10 +64,6 @@ export default function Browse() {
       .finally(() => setLoading(false));
   }, [params]);
 
-  const search = (e) => {
-    e.preventDefault();
-    setParam('q', new FormData(e.currentTarget).get('q').trim());
-  };
 
   const priceLabel = minPrice && maxPrice ? `${formatPrice(minPrice)} – ${formatPrice(maxPrice)}`
     : minPrice ? `${formatPrice(minPrice)} and up` : `Up to ${formatPrice(maxPrice)}`;
@@ -106,15 +93,16 @@ export default function Browse() {
           <p className="page-subtitle">Second-hand uniforms from students on your campus.</p>
         </div>
 
-        <SearchBar onSubmit={search} id="q" name="q" key={q} defaultValue={q} className="max-w-2xl" />
+        <SearchBar id="q" defaultValue={q} onSearch={(v) => setParam('q', v)} className="max-w-2xl" />
 
-        {/* one row that scrolls sideways on phones, wraps on larger screens */}
-        <div role="group" aria-label="Category" className="relative -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
-          <Toggle active={!category} onClick={() => setParam('category', '')}>All</Toggle>
-          {CATEGORIES.map((c) => (
-            <Toggle key={c} active={category === c} onClick={() => toggle('category', c)}>
-              <Icon name={CATEGORY_STYLES[c].icon} className="h-4 w-4" /> {c}
-            </Toggle>
+        {/* underline tabs (same style as the header links); the row scrolls sideways on phones */}
+        <div role="group" aria-label="Category"
+          className="relative -mx-4 flex h-11 overflow-x-auto px-4 shadow-[inset_0_-1px_0_var(--color-aqua)] [scrollbar-width:none] sm:mx-0 sm:px-0">
+          {[['', 'All', 'grid'], ...CATEGORIES.map((c) => [c, c, CATEGORY_STYLES[c].icon])].map(([value, label, icon]) => (
+            <button key={label} type="button" aria-pressed={category === value} onClick={() => setParam('category', value)}
+              className={`tab first:pl-0 first:after:left-0 ${category === value ? 'tab-on' : ''}`}>
+              <Icon name={icon} className="h-4 w-4" /> {label}
+            </button>
           ))}
         </div>
       </header>
@@ -200,15 +188,20 @@ export default function Browse() {
             </h2>
             <div className="flex items-center gap-2">
               <button type="button" onClick={() => setShowFilters(!showFilters)} aria-expanded={showFilters} aria-controls="filters"
-                className="btn-outline px-3 py-2 lg:hidden">
+                className={`control lg:hidden ${showFilters ? 'bg-frost' : ''}`}>
                 <Icon name="filter" className="h-4 w-4" />
                 Filters
                 {panelFilters > 0 && <span className="chip bg-navy px-2 text-mist">{panelFilters}</span>}
               </button>
-              <label htmlFor="sort" className="hidden text-sm text-slate-600 sm:inline">Sort by</label>
-              <select id="sort" className="input w-auto py-2" value={get('sort') || 'newest'} onChange={(e) => setParam('sort', e.target.value)}>
-                {SORTS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-              </select>
+              {/* native select (best on phones and for screen readers) dressed as a control */}
+              <div className="relative">
+                <label htmlFor="sort" className="sr-only">Sort by</label>
+                <Icon name="sort" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                <select id="sort" className="control cursor-pointer appearance-none pl-9 pr-9" value={get('sort') || 'newest'} onChange={(e) => setParam('sort', e.target.value)}>
+                  {SORTS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                </select>
+                <Icon name="chevron-down" className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" strokeWidth={2} />
+              </div>
             </div>
           </div>
 

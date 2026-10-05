@@ -5,11 +5,6 @@ import Logo from './Logo.jsx';
 import Avatar from './Avatar.jsx';
 import UserMenu from './UserMenu.jsx';
 
-const pillCls = ({ isActive }) =>
-  `rounded-full px-4 py-1.5 text-sm font-semibold transition duration-200 active:scale-95 ${isActive
-    ? 'bg-white text-navy shadow-sm shadow-navy/10'
-    : 'text-slate-600 hover:bg-white/60 hover:text-navy'}`;
-
 // Phone tab: solid icon + Midnight label when active, outline icon when not (shape changes too, not just colour)
 function Tab({ tab, user }) {
   return (
@@ -77,24 +72,29 @@ export default function Navbar() {
             <Logo />
           </Link>
 
-          <nav aria-label="Main" className="hidden items-center gap-1 rounded-full bg-frost p-1 ring-1 ring-inset ring-aqua/70 md:flex">
-            {links.map((l) => <NavLink key={l.label} to={l.to} end={l.end} className={pillCls}>{l.label}</NavLink>)}
+          {/* underline tabs: the bar under the current page sits on the header's bottom edge */}
+          <nav aria-label="Main" className="hidden h-16 items-stretch md:flex">
+            {links.map((l) => (
+              <NavLink key={l.label} to={l.to} end={l.end} className={({ isActive }) => `tab px-4 after:inset-x-4 ${isActive ? 'tab-on' : ''}`}>
+                {l.label}
+              </NavLink>
+            ))}
           </nav>
 
           <div className="flex items-center justify-end gap-2">
             {user ? (
               <>
-                <Link to="/sell" className="btn-primary hidden py-2 pl-3 pr-4 hover:-translate-y-px hover:shadow-md md:inline-flex">
+                <Link to="/sell" className="btn-primary hidden h-10 pl-3 pr-4 hover:shadow-md md:inline-flex">
                   <Icon name="plus" className="h-4 w-4" strokeWidth={2.2} /> Sell
                 </Link>
                 <UserMenu user={user} onLogout={() => { logout(); navigate('/'); }} />
               </>
             ) : (
               <>
-                <Link to="/login" className="hidden whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-frost hover:text-navy active:scale-95 min-[360px]:inline-flex">
+                <Link to="/login" className="control hidden whitespace-nowrap min-[360px]:inline-flex">
                   Log in
                 </Link>
-                <Link to="/register" className="btn-primary whitespace-nowrap px-4 py-2 hover:-translate-y-px hover:shadow-md">Sign up</Link>
+                <Link to="/register" className="btn-primary h-10 whitespace-nowrap px-4 hover:shadow-md">Sign up</Link>
               </>
             )}
           </div>

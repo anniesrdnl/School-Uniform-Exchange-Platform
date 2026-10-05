@@ -23,7 +23,7 @@ export default function App() {
     <>
       <Navbar />
       {/* extra bottom room where the floating help button sits, so it never covers the end of a page */}
-      <main className={`mx-auto max-w-6xl px-4 pt-4 sm:pt-6 ${showsHelpChat(location.pathname)
+      <main className={`mx-auto max-w-7xl px-4 pt-4 sm:pt-6 lg:px-8 ${showsHelpChat(location.pathname)
         ? 'pb-[calc(9.5rem+env(safe-area-inset-bottom))] md:pb-28'
         : 'pb-[calc(7rem+env(safe-area-inset-bottom))] md:pb-12'}`}>
         {/* keyed by path so each page fades in on navigation */}

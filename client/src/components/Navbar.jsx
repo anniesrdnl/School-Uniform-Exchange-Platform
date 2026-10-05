@@ -72,7 +72,7 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-30 border-b border-aqua/70 bg-white/85 pt-[env(safe-area-inset-top)] backdrop-blur-md supports-[backdrop-filter]:bg-white/75">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 md:grid md:grid-cols-[1fr_auto_1fr]">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 lg:px-8 md:grid md:grid-cols-[1fr_auto_1fr]">
           <Link to="/" className="shrink-0 justify-self-start rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-navy">
             <Logo />
           </Link>

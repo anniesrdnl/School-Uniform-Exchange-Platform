@@ -6,6 +6,7 @@ import { Spinner } from '../components/Loader.jsx';
 import Icon from '../components/Icon.jsx';
 import { LogoMark } from '../components/Logo.jsx';
 import AuthLayout, { AuthHeading } from '../components/AuthLayout.jsx';
+import PasswordInput from '../components/PasswordInput.jsx';
 
 const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'];
 
@@ -55,6 +56,13 @@ export default function Register() {
     </div>
   );
 
+  const passwordField = (id, label, props = {}) => (
+    <div>
+      <label className="label" htmlFor={id}>{label}</label>
+      <PasswordInput id={id} required minLength={6} autoComplete="new-password" value={form[id]} onChange={set(id)} {...props} />
+    </div>
+  );
+
   const layout = { headline: 'Pass it on. Save on the next one.', text: 'Join students who buy, sell, and swap school uniforms on campus.' };
 
   if (done) {
@@ -85,7 +93,7 @@ export default function Register() {
     <AuthLayout {...layout}>
       <form onSubmit={submit} className="space-y-5">
         <AuthHeading logo={<LogoMark className="h-12 w-12 rounded-2xl" iconClass="h-6 w-6" />}
-          title="Create your account" subtitle="Join your school's uniform exchange." />
+          title="Create your account" subtitle="Free to join. It takes about a minute." />
 
         {error && <p role="alert" className="animate-fade-up rounded-xl bg-red-50 p-3 text-sm text-red-700 ring-1 ring-inset ring-red-200">{error}</p>}
 
@@ -105,8 +113,8 @@ export default function Register() {
         </div>
         <div>
           <div className="grid gap-4 sm:grid-cols-2">
-            {field('password', 'Password', 'password', { autoComplete: 'new-password', minLength: 6, 'aria-describedby': 'password-hint' })}
-            {field('confirmPassword', 'Confirm password', 'password', { autoComplete: 'new-password', minLength: 6 })}
+            {passwordField('password', 'Password', { 'aria-describedby': 'password-hint' })}
+            {passwordField('confirmPassword', 'Confirm password')}
           </div>
           <p id="password-hint" className="mt-1.5 text-xs text-slate-500">Use at least 6 characters.</p>
         </div>

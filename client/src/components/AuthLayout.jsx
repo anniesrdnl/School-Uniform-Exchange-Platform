@@ -1,42 +1,47 @@
 import uniformImg from '../assets/uniforms.jpg';
 import Icon from './Icon.jsx';
 
-const HIGHLIGHTS = ['Free to join', 'Buy or swap uniforms with other students', 'Chat with sellers in the app'];
+// How an exchange works, shown under the photo on desktop
+const STEPS = [
+  { icon: 'tag', title: 'Post it', text: "List what you've outgrown" },
+  { icon: 'chat', title: 'Chat', text: 'Agree on a price or a swap' },
+  { icon: 'recycle', title: 'Pass it on', text: 'Meet up on campus' },
+];
 
-// Split screen for login/register: palette panel on desktop, plain centred card on smaller screens
+// Split screen for login/register: photo + navy story panel on desktop, plain centred card on smaller screens
 export default function AuthLayout({ headline, text, children }) {
   return (
-    // min-height fills the viewport below the 64px header + page padding (8.5rem) and the header's 1px border
-    <div className="card mx-auto grid max-w-lg overflow-hidden lg:min-h-[calc(100dvh-8.5rem-1px)] lg:max-w-none lg:grid-cols-[1.1fr_1fr]">
-      <aside className="relative hidden flex-col justify-between gap-10 overflow-hidden bg-aqua p-10 lg:flex xl:p-12">
-        <div className="pointer-events-none absolute -right-36 -top-40 h-80 w-80 rounded-full bg-powder" aria-hidden="true" />
-        <div className="pointer-events-none absolute -bottom-28 -left-20 h-72 w-72 rounded-full bg-cream" aria-hidden="true" />
+    // centred in the viewport below the 64px header + page padding (8.5rem) and the header's 1px border
+    <div className="lg:flex lg:min-h-[calc(100dvh-8.5rem-1px)] lg:items-center">
+      <div className="card mx-auto grid w-full max-w-lg overflow-hidden lg:min-h-[38rem] lg:max-w-5xl lg:grid-cols-2">
+        <aside className="hidden flex-col bg-navy text-white lg:flex">
+          <div className="relative min-h-56 flex-1">
+            <img src={uniformImg} alt="Folded navy and white school uniforms stacked on a table"
+              className="absolute inset-0 h-full w-full object-cover" />
+          </div>
 
-        <div className="relative">
-          <span className="chip bg-cream px-3 py-1 text-navy ring-1 ring-inset ring-amber-200/70">For students, by students</span>
-          <p className="mt-5 max-w-md text-4xl font-extrabold leading-[1.1] tracking-tight text-ink xl:text-[2.75rem]">{headline}</p>
-          <p className="mt-3 max-w-sm leading-relaxed text-slate-700">{text}</p>
-          {/* hidden on short laptop screens so the panel fits without scrolling */}
-          <ul className="mt-6 space-y-2.5 text-sm font-medium text-slate-700 [@media(max-height:820px)]:hidden">
-            {HIGHLIGHTS.map((h) => (
-              <li key={h} className="flex items-center gap-2.5">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-navy shadow-sm">
-                  <Icon name="check" className="h-3.5 w-3.5" strokeWidth={3} />
-                </span>
-                {h}
-              </li>
-            ))}
-          </ul>
+          <div className="shrink-0 p-8 xl:p-10">
+            <span className="chip bg-white/10 px-3 py-1 text-aqua ring-1 ring-inset ring-white/15">For students, by students</span>
+            <p className="mt-4 max-w-sm text-balance text-2xl font-extrabold leading-tight tracking-tight xl:text-3xl">{headline}</p>
+            <p className="mt-2 max-w-sm text-sm leading-relaxed text-aqua">{text}</p>
+
+            <ol className="mt-6 grid grid-cols-3 gap-4 border-t border-white/15 pt-6">
+              {STEPS.map((s) => (
+                <li key={s.title} className="min-w-0">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-aqua">
+                    <Icon name={s.icon} className="h-5 w-5" />
+                  </span>
+                  <p className="mt-2 text-sm font-bold">{s.title}</p>
+                  <p className="text-xs leading-snug text-aqua">{s.text}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </aside>
+
+        <div className="flex items-center justify-center p-6 sm:p-10 xl:p-12">
+          <div className="w-full max-w-sm">{children}</div>
         </div>
-
-        <div className="relative rounded-3xl bg-powder p-2.5 shadow-xl shadow-navy/10">
-          <img src={uniformImg} alt="Folded navy and white school uniforms stacked on a table"
-            className="aspect-[16/10] max-h-[32dvh] w-full rounded-[1.25rem] object-cover" />
-        </div>
-      </aside>
-
-      <div className="flex items-center justify-center p-6 sm:p-10 xl:p-14">
-        <div className="w-full max-w-md">{children}</div>
       </div>
     </div>
   );

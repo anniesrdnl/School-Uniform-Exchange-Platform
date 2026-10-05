@@ -71,6 +71,10 @@
 
   /* text-base on phones stops iOS Safari from zooming in when an input is focused */
   .input { @apply w-full min-w-0 rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-base text-ink transition duration-200 placeholder:text-slate-400 hover:border-denim focus:border-navy focus:outline-none focus:ring-4 focus:ring-powder/50 sm:text-sm; }
+  /* Keep autofilled fields white: Chrome's blue fill is delayed forever by the transition */
+  .input:-webkit-autofill { -webkit-text-fill-color: var(--color-ink); transition: background-color 600000s 0s; }
+  /* PasswordInput has its own show/hide button, so hide Edge's built-in one */
+  .input::-ms-reveal, .input::-ms-clear { display: none; }
   .label { @apply mb-1.5 block text-sm font-semibold text-slate-700; }
   .card { @apply rounded-2xl border border-aqua/70 bg-white shadow-[0_1px_2px_rgb(18_38_58/0.04),0_8px_24px_-12px_rgb(31_78_121/0.12)]; }
   .chip { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold; }

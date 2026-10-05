@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { errMsg } from '../api.js';
 import { Spinner } from '../components/Loader.jsx';
 import { LogoMark } from '../components/Logo.jsx';
+import PasswordInput from '../components/PasswordInput.jsx';
 import AuthLayout, { AuthHeading } from '../components/AuthLayout.jsx';
 
 export default function Login() {
@@ -30,11 +31,11 @@ export default function Login() {
   };
 
   return (
-    <AuthLayout headline="Good to see you again."
+    <AuthLayout headline="Your next uniform might already be on campus."
       text="Pick up where you left off: check your requests, reply to buyers, and find your next uniform.">
       <form onSubmit={submit} className="space-y-5">
         <AuthHeading logo={<LogoMark className="h-12 w-12 rounded-2xl" iconClass="h-6 w-6" />}
-          title="Welcome back" subtitle="Log in to buy, sell, and swap uniforms." />
+          title="Welcome back" subtitle="Log in to your account to continue." />
         {justRegistered && !error && (
           <p role="status" className="animate-fade-up rounded-xl bg-green-50 p-3 text-sm text-green-800 ring-1 ring-inset ring-green-200">
             Registration successful. Log in with your new account.
@@ -48,7 +49,7 @@ export default function Login() {
         </div>
         <div>
           <label className="label" htmlFor="password">Password</label>
-          <input id="password" type="password" autoComplete="current-password" required className="input" value={form.password}
+          <PasswordInput id="password" autoComplete="current-password" required value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })} />
         </div>
         <button className="btn-primary w-full py-3" disabled={busy}>{busy ? <><Spinner /> Logging in…</> : 'Log in'}</button>

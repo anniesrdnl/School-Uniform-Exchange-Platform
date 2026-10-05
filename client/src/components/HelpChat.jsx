@@ -78,65 +78,89 @@ export default function HelpChat() {
       {open && (
         <section id={panelId} role="dialog" aria-labelledby={titleId}
           onKeyDown={(e) => e.key === 'Escape' && close()}
-          className="fixed inset-x-3 bottom-[calc(9.5rem+env(safe-area-inset-bottom))] top-24 z-40 flex animate-fade-up flex-col overflow-hidden rounded-2xl bg-white shadow-2xl shadow-navy/20 ring-1 ring-aqua sm:inset-x-auto sm:right-4 sm:top-auto sm:h-[34rem] sm:max-h-[calc(100dvh-12rem)] sm:w-[23rem] md:bottom-24 md:right-6">
-          <header className="flex items-center gap-3 border-b border-aqua/70 px-4 py-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-frost">
-              <LogoMark className="h-6 w-6" />
+          className="fixed inset-x-3 bottom-[calc(9.5rem+env(safe-area-inset-bottom))] top-24 z-40 flex animate-fade-up flex-col overflow-hidden rounded-3xl bg-white shadow-2xl shadow-navy/25 ring-1 ring-navy/5 sm:inset-x-auto sm:right-4 sm:top-auto sm:h-[34rem] sm:max-h-[calc(100dvh-12rem)] sm:w-[23rem] md:bottom-24 md:right-6">
+          {/* Midnight header with white text; the soft circles are decoration */}
+          <header className="relative isolate flex items-center gap-3 overflow-hidden bg-navy px-4 py-4 text-white">
+            <span className="pointer-events-none absolute -right-8 -top-16 -z-10 h-36 w-36 rounded-full bg-white/10" aria-hidden="true" />
+            <span className="pointer-events-none absolute -bottom-12 right-16 -z-10 h-20 w-20 rounded-full bg-white/5" aria-hidden="true" />
+            <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white shadow-md shadow-navy-deep/30">
+              <LogoMark className="h-7 w-7" />
+              <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-navy" aria-hidden="true" />
             </span>
             <div className="min-w-0 flex-1">
-              <h2 id={titleId} className="text-sm font-bold text-ink">Help assistant</h2>
-              <p className="text-xs text-slate-500">Quick answers to common questions</p>
+              <h2 id={titleId} className="text-[15px] font-bold leading-tight">Help assistant</h2>
+              <p className="mt-0.5 text-xs text-white/70">Online · replies instantly</p>
             </div>
             <button type="button" onClick={close} aria-label="Close help"
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition hover:bg-frost hover:text-navy focus-visible:outline-2 focus-visible:outline-navy">
-              <Icon name="x" className="h-5 w-5" />
+              className="flex h-9 w-9 items-center justify-center rounded-full text-white/80 transition hover:bg-white/15 hover:text-white active:scale-95 focus-visible:outline-2 focus-visible:outline-white">
+              <Icon name="x" className="h-5 w-5" strokeWidth={2} />
             </button>
           </header>
 
-          <div role="log" aria-live="polite" className="scroll-thin flex-1 space-y-3 overflow-y-auto bg-mist px-4 py-4">
-            {messages.map((m) => (
-              <div key={m.id} className={`flex ${m.from === 'user' ? 'justify-end' : ''}`}>
-                <div className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${m.from === 'user'
-                  ? 'rounded-br-md bg-navy text-white'
-                  : 'rounded-bl-md bg-white text-ink shadow-sm ring-1 ring-aqua/80'}`}>
-                  {m.from === 'user' && <span className="sr-only">You: </span>}
-                  <p className="whitespace-pre-line">{m.text}</p>
-                  {m.link && (
-                    <Link to={m.link.to} onClick={() => setOpen(false)} className="mt-2 inline-flex items-center gap-1 font-semibold text-navy underline-offset-2 hover:underline">
-                      {m.link.label} <Icon name="arrow-right" className="h-3.5 w-3.5" strokeWidth={2} />
-                    </Link>
-                  )}
+          <div role="log" aria-live="polite" className="scroll-thin flex-1 space-y-3 overflow-y-auto bg-white px-4 py-5">
+            {messages.map((m) => (m.from === 'user'
+              ? (
+                <div key={m.id} className="flex animate-fade-up justify-end">
+                  <div className="max-w-[80%] rounded-2xl rounded-br-md bg-navy px-3.5 py-2.5 text-sm leading-relaxed text-white shadow-sm shadow-navy/20">
+                    <span className="sr-only">You: </span>
+                    <p className="whitespace-pre-line">{m.text}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ) : (
+                <div key={m.id} className="flex animate-fade-up items-end gap-2">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-aqua" aria-hidden="true">
+                    <LogoMark className="h-5 w-5" />
+                  </span>
+                  <div className="max-w-[80%] rounded-2xl rounded-bl-md bg-frost px-3.5 py-2.5 text-sm leading-relaxed text-ink">
+                    <p className="whitespace-pre-line">{m.text}</p>
+                    {m.link && (
+                      <Link to={m.link.to} onClick={() => setOpen(false)}
+                        className="group mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-navy shadow-sm ring-1 ring-aqua transition hover:bg-navy hover:text-white hover:ring-navy">
+                        {m.link.label} <Icon name="arrow-right" className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" strokeWidth={2} />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              )))}
             {typing && (
-              <div className="flex" aria-label="Assistant is typing">
-                <span className="flex gap-1 rounded-2xl rounded-bl-md bg-white px-3.5 py-3 shadow-sm ring-1 ring-aqua/80">
-                  {[0, 150, 300].map((d) => <span key={d} className="h-1.5 w-1.5 animate-pulse rounded-full bg-denim" style={{ animationDelay: `${d}ms` }} />)}
+              <div className="flex items-end gap-2" aria-label="Assistant is typing">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-aqua" aria-hidden="true">
+                  <LogoMark className="h-5 w-5" />
+                </span>
+                <span className="flex gap-1 rounded-2xl rounded-bl-md bg-frost px-3.5 py-3.5">
+                  {[0, 150, 300].map((d) => <span key={d} className="h-1.5 w-1.5 animate-bounce rounded-full bg-denim" style={{ animationDelay: `${d}ms` }} />)}
                 </span>
               </div>
             )}
             {/* topic chips only under the latest answer, to keep the thread tidy */}
             {!typing && last?.from === 'bot' && last.suggestions?.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-1">
-                {last.suggestions.map((id) => (
-                  <button key={id} type="button" onClick={() => ask(FAQ_BY_ID[id].question, id)}
-                    className="rounded-full bg-white px-3 py-1.5 text-left text-xs font-semibold text-navy ring-1 ring-inset ring-powder transition hover:bg-frost hover:ring-denim focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy">
-                    {FAQ_BY_ID[id].question}
-                  </button>
-                ))}
+              <div className="animate-fade-up pl-9 pt-1">
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Suggested topics</p>
+                <div className="flex flex-wrap gap-2">
+                  {last.suggestions.map((id) => (
+                    <button key={id} type="button" onClick={() => ask(FAQ_BY_ID[id].question, id)}
+                      className="group inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-left text-xs font-semibold text-navy shadow-sm ring-1 ring-inset ring-aqua transition duration-200 hover:bg-navy hover:text-white hover:ring-navy active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy">
+                      {FAQ_BY_ID[id].question}
+                      <Icon name="arrow-right" className="h-3.5 w-3.5 -translate-x-1 opacity-0 transition duration-200 group-hover:translate-x-0 group-hover:opacity-100" strokeWidth={2} />
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
             <div ref={endRef} />
           </div>
 
-          <form onSubmit={(e) => { e.preventDefault(); ask(text); }} className="flex items-center gap-2 border-t border-aqua/70 p-3">
-            <label htmlFor={`${panelId}-input`} className="sr-only">Type your question</label>
-            <input id={`${panelId}-input`} ref={inputRef} className="input" placeholder="Type your question…" autoComplete="off"
-              maxLength={200} value={text} onChange={(e) => setText(e.target.value)} />
-            <button className="btn-primary shrink-0 px-3" disabled={!text.trim() || typing} aria-label="Send question">
-              <Icon name="send" className="h-5 w-5" />
-            </button>
+          <form onSubmit={(e) => { e.preventDefault(); ask(text); }} className="border-t border-aqua/60 bg-white p-3">
+            <div className="flex items-center gap-2 rounded-full bg-white py-1.5 pl-4 pr-1.5 ring-1 ring-aqua transition focus-within:ring-2 focus-within:ring-navy/25">
+              <label htmlFor={`${panelId}-input`} className="sr-only">Type your question</label>
+              <input id={`${panelId}-input`} ref={inputRef} placeholder="Type your question…" autoComplete="off"
+                maxLength={200} value={text} onChange={(e) => setText(e.target.value)}
+                className="h-9 w-full min-w-0 bg-transparent text-base text-ink placeholder:text-slate-400 focus:outline-none sm:text-sm" />
+              <button disabled={!text.trim() || typing} aria-label="Send question"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy text-white shadow-sm transition hover:bg-navy-deep active:scale-90 disabled:bg-aqua disabled:text-slate-400 disabled:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy">
+                <Icon name="send" className="h-4 w-4" strokeWidth={2} />
+              </button>
+            </div>
           </form>
         </section>
       )}

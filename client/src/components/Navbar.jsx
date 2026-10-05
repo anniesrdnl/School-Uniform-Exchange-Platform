@@ -84,7 +84,7 @@ export default function Navbar() {
           <div className="flex items-center justify-end gap-2">
             {user ? (
               <>
-                <Link to="/sell" className="btn-primary hidden rounded-full py-2 pl-3 pr-4 hover:-translate-y-px hover:shadow-md md:inline-flex">
+                <Link to="/sell" className="btn-primary hidden py-2 pl-3 pr-4 hover:-translate-y-px hover:shadow-md md:inline-flex">
                   <Icon name="plus" className="h-4 w-4" strokeWidth={2.2} /> Sell
                 </Link>
                 <UserMenu user={user} onLogout={() => { logout(); navigate('/'); }} />
@@ -94,7 +94,7 @@ export default function Navbar() {
                 <Link to="/login" className="hidden whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-frost hover:text-navy active:scale-95 min-[360px]:inline-flex">
                   Log in
                 </Link>
-                <Link to="/register" className="btn-primary whitespace-nowrap rounded-full px-4 py-2 hover:-translate-y-px hover:shadow-md">Sign up</Link>
+                <Link to="/register" className="btn-primary whitespace-nowrap px-4 py-2 hover:-translate-y-px hover:shadow-md">Sign up</Link>
               </>
             )}
           </div>

@@ -72,7 +72,7 @@ export default function Register() {
           <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green-50 text-green-700 ring-1 ring-inset ring-green-200 lg:mx-0">
             <Icon name="check" className="h-7 w-7" strokeWidth={2.5} />
           </span>
-          <h1 className="text-2xl font-extrabold tracking-tight lg:text-3xl">Account created!</h1>
+          <h1 className="page-title">Account created!</h1>
           <p role="status" className="text-sm leading-relaxed text-slate-600">
             {done.emailConfirmationRequired ? (
               <>We sent a verification link to <strong className="text-ink">{done.email}</strong>. Please confirm your email, then log in with your new account.</>
@@ -95,7 +95,7 @@ export default function Register() {
         <AuthHeading logo={<LogoMark className="h-14 w-14" />}
           title="Create your account" subtitle="Free to join. It takes about a minute." />
 
-        {error && <p role="alert" className="animate-fade-up rounded-xl bg-red-50 p-3 text-sm text-red-700 ring-1 ring-inset ring-red-200">{error}</p>}
+        {error && <p role="alert" className="alert-error animate-fade-up">{error}</p>}
 
         <div className="grid gap-4 sm:grid-cols-2">
           {field('fullName', 'Full name', 'text', { autoComplete: 'name' })}

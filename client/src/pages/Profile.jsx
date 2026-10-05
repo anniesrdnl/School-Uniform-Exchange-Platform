@@ -19,7 +19,7 @@ function Section({ title, action, empty, children }) {
   return (
     <section>
       <div className="mb-3 flex items-center justify-between gap-2">
-        <h2 className="text-lg font-bold">{title}</h2>
+        <h2 className="section-title">{title}</h2>
         {action}
       </div>
       <div className="card divide-y divide-aqua/60 overflow-hidden">
@@ -84,7 +84,7 @@ export default function Profile() {
         <div className="flex flex-col items-center gap-4 px-5 pb-5 text-center sm:px-6 md:flex-row md:items-end md:text-left">
           <Avatar name={user.fullName} src={user.avatar} className="relative -mt-10 h-20 w-20 text-2xl ring-4 ring-white" />
           <div className="min-w-0 flex-1">
-            <h1 className="break-words text-xl font-extrabold tracking-tight sm:text-2xl">{user.fullName}</h1>
+            <h1 className="break-words text-xl font-bold tracking-[-0.015em] text-ink sm:text-2xl">{user.fullName}</h1>
             <p className="text-sm text-slate-600">{[user.studentId, user.program, user.yearLevel].filter(Boolean).join(' · ')}</p>
             <div className="mt-2 flex flex-wrap justify-center gap-2 md:justify-start">
               <span className="chip bg-frost text-navy">
@@ -100,14 +100,14 @@ export default function Profile() {
             {[['Items listed', stats.itemsListed], ['Completed', stats.completedExchanges]].map(([label, n]) => (
               <div key={label} className="flex min-w-24 flex-1 flex-col-reverse rounded-xl bg-frost px-4 py-2.5 text-center md:flex-none">
                 <dt className="text-xs text-slate-600">{label}</dt>
-                <dd className="text-2xl font-extrabold text-navy">{n}</dd>
+                <dd className="text-2xl font-bold text-navy">{n}</dd>
               </div>
             ))}
           </dl>
         </div>
       </section>
 
-      {error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700 ring-1 ring-inset ring-red-200">{error}</p>}
+      {error && <p role="alert" className="alert-error">{error}</p>}
 
       <Section title="Requests for my uniforms" empty="No requests yet. They'll show up here when someone wants one of your uniforms.">
         {incoming.map((r) => (

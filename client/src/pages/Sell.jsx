@@ -8,7 +8,7 @@ import { CATEGORIES, CONDITIONS, EXCHANGE_OPTIONS, SIZES } from '../constants.js
 
 const MAX_PHOTOS = 5;
 
-// Radio buttons styled as selectable pills
+// Radio buttons styled as selectable pills: same .choice look as the Browse filters
 function PillGroup({ name, label, options, value, onChange, cols }) {
   return (
     <fieldset>
@@ -16,7 +16,7 @@ function PillGroup({ name, label, options, value, onChange, cols }) {
       <div className={`grid gap-2 ${cols}`}>
         {options.map((o) => (
           <label key={o}
-            className="cursor-pointer rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-center text-sm font-semibold text-slate-600 transition hover:border-denim has-[:checked]:border-navy has-[:checked]:bg-aqua has-[:checked]:text-navy has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-powder/60">
+            className="choice cursor-pointer py-2.5 text-center">
             <input type="radio" name={name} value={o} checked={value === o} onChange={onChange} className="sr-only" />
             {o}
           </label>
@@ -68,17 +68,17 @@ export default function Sell() {
     }
   };
 
-  const sectionTitle = 'text-base font-bold';
+  const sectionTitle = 'section-title';
 
   return (
     <div className="mx-auto max-w-2xl space-y-5">
       <header>
-        <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Post a uniform</h1>
-        <p className="mt-1 text-sm text-slate-600">Clear photos and honest details help your listing find a new owner faster.</p>
+        <h1 className="page-title">Post a uniform</h1>
+        <p className="page-subtitle">Clear photos and honest details help your listing find a new owner faster.</p>
       </header>
 
       <form onSubmit={submit} className="card divide-y divide-aqua/70">
-        {error && <p role="alert" className="m-5 animate-fade-up rounded-xl bg-red-50 p-3 text-sm text-red-700 ring-1 ring-inset ring-red-200 sm:m-6">{error}</p>}
+        {error && <p role="alert" className="alert-error m-5 animate-fade-up sm:m-6">{error}</p>}
 
         <section className="space-y-3 p-5 sm:p-6" aria-labelledby="photos-title">
           <div className="flex items-baseline justify-between">

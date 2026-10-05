@@ -114,8 +114,8 @@ export default function ListingDetails() {
               <StatusBadge status={listing.status} />
               <span className="chip bg-frost text-navy">{listing.category}</span>
             </div>
-            <h1 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">{listing.title}</h1>
-            <p className="mt-1 text-3xl font-extrabold text-navy">{formatPrice(listing.price)}</p>
+            <h1 className="page-title mt-3">{listing.title}</h1>
+            <p className="mt-1 text-3xl font-bold text-navy">{formatPrice(listing.price)}</p>
           </div>
 
           <dl className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
@@ -149,7 +149,7 @@ export default function ListingDetails() {
 
           {notice.text && (
             <p role={notice.type === 'ok' ? 'status' : 'alert'}
-              className={`animate-fade-up rounded-xl p-3 text-sm ring-1 ring-inset ${notice.type === 'ok' ? 'bg-green-50 text-green-800 ring-green-200' : 'bg-red-50 text-red-700 ring-red-200'}`}>
+              className={`animate-fade-up ${notice.type === 'ok' ? 'alert-success' : 'alert-error'}`}>
               {notice.text}
             </p>
           )}

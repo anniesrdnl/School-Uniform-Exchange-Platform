@@ -34,8 +34,8 @@ export default function Admin() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Admin dashboard</h1>
-        <p className="mt-1 text-sm text-slate-600">Verify students, moderate listings, and handle reports.</p>
+        <h1 className="page-title">Admin dashboard</h1>
+        <p className="page-subtitle">Verify students, moderate listings, and handle reports.</p>
       </header>
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
@@ -44,7 +44,7 @@ export default function Admin() {
               <div key={label} className="card flex animate-fade-up items-center gap-3 p-4" style={{ animationDelay: `${i * 60}ms` }}>
                 <span className="icon-tile hidden h-11 w-11 sm:flex"><Icon name={icon} className="h-6 w-6" /></span>
                 <div className="min-w-0">
-                  <p className="text-2xl font-extrabold text-navy">{n}</p>
+                  <p className="text-2xl font-bold text-navy">{n}</p>
                   <p className="text-xs text-slate-600 sm:text-sm">{label}</p>
                 </div>
               </div>

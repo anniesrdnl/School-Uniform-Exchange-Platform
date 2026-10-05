@@ -28,7 +28,7 @@ export default function ListingCard({ listing }) {
         <h3 className="truncate text-sm font-semibold transition group-hover:text-navy">{title}</h3>
         <p className="truncate text-xs text-slate-500">Size {size}{category && ` · ${category}`}</p>
         <div className="mt-auto flex items-center justify-between gap-2 pt-2">
-          <p className="text-base font-extrabold text-navy">{formatPrice(price)}</p>
+          <p className="text-base font-bold text-navy">{formatPrice(price)}</p>
           {seller && (
             <span className="flex min-w-0 items-center gap-1.5 text-xs text-slate-500">
               <Avatar name={seller.fullName} src={seller.avatar} className="h-5 w-5 text-[10px]" />

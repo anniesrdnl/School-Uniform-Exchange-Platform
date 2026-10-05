@@ -22,7 +22,7 @@ export default function AuthLayout({ headline, text, children }) {
 
           <div className="shrink-0 p-8 xl:p-10">
             <span className="chip bg-white/10 px-3 py-1 text-aqua ring-1 ring-inset ring-white/15">For students, by students</span>
-            <p className="mt-4 max-w-sm text-balance text-2xl font-extrabold leading-tight tracking-tight xl:text-3xl">{headline}</p>
+            <p className="mt-4 max-w-sm text-balance text-2xl font-bold leading-tight tracking-[-0.015em] xl:text-3xl">{headline}</p>
             <p className="mt-2 max-w-sm text-sm leading-relaxed text-aqua">{text}</p>
 
             <ol className="mt-6 grid grid-cols-3 gap-4 border-t border-white/15 pt-6">
@@ -53,8 +53,8 @@ export function AuthHeading({ logo, title, subtitle }) {
     <div className="flex flex-col items-center gap-3 text-center lg:items-start lg:text-left">
       <span className="lg:hidden">{logo}</span>
       <div>
-        <h1 className="text-2xl font-extrabold tracking-tight lg:text-3xl">{title}</h1>
-        <p className="mt-1 text-sm text-slate-600">{subtitle}</p>
+        <h1 className="page-title">{title}</h1>
+        <p className="page-subtitle">{subtitle}</p>
       </div>
     </div>
   );

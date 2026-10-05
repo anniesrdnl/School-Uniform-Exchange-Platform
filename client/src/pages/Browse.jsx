@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api.js';
 import ListingCard from '../components/ListingCard.jsx';
+import SearchBar from '../components/SearchBar.jsx';
 import Icon from '../components/Icon.jsx';
 import { EmptyState, ListingGridSkeleton } from '../components/Loader.jsx';
 import { CATEGORIES, CATEGORY_STYLES, CONDITIONS, SIZES, formatPrice } from '../constants.js';
@@ -11,13 +12,10 @@ const FILTER_KEYS = ['category', 'size', 'condition', 'minPrice', 'maxPrice'];
 const SORTS = [['newest', 'Newest'], ['price-asc', 'Price: low to high'], ['price-desc', 'Price: high to low']];
 const GRID = 'grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4';
 
-// Pill toggle for categories, sizes and conditions; aria-pressed tells screen readers which one is on
+// Pill toggle for categories, sizes and conditions (.choice in index.css); aria-pressed tells screen readers which is on
 function Toggle({ active, onClick, children, className = '' }) {
   return (
-    <button type="button" onClick={onClick} aria-pressed={active}
-      className={`inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-semibold transition duration-200 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${active
-        ? 'bg-navy text-mist shadow-sm shadow-navy/20'
-        : 'bg-white text-slate-700 ring-1 ring-inset ring-aqua hover:bg-frost hover:text-navy hover:ring-denim/50'} ${className}`}>
+    <button type="button" onClick={onClick} aria-pressed={active} className={`choice ${active ? 'choice-on' : ''} ${className}`}>
       {children}
     </button>
   );
@@ -90,18 +88,11 @@ export default function Browse() {
     <div className="space-y-6">
       <header className="space-y-5">
         <div>
-          <h1 className="text-2xl font-bold tracking-[-0.015em] text-ink sm:text-3xl">Browse uniforms</h1>
-          <p className="mt-1 text-sm text-slate-600 sm:text-base">Second-hand uniforms from students on your campus.</p>
+          <h1 className="page-title">Browse uniforms</h1>
+          <p className="page-subtitle">Second-hand uniforms from students on your campus.</p>
         </div>
 
-        <form onSubmit={search} role="search"
-          className="flex max-w-2xl items-center gap-2 rounded-2xl bg-white p-1.5 shadow-sm shadow-navy/5 ring-1 ring-aqua transition focus-within:ring-2 focus-within:ring-navy/40">
-          <Icon name="search" className="ml-2.5 h-5 w-5 shrink-0 text-slate-400" />
-          <label htmlFor="q" className="sr-only">Search uniforms</label>
-          <input id="q" name="q" key={q} defaultValue={q} placeholder="Search polo, skirt, PE shirt…"
-            className="w-full min-w-0 bg-transparent py-2.5 text-base text-ink placeholder:text-slate-500 focus:outline-none sm:text-sm" />
-          <button className="btn-primary shrink-0">Search</button>
-        </form>
+        <SearchBar onSubmit={search} id="q" name="q" key={q} defaultValue={q} className="max-w-2xl" />
 
         {/* one row that scrolls sideways on phones, wraps on larger screens */}
         <div role="group" aria-label="Category" className="relative -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
@@ -129,7 +120,7 @@ export default function Browse() {
               <legend className={legend}>Size</legend>
               <div className="grid grid-cols-3 gap-2">
                 {SIZES.map((s) => (
-                  <Toggle key={s} active={size === s} onClick={() => toggle('size', s)} className="rounded-xl px-0">{s}</Toggle>
+                  <Toggle key={s} active={size === s} onClick={() => toggle('size', s)} className="px-0">{s}</Toggle>
                 ))}
               </div>
             </fieldset>

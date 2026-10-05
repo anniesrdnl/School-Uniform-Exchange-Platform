@@ -80,6 +80,21 @@
   .input::-ms-reveal, .input::-ms-clear { display: none; }
   .label { @apply mb-1.5 block text-sm font-semibold text-slate-700; }
   .card { @apply rounded-2xl border border-aqua/70 bg-white shadow-[0_1px_2px_rgb(16_46_74/0.04),0_8px_24px_-12px_rgb(16_46_74/0.12)]; }
+  /* Shared type scale: every page title, subtitle and section heading uses these */
+  .page-title { @apply text-2xl font-bold tracking-[-0.015em] text-ink sm:text-3xl; }
+  .page-subtitle { @apply mt-1 text-sm text-slate-600 sm:text-base; }
+  .section-title { @apply text-lg font-bold text-ink; }
+
+  /* Selectable choice (Browse filters, Sell form options): white pill, filled Midnight when selected.
+     .choice-on marks a selected <button>; a <label> wrapping a checked radio gets the same look via :has */
+  .choice { @apply relative inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-aqua transition duration-200 hover:bg-frost hover:text-navy hover:ring-denim/50 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy; }
+  .choice-on, .choice:has(:checked) { @apply bg-navy text-mist shadow-sm shadow-navy/20 ring-navy hover:bg-navy hover:text-mist hover:ring-navy; }
+  .choice:has(:focus-visible) { @apply outline-2 outline-offset-2 outline-navy; }
+
+  /* Inline messages (form errors, success notices) */
+  .alert-error { @apply rounded-xl bg-red-50 p-3 text-sm text-red-700 ring-1 ring-inset ring-red-200; }
+  .alert-success { @apply rounded-xl bg-green-50 p-3 text-sm text-green-800 ring-1 ring-inset ring-green-200; }
+
   /* Square icon holder used by category cards, stats and feature lists: one colour everywhere */
   .icon-tile { @apply flex shrink-0 items-center justify-center rounded-xl bg-frost text-navy ring-1 ring-inset ring-aqua; }
   .chip { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold; }

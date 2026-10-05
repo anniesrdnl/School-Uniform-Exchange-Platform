@@ -37,11 +37,11 @@ export default function Login() {
         <AuthHeading logo={<LogoMark className="h-14 w-14" />}
           title="Welcome back" subtitle="Log in to your account to continue." />
         {justRegistered && !error && (
-          <p role="status" className="animate-fade-up rounded-xl bg-green-50 p-3 text-sm text-green-800 ring-1 ring-inset ring-green-200">
+          <p role="status" className="alert-success animate-fade-up">
             Registration successful. Log in with your new account.
           </p>
         )}
-        {error && <p role="alert" className="animate-fade-up rounded-xl bg-red-50 p-3 text-sm text-red-700 ring-1 ring-inset ring-red-200">{error}</p>}
+        {error && <p role="alert" className="alert-error animate-fade-up">{error}</p>}
         <div>
           <label className="label" htmlFor="email">Email address</label>
           <input id="email" type="email" autoComplete="email" required className="input" value={form.email}

@@ -219,7 +219,8 @@
   }
   .reveal.is-shown { opacity: 1; transform: none; }
 
-  /* Living page background (Backdrop.jsx). --bx/--by: mouse offset from centre (-0.5..0.5), --sy: scroll in px */
+  /* Living page background (Backdrop.jsx): drifting glows, a panning dot grid and flowing stitched threads.
+     --bx/--by: mouse offset from centre (-0.5..0.5), --sy: scroll in px */
   .backdrop { position: fixed; inset: 0; z-index: -10; overflow: hidden; pointer-events: none; }
   .backdrop-glows {
     position: absolute;
@@ -228,8 +229,8 @@
     transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .orb { position: absolute; border-radius: 9999px; will-change: transform; }
-  .orb-1 { width: 46rem; height: 46rem; top: -6rem; right: -8rem; background: radial-gradient(closest-side, rgb(14 54 97 / 0.14), transparent); animation: orb-a 16s ease-in-out infinite; }
-  .orb-2 { width: 44rem; height: 44rem; bottom: -8rem; left: -8rem; background: radial-gradient(closest-side, rgb(14 54 97 / 0.07), transparent); animation: orb-b 20s ease-in-out infinite; }
+  .orb-1 { width: 46rem; height: 46rem; top: -6rem; right: -8rem; background: radial-gradient(closest-side, rgb(14 54 97 / 0.18), transparent); animation: orb-a 16s ease-in-out infinite; }
+  .orb-2 { width: 44rem; height: 44rem; bottom: -8rem; left: -8rem; background: radial-gradient(closest-side, rgb(14 54 97 / 0.11), transparent); animation: orb-b 20s ease-in-out infinite; }
   .orb-3 { width: 32rem; height: 32rem; top: 28%; left: 12%; background: radial-gradient(closest-side, rgb(183 195 208 / 0.35), transparent); animation: orb-a 24s ease-in-out infinite reverse; }
   .orb-4 { width: 36rem; height: 36rem; top: 40%; right: 2%; background: radial-gradient(closest-side, rgb(183 195 208 / 0.45), transparent); animation: orb-b 18s ease-in-out -10s infinite reverse; }
   .orb-5 { width: 24rem; height: 24rem; top: 8%; left: 38%; background: radial-gradient(closest-side, rgb(72 102 135 / 0.12), transparent); animation: orb-a 14s ease-in-out -6s infinite; }
@@ -241,6 +242,26 @@
     -webkit-mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, #000 15%, transparent 75%);
     mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, #000 15%, transparent 75%);
     animation: dots-pan 9s linear infinite;
+  }
+
+  /* Stitched threads (Backdrop.jsx). Strongest in the page margins and faint behind the centred content, so text
+     stays easy to read. Each svg slides one wave period (--p, px) per loop; transform-only, so it stays smooth. */
+  .backdrop-threads {
+    position: absolute;
+    inset: 0;
+    color: var(--color-navy);
+    transform: translate3d(calc(var(--bx) * 24px), calc(var(--by) * 16px - var(--sy) * 0.05px), 0);
+    transition: transform 1.6s cubic-bezier(0.22, 1, 0.36, 1);
+    -webkit-mask-image: linear-gradient(90deg, #000, rgb(0 0 0 / 0.35) 30%, rgb(0 0 0 / 0.35) 70%, #000);
+    mask-image: linear-gradient(90deg, #000, rgb(0 0 0 / 0.35) 30%, rgb(0 0 0 / 0.35) 70%, #000);
+  }
+  .thread { position: absolute; left: 0; transform-origin: 50vw 50%; animation: thread-sway var(--sway) ease-in-out infinite alternate; }
+  .thread-line { display: block; max-width: none; will-change: transform; animation: thread-flow var(--flow) linear infinite; }
+  .thread-reverse { animation-direction: reverse; }
+  @keyframes thread-flow { to { transform: translateX(calc(var(--p) * -1px)); } }
+  @keyframes thread-sway {
+    from { transform: translateY(-14px) rotate(-1.2deg); }
+    to { transform: translateY(14px) rotate(1.2deg); }
   }
 
   /* Thin, quiet scrollbars for chat and tables */

@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { errMsg } from '../api.js';
 import { Spinner } from '../components/Loader.jsx';
+import { LogoMark } from '../components/Logo.jsx';
 
 export default function Login() {
   const { login } = useAuth();
@@ -28,26 +29,33 @@ export default function Login() {
   };
 
   return (
-    <form onSubmit={submit} className="card mx-auto mt-2 max-w-sm space-y-4 p-5 sm:mt-6 sm:p-6 shadow-xl shadow-navy/5 md:mt-12 md:p-8">
+    <form onSubmit={submit} className="card mx-auto mt-2 max-w-sm space-y-5 p-6 sm:mt-8 sm:p-8 md:mt-12">
       <div className="flex flex-col items-center gap-3 text-center">
-        <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-navy text-lg font-extrabold text-white shadow-lg shadow-navy/20" aria-hidden="true">S</span>
-        <h1 className="text-xl font-bold">Log in</h1>
+        <LogoMark className="h-12 w-12 rounded-2xl" iconClass="h-6 w-6" />
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight">Welcome back</h1>
+          <p className="mt-1 text-sm text-slate-600">Log in to buy, sell, and swap uniforms.</p>
+        </div>
       </div>
-      {justRegistered && !error && <p role="status" className="animate-fade-up rounded-lg border border-green-100 bg-green-50 p-3 text-sm text-green-700">Registration successful. Log in with your new account.</p>}
-      {error && <p role="alert" className="animate-fade-up rounded-lg border border-red-100 bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+      {justRegistered && !error && (
+        <p role="status" className="animate-fade-up rounded-xl bg-green-50 p-3 text-sm text-green-800 ring-1 ring-inset ring-green-200">
+          Registration successful. Log in with your new account.
+        </p>
+      )}
+      {error && <p role="alert" className="animate-fade-up rounded-xl bg-red-50 p-3 text-sm text-red-700 ring-1 ring-inset ring-red-200">{error}</p>}
       <div>
         <label className="label" htmlFor="email">Email address</label>
-        <input id="email" type="email" required className="input" value={form.email}
+        <input id="email" type="email" autoComplete="email" required className="input" value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })} />
       </div>
       <div>
         <label className="label" htmlFor="password">Password</label>
-        <input id="password" type="password" required className="input" value={form.password}
+        <input id="password" type="password" autoComplete="current-password" required className="input" value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })} />
       </div>
-      <button className="btn-primary w-full" disabled={busy}>{busy ? <><Spinner /> Logging in…</> : 'Log in'}</button>
+      <button className="btn-primary w-full py-3" disabled={busy}>{busy ? <><Spinner /> Logging in…</> : 'Log in'}</button>
       <p className="text-center text-sm text-slate-600">
-        New here? <Link to="/register" className="font-semibold text-navy">Create an account</Link>
+        New here? <Link to="/register" className="font-semibold text-navy hover:underline">Create an account</Link>
       </p>
     </form>
   );

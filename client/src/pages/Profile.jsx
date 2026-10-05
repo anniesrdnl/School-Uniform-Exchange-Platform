@@ -2,6 +2,34 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api, { errMsg } from '../api.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import Icon from '../components/Icon.jsx';
+import Avatar from '../components/Avatar.jsx';
+import StatusBadge from '../components/StatusBadge.jsx';
+import { formatPrice } from '../constants.js';
+
+// Small listing photo for request and listing rows
+function Thumb({ src }) {
+  return src
+    ? <img src={src} alt="" className="h-12 w-12 shrink-0 rounded-xl object-cover ring-1 ring-aqua" />
+    : <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-frost text-slate-500"><Icon name="photo" className="h-5 w-5" /></span>;
+}
+
+function Section({ title, action, empty, children }) {
+  return (
+    <section>
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h2 className="text-lg font-bold">{title}</h2>
+        {action}
+      </div>
+      <div className="card divide-y divide-aqua/60 overflow-hidden">
+        {children?.length ? children : <p className="p-5 text-sm text-slate-600">{empty}</p>}
+      </div>
+    </section>
+  );
+}
+
+const rowCls = 'flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between';
+const actionsCls = 'flex shrink-0 gap-2 [&>*]:flex-1 sm:[&>*]:flex-none';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -46,83 +74,96 @@ export default function Profile() {
   };
 
   return (
-    <div className="space-y-6">
-      <section className="card flex flex-col items-center gap-3 p-5 text-center sm:p-6 md:flex-row md:gap-6 md:text-left">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-navy to-navy-soft text-2xl font-bold text-white shadow-lg shadow-navy/20 ring-4 ring-sky">
-          {user.fullName[0]}
+    <div className="space-y-8">
+      <section className="card overflow-hidden">
+        <div className="relative h-20 overflow-hidden bg-aqua sm:h-24" aria-hidden="true">
+          <div className="absolute -right-8 -top-10 h-36 w-36 rounded-full bg-powder" />
+          <div className="absolute -bottom-12 right-28 h-28 w-28 rounded-full bg-cream" />
         </div>
-        <div className="min-w-0 flex-1">
-          <h1 className="break-words text-xl font-bold">{user.fullName}</h1>
-          <p className="text-sm text-slate-500">{user.studentId} · {user.program} · {user.yearLevel}</p>
-          <p className="text-sm">{user.ratingCount ? `★ ${user.ratingAvg} (${user.ratingCount} reviews)` : 'No reviews yet'}
-            {!user.verified && <span className="ml-2 inline-block rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-800">Awaiting verification</span>}</p>
-        </div>
-        <div className="flex w-full justify-center gap-8 border-t border-slate-100 pt-3 text-center md:w-auto md:border-0 md:pt-0">
-          <div><p className="text-2xl font-bold">{stats.itemsListed}</p><p className="text-xs text-slate-500">Items listed</p></div>
-          <div><p className="text-2xl font-bold">{stats.completedExchanges}</p><p className="text-xs text-slate-500">Completed</p></div>
-        </div>
-      </section>
-
-      {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-
-      <section>
-        <h2 className="mb-2 text-lg font-bold">Requests for my uniforms</h2>
-        {incoming.length === 0 ? <p className="text-sm text-slate-500">No requests yet.</p> : (
-          <div className="space-y-2">
-            {incoming.map((r) => (
-              <div key={r._id} className="card flex flex-col gap-2 p-4 md:flex-row md:items-center md:justify-between">
-                <div className="min-w-0 break-words text-sm">
-                  <p className="font-semibold">{r.listing?.title} <span className="font-normal text-slate-500">· ₱{r.listing?.price}</span></p>
-                  <p>{r.buyer?.fullName} wants to <b>{r.option.toLowerCase()}</b>{r.message && `: “${r.message}”`}</p>
-                  <p className="text-xs text-slate-500">Status: {r.status}</p>
-                </div>
-                <div className="flex shrink-0 gap-2 [&>*]:flex-1 md:[&>*]:flex-none">
-                  {r.status === 'pending' && (<>
-                    <button className="btn-primary" onClick={() => setStatus(r._id, 'accepted')}>Accept</button>
-                    <button className="btn-outline" onClick={() => setStatus(r._id, 'declined')}>Decline</button>
-                  </>)}
-                  {r.status === 'accepted' && <button className="btn-primary" onClick={() => setStatus(r._id, 'completed')}>Mark completed</button>}
-                  {r.status === 'completed' && <button className="btn-outline" onClick={() => review(r._id)}>Leave review</button>}
-                </div>
+        <div className="flex flex-col items-center gap-4 px-5 pb-5 text-center sm:px-6 md:flex-row md:items-end md:text-left">
+          <Avatar name={user.fullName} src={user.avatar} className="-mt-10 h-20 w-20 text-2xl ring-4 ring-white" />
+          <div className="min-w-0 flex-1">
+            <h1 className="break-words text-xl font-extrabold tracking-tight sm:text-2xl">{user.fullName}</h1>
+            <p className="text-sm text-slate-600">{[user.studentId, user.program, user.yearLevel].filter(Boolean).join(' · ')}</p>
+            <div className="mt-2 flex flex-wrap justify-center gap-2 md:justify-start">
+              <span className="chip bg-frost text-navy">
+                <Icon name="star" filled className="h-3.5 w-3.5 text-amber-500" />
+                {user.ratingCount ? `${user.ratingAvg} · ${user.ratingCount} review${user.ratingCount === 1 ? '' : 's'}` : 'No reviews yet'}
+              </span>
+              {user.verified
+                ? <span className="chip bg-aqua text-navy"><Icon name="shield" className="h-3.5 w-3.5" /> Verified student</span>
+                : <span className="chip bg-cream text-amber-800 ring-1 ring-inset ring-amber-200">Awaiting verification</span>}
+            </div>
+          </div>
+          <dl className="flex w-full justify-center gap-3 md:w-auto">
+            {[['Items listed', stats.itemsListed], ['Completed', stats.completedExchanges]].map(([label, n]) => (
+              <div key={label} className="flex min-w-24 flex-1 flex-col-reverse rounded-xl bg-frost px-4 py-2.5 text-center md:flex-none">
+                <dt className="text-xs text-slate-600">{label}</dt>
+                <dd className="text-2xl font-extrabold text-navy">{n}</dd>
               </div>
             ))}
-          </div>
-        )}
-      </section>
-
-      <section>
-        <h2 className="mb-2 text-lg font-bold">My requests</h2>
-        {outgoing.length === 0 ? <p className="text-sm text-slate-500">You haven't requested anything yet.</p> : (
-          <div className="space-y-2">
-            {outgoing.map((r) => (
-              <div key={r._id} className="card flex flex-col gap-2 p-4 text-sm sm:flex-row sm:items-center sm:justify-between">
-                <p className="min-w-0 break-words"><b>{r.listing?.title}</b> from {r.seller?.fullName} · {r.status}</p>
-                <div className="flex shrink-0 gap-2 [&>*]:flex-1 sm:[&>*]:flex-none">
-                  {['pending', 'accepted'].includes(r.status) && <button className="btn-outline" onClick={() => setStatus(r._id, 'cancelled')}>Cancel</button>}
-                  {r.status === 'completed' && <button className="btn-outline" onClick={() => review(r._id)}>Leave review</button>}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section>
-        <div className="mb-2 flex items-center justify-between gap-2">
-          <h2 className="text-lg font-bold">My listings</h2>
-          <Link to="/sell" className="btn-primary">Post a uniform</Link>
+          </dl>
         </div>
-        {listings.length === 0 ? <p className="text-sm text-slate-500">You haven't posted anything yet.</p> : (
-          <div className="space-y-2">
-            {listings.map((l) => (
-              <div key={l._id} className="card flex items-center justify-between gap-3 p-4 text-sm">
-                <Link to={`/listings/${l._id}`} className="min-w-0 break-words font-semibold hover:underline">{l.title} · ₱{l.price} · {l.status}</Link>
-                <button className="shrink-0 rounded-lg px-2 py-1 text-red-600 hover:bg-red-50" onClick={() => remove(l._id)}>Delete</button>
-              </div>
-            ))}
-          </div>
-        )}
       </section>
+
+      {error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700 ring-1 ring-inset ring-red-200">{error}</p>}
+
+      <Section title="Requests for my uniforms" empty="No requests yet. They'll show up here when someone wants one of your uniforms.">
+        {incoming.map((r) => (
+          <div key={r._id} className={rowCls}>
+            <div className="flex min-w-0 gap-3">
+              <Thumb src={r.listing?.images?.[0]} />
+              <div className="min-w-0 break-words text-sm">
+                <p className="font-semibold">{r.listing?.title} <span className="font-normal text-slate-500">· {formatPrice(r.listing?.price)}</span></p>
+                <p className="text-slate-700">{r.buyer?.fullName} wants to <b>{r.option.toLowerCase()}</b>{r.message && `: “${r.message}”`}</p>
+                <div className="mt-1"><StatusBadge status={r.status} /></div>
+              </div>
+            </div>
+            <div className={actionsCls}>
+              {r.status === 'pending' && (<>
+                <button className="btn-primary btn-sm" onClick={() => setStatus(r._id, 'accepted')}>Accept</button>
+                <button className="btn-outline btn-sm" onClick={() => setStatus(r._id, 'declined')}>Decline</button>
+              </>)}
+              {r.status === 'accepted' && <button className="btn-primary btn-sm" onClick={() => setStatus(r._id, 'completed')}>Mark completed</button>}
+              {r.status === 'completed' && <button className="btn-outline btn-sm" onClick={() => review(r._id)}>Leave review</button>}
+            </div>
+          </div>
+        ))}
+      </Section>
+
+      <Section title="My requests" empty="You haven't requested anything yet.">
+        {outgoing.map((r) => (
+          <div key={r._id} className={rowCls}>
+            <div className="flex min-w-0 items-center gap-3">
+              <Thumb src={r.listing?.images?.[0]} />
+              <div className="min-w-0 break-words text-sm">
+                <p><b>{r.listing?.title}</b> <span className="text-slate-500">from {r.seller?.fullName}</span></p>
+                <div className="mt-1"><StatusBadge status={r.status} /></div>
+              </div>
+            </div>
+            <div className={actionsCls}>
+              {['pending', 'accepted'].includes(r.status) && <button className="btn-outline btn-sm" onClick={() => setStatus(r._id, 'cancelled')}>Cancel</button>}
+              {r.status === 'completed' && <button className="btn-outline btn-sm" onClick={() => review(r._id)}>Leave review</button>}
+            </div>
+          </div>
+        ))}
+      </Section>
+
+      <Section title="My listings" empty="You haven't posted anything yet."
+        action={<Link to="/sell" className="btn-primary btn-sm"><Icon name="plus" className="h-4 w-4" strokeWidth={2} /> Post a uniform</Link>}>
+        {listings.map((l) => (
+          <div key={l._id} className="flex items-center justify-between gap-3 p-4 text-sm">
+            <Link to={`/listings/${l._id}`} className="group flex min-w-0 items-center gap-3">
+              <Thumb src={l.images?.[0]} />
+              <span className="min-w-0">
+                <span className="block truncate font-semibold group-hover:underline">{l.title}</span>
+                <span className="mt-1 flex items-center gap-2 text-slate-500">{formatPrice(l.price)} <StatusBadge status={l.status} /></span>
+              </span>
+            </Link>
+            <button className="btn-sm shrink-0 rounded-lg font-semibold text-red-600 transition hover:bg-red-50" onClick={() => remove(l._id)}>Delete</button>
+          </div>
+        ))}
+      </Section>
     </div>
   );
 }

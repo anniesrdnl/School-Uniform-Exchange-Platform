@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react';
 import api from '../api.js';
+import Icon from '../components/Icon.jsx';
+import StatusBadge from '../components/StatusBadge.jsx';
+import { formatPrice } from '../constants.js';
 
 const TABS = ['Users', 'Listings', 'Reports'];
+const HEADERS = {
+  Users: ['Student', 'Status', ''],
+  Listings: ['Listing', 'Status', ''],
+  Reports: ['Report', 'Status', ''],
+};
 
 export default function Admin() {
   const [stats, setStats] = useState(null);
@@ -17,19 +25,28 @@ export default function Admin() {
   const act = async (fn) => { await fn(); loadRows(); loadStats(); };
 
   const cards = stats && [
-    ['Total users', stats.totalUsers], ['Active listings', stats.activeListings],
-    ['Completed exchanges', stats.completedExchanges], ['Open reports', stats.openReports],
+    ['Total users', stats.totalUsers, 'users', 'bg-aqua'],
+    ['Active listings', stats.activeListings, 'tag', 'bg-cream'],
+    ['Completed exchanges', stats.completedExchanges, 'recycle', 'bg-powder'],
+    ['Open reports', stats.openReports, 'flag', 'bg-frost'],
   ];
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold">Admin dashboard</h1>
+      <header>
+        <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Admin dashboard</h1>
+        <p className="mt-1 text-sm text-slate-600">Verify students, moderate listings, and handle reports.</p>
+      </header>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
         {cards
-          ? cards.map(([label, n], i) => (
-              <div key={label} className="card animate-fade-up p-4 transition hover:shadow-md" style={{ animationDelay: `${i * 60}ms` }}>
-                <p className="text-3xl font-extrabold text-navy">{n}</p><p className="text-sm text-slate-500">{label}</p>
+          ? cards.map(([label, n, icon, tile], i) => (
+              <div key={label} className="card flex animate-fade-up items-center gap-3 p-4" style={{ animationDelay: `${i * 60}ms` }}>
+                <span className={`hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl text-navy sm:flex ${tile}`}><Icon name={icon} className="h-6 w-6" /></span>
+                <div className="min-w-0">
+                  <p className="text-2xl font-extrabold text-navy">{n}</p>
+                  <p className="text-xs text-slate-600 sm:text-sm">{label}</p>
+                </div>
               </div>
             ))
           : Array.from({ length: 4 }, (_, i) => (
@@ -37,46 +54,62 @@ export default function Admin() {
             ))}
       </div>
 
-      <div className="scroll-thin -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 [&>*]:shrink-0">
+      <div className="inline-flex gap-1 rounded-xl bg-frost p-1">
         {TABS.map((t) => (
-          <button key={t} onClick={() => setTab(t)} className={tab === t ? 'btn-primary' : 'btn-outline'}>{t}</button>
+          <button key={t} onClick={() => setTab(t)} aria-pressed={tab === t}
+            className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${tab === t ? 'bg-white text-navy shadow-sm' : 'text-slate-600 hover:text-navy'}`}>
+            {t}
+          </button>
         ))}
       </div>
 
       {/* wide tables scroll sideways inside their own box on phones */}
       <div className="card scroll-thin overflow-x-auto">
         <table className="w-full min-w-[560px] text-left text-sm">
-          <tbody>
-            {rows.length === 0 && <tr><td className="p-4 text-slate-500">Nothing to show.</td></tr>}
+          <thead className="bg-frost/60 text-xs uppercase tracking-wide text-slate-600">
+            <tr>
+              {HEADERS[tab].map((h, i) => <th key={i} scope="col" className={`px-4 py-3 font-semibold ${i === 2 ? 'text-right' : ''}`}>{h || <span className="sr-only">Actions</span>}</th>)}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-aqua/60">
+            {rows.length === 0 && <tr><td colSpan={3} className="px-4 py-6 text-slate-600">Nothing to show.</td></tr>}
 
             {tab === 'Users' && rows.map((u) => (
-              <tr key={u._id} className="border-b border-slate-100">
-                <td className="p-3"><b>{u.fullName}</b><br /><span className="text-xs text-slate-500">{u.studentId} · {u.email}</span></td>
-                <td className="p-3">{u.verified ? 'Verified' : 'Unverified'}{u.banned && ' · Banned'}</td>
-                <td className="space-x-2 whitespace-nowrap p-3 text-right">
+              <tr key={u._id}>
+                <td className="px-4 py-3"><b>{u.fullName}</b><br /><span className="text-xs text-slate-500">{u.studentId} · {u.email}</span></td>
+                <td className="px-4 py-3">
+                  <span className="flex flex-wrap gap-1.5">
+                    {u.verified
+                      ? <span className="chip bg-aqua text-navy">Verified</span>
+                      : <span className="chip bg-slate-100 text-slate-600">Unverified</span>}
+                    {u.banned && <span className="chip bg-red-50 text-red-700 ring-1 ring-inset ring-red-200">Banned</span>}
+                  </span>
+                </td>
+                <td className="space-x-2 whitespace-nowrap px-4 py-3 text-right">
                   {u.role !== 'admin' && (<>
-                    <button className="btn-outline" onClick={() => act(() => api.patch(`/admin/users/${u._id}`, { verified: !u.verified }))}>{u.verified ? 'Unverify' : 'Verify'}</button>
-                    <button className="btn-outline" onClick={() => act(() => api.patch(`/admin/users/${u._id}`, { banned: !u.banned }))}>{u.banned ? 'Unban' : 'Ban'}</button>
+                    <button className="btn-outline btn-sm" onClick={() => act(() => api.patch(`/admin/users/${u._id}`, { verified: !u.verified }))}>{u.verified ? 'Unverify' : 'Verify'}</button>
+                    <button className="btn-outline btn-sm" onClick={() => act(() => api.patch(`/admin/users/${u._id}`, { banned: !u.banned }))}>{u.banned ? 'Unban' : 'Ban'}</button>
                   </>)}
                 </td>
               </tr>
             ))}
 
             {tab === 'Listings' && rows.map((l) => (
-              <tr key={l._id} className="border-b border-slate-100">
-                <td className="p-3"><b>{l.title}</b><br /><span className="text-xs text-slate-500">by {l.seller?.fullName} · ₱{l.price} · {l.status}</span></td>
-                <td className="whitespace-nowrap p-3 text-right"><button className="btn-outline" onClick={() => act(() => api.delete(`/admin/listings/${l._id}`))}>Remove</button></td>
+              <tr key={l._id}>
+                <td className="px-4 py-3"><b>{l.title}</b><br /><span className="text-xs text-slate-500">by {l.seller?.fullName} · {formatPrice(l.price)}</span></td>
+                <td className="px-4 py-3"><StatusBadge status={l.status} /></td>
+                <td className="whitespace-nowrap px-4 py-3 text-right"><button className="btn-outline btn-sm" onClick={() => act(() => api.delete(`/admin/listings/${l._id}`))}>Remove</button></td>
               </tr>
             ))}
 
             {tab === 'Reports' && rows.map((r) => (
-              <tr key={r._id} className="border-b border-slate-100">
-                <td className="p-3"><b>{r.targetType}</b> reported by {r.reporter?.fullName}<br /><span className="text-xs text-slate-500">{r.reason}</span></td>
-                <td className="p-3">{r.status}</td>
-                <td className="space-x-2 whitespace-nowrap p-3 text-right">
+              <tr key={r._id}>
+                <td className="px-4 py-3"><b className="capitalize">{r.targetType}</b> reported by {r.reporter?.fullName}<br /><span className="text-xs text-slate-500">{r.reason}</span></td>
+                <td className="px-4 py-3"><StatusBadge status={r.status} /></td>
+                <td className="space-x-2 whitespace-nowrap px-4 py-3 text-right">
                   {r.status === 'open' && (<>
-                    <button className="btn-outline" onClick={() => act(() => api.patch(`/admin/reports/${r._id}`, { status: 'resolved' }))}>Resolve</button>
-                    <button className="btn-outline" onClick={() => act(() => api.patch(`/admin/reports/${r._id}`, { status: 'dismissed' }))}>Dismiss</button>
+                    <button className="btn-outline btn-sm" onClick={() => act(() => api.patch(`/admin/reports/${r._id}`, { status: 'resolved' }))}>Resolve</button>
+                    <button className="btn-outline btn-sm" onClick={() => act(() => api.patch(`/admin/reports/${r._id}`, { status: 'dismissed' }))}>Dismiss</button>
                   </>)}
                 </td>
               </tr>

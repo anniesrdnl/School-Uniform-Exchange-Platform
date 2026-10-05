@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import api, { API_URL, errMsg } from '../api.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import Icon from '../components/Icon.jsx';
+import Avatar from '../components/Avatar.jsx';
 
 export default function Messages() {
   const { user } = useAuth();
@@ -54,37 +57,59 @@ export default function Messages() {
   const active = convos.find((c) => c._id === activeId);
 
   return (
-    <div className="card -mx-4 grid h-[calc(100dvh-10.5rem-env(safe-area-inset-bottom))] overflow-hidden rounded-none border-x-0 sm:mx-0 sm:rounded-xl sm:border-x md:h-[70vh] md:grid-cols-[280px_1fr]">
+    <div className="card -mx-4 grid h-[calc(100dvh-10.5rem-env(safe-area-inset-bottom))] overflow-hidden rounded-none border-x-0 sm:mx-0 sm:rounded-2xl sm:border-x md:h-[72vh] md:grid-cols-[300px_1fr]">
       {/* list: hidden on phones once a chat is open */}
-      <div className={`scroll-thin overflow-y-auto border-slate-200 md:border-r ${activeId ? 'hidden md:block' : ''}`}>
-        <h1 className="border-b border-slate-200 p-4 font-bold">Messages</h1>
-        {convos.length === 0 && <p className="p-4 text-sm text-slate-500">No conversations yet. Message a seller from a listing.</p>}
-        {convos.map((c) => (
-          <button key={c._id} onClick={() => setActiveId(c._id)}
-            className={`block w-full border-b border-l-4 border-b-slate-100 p-4 text-left transition duration-200 hover:bg-sky ${c._id === activeId ? 'border-l-navy bg-sky' : 'border-l-transparent'}`}>
-            <p className="text-sm font-semibold">{other(c)?.fullName}</p>
-            <p className="truncate text-xs text-slate-500">{c.listing?.title}</p>
-            <p className="truncate text-xs text-slate-400">{c.lastMessage}</p>
-          </button>
-        ))}
+      <div className={`scroll-thin overflow-y-auto border-aqua/70 md:border-r ${activeId ? 'hidden md:block' : ''}`}>
+        <h1 className="sticky top-0 border-b border-aqua/70 bg-white p-4 text-lg font-bold">Messages</h1>
+        {convos.length === 0 && (
+          <div className="flex flex-col items-center gap-2 p-8 text-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-aqua text-navy"><Icon name="chat" className="h-6 w-6" /></span>
+            <p className="text-sm text-slate-600">No conversations yet. Message a seller from any listing.</p>
+          </div>
+        )}
+        {convos.map((c) => {
+          const person = other(c);
+          return (
+            <button key={c._id} onClick={() => setActiveId(c._id)} aria-current={c._id === activeId ? 'true' : undefined}
+              className={`flex w-full items-center gap-3 border-b border-l-4 border-b-aqua/40 px-4 py-3 text-left transition duration-200 hover:bg-frost ${c._id === activeId ? 'border-l-navy bg-frost' : 'border-l-transparent'}`}>
+              <Avatar name={person?.fullName} src={person?.avatar} />
+              <span className="min-w-0">
+                <span className="block truncate text-sm font-semibold">{person?.fullName}</span>
+                {c.listing?.title && <span className="block truncate text-xs font-medium text-navy">{c.listing.title}</span>}
+                <span className="block truncate text-xs text-slate-500">{c.lastMessage}</span>
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       <div className={`flex min-h-0 flex-col ${activeId ? '' : 'hidden md:flex'}`}>
         {!activeId ? (
-          <p className="m-auto text-sm text-slate-500">Pick a conversation to start chatting.</p>
+          <div className="m-auto flex flex-col items-center gap-2 p-6 text-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-frost text-navy"><Icon name="chat" className="h-6 w-6" /></span>
+            <p className="text-sm text-slate-600">Pick a conversation to start chatting.</p>
+          </div>
         ) : (
           <>
-            <div className="flex items-center gap-2 border-b border-slate-200 px-2 py-2 sm:gap-3 sm:p-4">
-              <button className="rounded-lg px-3 py-2 text-sm font-medium text-navy active:bg-sky md:hidden" onClick={() => setActiveId(null)}>← Back</button>
-              <p className="truncate font-semibold">{other(active)?.fullName}</p>
+            <div className="flex items-center gap-2 border-b border-aqua/70 px-2 py-2 sm:gap-3 sm:px-4 sm:py-3">
+              <button className="flex h-9 w-9 items-center justify-center rounded-lg text-navy hover:bg-frost md:hidden" onClick={() => setActiveId(null)} aria-label="Back to conversations">
+                <Icon name="arrow-left" className="h-5 w-5" />
+              </button>
+              <Avatar name={other(active)?.fullName} src={other(active)?.avatar} className="h-9 w-9 text-sm" />
+              <div className="min-w-0">
+                <p className="truncate font-semibold">{other(active)?.fullName}</p>
+                {active?.listing && (
+                  <Link to={`/listings/${active.listing._id}`} className="block truncate text-xs font-medium text-navy hover:underline">{active.listing.title}</Link>
+                )}
+              </div>
             </div>
-            <div className="scroll-thin flex-1 space-y-2 overflow-y-auto bg-mist p-4">
+            <div className="scroll-thin flex-1 space-y-2 overflow-y-auto bg-frost/50 p-4">
               {messages.map((m) => {
                 const mine = m.sender === user._id;
                 return (
                   <div key={m._id} className={`flex animate-fade-up ${mine ? 'justify-end' : ''}`}>
-                    <div className={`max-w-[85%] break-words rounded-2xl sm:max-w-[75%] px-3 py-2 text-sm shadow-sm ${mine ? 'rounded-br-md bg-navy text-white' : 'rounded-bl-md bg-white border border-slate-200'}`}>
-                      {m.image && <img src={m.image} alt="Shared" className="mb-1 max-h-48 rounded-lg" />}
+                    <div className={`max-w-[85%] break-words rounded-2xl px-3.5 py-2 text-sm shadow-sm sm:max-w-[70%] ${mine ? 'rounded-br-md bg-navy text-white' : 'rounded-bl-md bg-white ring-1 ring-aqua'}`}>
+                      {m.image && <img src={m.image} alt="Shared photo" className="mb-1 max-h-48 rounded-lg" />}
                       {m.text}
                     </div>
                   </div>
@@ -92,14 +117,18 @@ export default function Messages() {
               })}
               <div ref={bottomRef} />
             </div>
-            {error && <p role="alert" className="px-4 text-xs text-red-600">{error}</p>}
-            <form onSubmit={send} className="flex items-center gap-2 border-t border-slate-200 p-2 sm:p-3">
-              <label className="btn-outline shrink-0 cursor-pointer !px-3" aria-label="Attach photo">
-                Photo
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files[0] && send(null, e.target.files[0])} />
+            {error && <p role="alert" className="px-4 pt-2 text-xs text-red-600">{error}</p>}
+            <form onSubmit={send} className="flex items-center gap-2 border-t border-aqua/70 p-2 sm:p-3">
+              <label className="btn-soft shrink-0 cursor-pointer px-3 focus-within:ring-4 focus-within:ring-powder/60">
+                <Icon name="photo" className="h-5 w-5" />
+                <span className="sr-only">Attach photo</span>
+                <input type="file" accept="image/*" className="sr-only" onChange={(e) => e.target.files[0] && send(null, e.target.files[0])} />
               </label>
-              <input className="input" placeholder="Type a message…" value={text} onChange={(e) => setText(e.target.value)} />
-              <button className="btn-primary shrink-0">Send</button>
+              <label htmlFor="chat-input" className="sr-only">Message</label>
+              <input id="chat-input" className="input" placeholder="Type a message…" value={text} onChange={(e) => setText(e.target.value)} />
+              <button className="btn-primary shrink-0 px-3 sm:px-4" aria-label="Send">
+                <Icon name="send" className="h-5 w-5" /><span className="hidden sm:inline">Send</span>
+              </button>
             </form>
           </>
         )}

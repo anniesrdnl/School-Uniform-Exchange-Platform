@@ -122,14 +122,7 @@ export default function Splash() {
 
         <div className="text-center lg:text-left">
           <Link to="/browse"
-            className="group inline-flex animate-fade-up items-center gap-2.5 rounded-full bg-white/80 py-1 pl-1 pr-3 text-sm font-medium text-slate-700 shadow-sm shadow-navy/5 ring-1 ring-aqua backdrop-blur transition duration-300 hover:bg-white hover:shadow-md hover:ring-denim/40 active:scale-[0.98]">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-navy px-2.5 py-1 text-xs font-semibold text-mist">
-              <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
-                <span className="absolute inset-0 animate-ping rounded-full bg-cream" />
-                <span className="relative h-1.5 w-1.5 rounded-full bg-cream" />
-              </span>
-              Live
-            </span>
+            className="group inline-flex animate-fade-up items-center gap-2.5 rounded-full bg-white/80 px-4 py-1.5 text-sm font-medium text-slate-700 shadow-sm shadow-navy/5 ring-1 ring-aqua backdrop-blur transition duration-300 hover:bg-white hover:shadow-md hover:ring-denim/40 active:scale-[0.98]">
             {total == null
               ? 'Uniforms from students on your campus'
               : <span><strong className="font-bold tabular-nums text-ink">{shownTotal}</strong> {total === 1 ? 'uniform' : 'uniforms'} available now</span>}

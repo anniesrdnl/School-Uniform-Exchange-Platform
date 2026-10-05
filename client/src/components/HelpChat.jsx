@@ -142,11 +142,11 @@ export default function HelpChat() {
       )}
 
       {/* Logo-only launcher with no backing circle; the accessible name says what it does since there is no visible text.
-          The logo bobs gently above a soft light-blue aura (10% opacity) that slowly breathes. */}
+          The logo bobs gently above a soft white aura that slowly breathes. */}
       <button ref={launcherRef} type="button" onClick={() => (open ? close() : setOpen(true))}
         aria-expanded={open} aria-controls={open ? panelId : undefined} aria-label={open ? 'Close help assistant' : 'Open help assistant'}
         className="group fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full transition duration-200 hover:scale-105 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy md:bottom-6 md:right-6 md:h-16 md:w-16">
-        <span className="absolute -inset-2 animate-breathe rounded-full bg-sky-400/10 blur-[2px] transition-colors duration-300 group-hover:bg-sky-400/20" aria-hidden="true" />
+        <span className="absolute -inset-2 animate-breathe rounded-full bg-white/70 blur-[2px] transition-colors duration-300 group-hover:bg-white/90" aria-hidden="true" />
         <span className="relative animate-float drop-shadow-[0_6px_10px_rgb(16_46_74/0.25)] [animation-duration:3.5s]">
           {open
             ? <Icon name="x" className="h-8 w-8 text-navy" strokeWidth={2.2} />

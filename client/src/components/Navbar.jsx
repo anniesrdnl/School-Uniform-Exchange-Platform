@@ -58,15 +58,20 @@ export default function Navbar() {
     ...(user ? [{ to: '/messages', label: 'Messages' }] : []),
   ];
 
-  // Phone tab bar: the same five slots whether or not you are logged in, with Sell raised in the centre.
-  // Logged out, Sell and Messages go through the login page (which returns you there) and Profile becomes Log in.
-  const tabs = [
-    { to: home, label: 'Home', icon: 'home', end: true },
-    { to: '/browse', label: 'Browse', icon: 'search' },
-    { center: true },
-    { to: '/messages', label: 'Messages', icon: 'chat' },
-    user ? { to: '/profile', label: 'Profile', avatar: true } : { to: '/login', label: 'Log in', icon: 'user' },
-  ];
+  // Phone tab bar: Sell takes the raised centre slot when logged in
+  const tabs = user
+    ? [
+        { to: home, label: 'Home', icon: 'home', end: true },
+        { to: '/browse', label: 'Browse', icon: 'search' },
+        { center: true },
+        { to: '/messages', label: 'Messages', icon: 'chat' },
+        { to: '/profile', label: 'Profile', avatar: true },
+      ]
+    : [
+        { to: home, label: 'Home', icon: 'home', end: true },
+        { to: '/browse', label: 'Browse', icon: 'search' },
+        { to: '/login', label: 'Log in', icon: 'user' },
+      ];
 
   return (
     <>
@@ -111,7 +116,7 @@ export default function Navbar() {
       {/* Bottom tab bar: phones only. The white shape is a separate layer so the notch can be masked out of it
           while drop-shadow (on the nav) still follows the notched outline */}
       <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 drop-shadow-[0_-6px_16px_rgb(16_46_74/0.10)] md:hidden">
-        <div className="tabbar-notch absolute inset-0 rounded-t-[1.75rem] bg-white" aria-hidden="true" />
+        <div className={`absolute inset-0 rounded-t-[1.75rem] bg-white ${user ? 'tabbar-notch' : ''}`} aria-hidden="true" />
         <ul className="relative grid px-2 pb-[env(safe-area-inset-bottom)]" style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
           {tabs.map((t) => (
             <li key={t.center ? 'sell' : t.label} className="relative">

@@ -19,7 +19,7 @@ export default function Splash() {
       <section className="grid items-center gap-12 lg:grid-cols-2 lg:gap-14">
         <div className="text-center lg:text-left">
           <p className="chip animate-fade-up bg-cream px-3 py-1 text-navy ring-1 ring-inset ring-amber-200/70">
-            School Uniform Exchange Platform System
+            For students, by students
           </p>
           <h1 className="mt-5 animate-fade-up text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-[3.5rem]" style={delay(80)}>
             Exchange. <span className="marker">Reuse.</span>
@@ -64,7 +64,7 @@ export default function Splash() {
       </section>
 
       <section aria-labelledby="why-heading" className="rounded-[2rem] bg-white/80 p-6 ring-1 ring-aqua/70 sm:p-10">
-        <h2 id="why-heading" className="text-center text-2xl font-extrabold tracking-tight sm:text-3xl">Why swap uniforms on SUEPS?</h2>
+        <h2 id="why-heading" className="text-center text-2xl font-extrabold tracking-tight sm:text-3xl">Why swap uniforms here?</h2>
         <div className="mt-8 grid gap-8 md:grid-cols-3 md:gap-10">
           {FEATURES.map((f, i) => (
             <div key={f.title} className="animate-fade-up text-center md:text-left" style={delay(400 + i * 80)}>

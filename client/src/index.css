@@ -177,7 +177,9 @@
 
   /* Underline tab (header links, Browse categories): a Midnight bar slides in under the current one */
   .tab { @apply relative inline-flex shrink-0 items-center gap-2 px-3 text-sm font-semibold text-slate-500 transition-colors duration-200 hover:text-navy after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:scale-x-0 after:rounded-full after:bg-navy after:transition-transform after:duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-navy; }
-  .tab-on { @apply text-navy after:scale-x-100; }
+  .tab:hover::after { --tw-scale-x: 50%; } /* hover previews the underline in Midnight */
+  .tab-on { @apply text-navy; }
+  .tab-on::after, .tab-on:hover::after { --tw-scale-x: 100%; }
 
   /* Inline messages (form errors, success notices) */
   .alert-error { @apply rounded-xl bg-red-50 p-3 text-sm text-red-700 ring-1 ring-inset ring-red-200; }

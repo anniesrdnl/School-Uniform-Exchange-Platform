@@ -101,8 +101,9 @@ export default function Browse() {
           className="relative -mx-4 flex h-11 overflow-x-auto px-4 shadow-[inset_0_-1px_0_var(--color-aqua)] [scrollbar-width:none] sm:mx-0 sm:px-0">
           {[['', 'All', 'grid'], ...CATEGORIES.map((c) => [c, c, CATEGORY_STYLES[c].icon])].map(([value, label, icon]) => (
             <button key={label} type="button" aria-pressed={category === value} onClick={() => setParam('category', value)}
-              className={`tab first:pl-0 first:after:left-0 ${category === value ? 'tab-on' : ''}`}>
-              <Icon name={icon} className="h-4 w-4" /> {label}
+              className={`tab group first:pl-0 first:after:left-0 ${category === value ? 'tab-on' : ''}`}>
+              {/* filled icon on the selected category; outline icons lift slightly on hover */}
+              <Icon name={icon} filled={category === value} className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5" /> {label}
             </button>
           ))}
         </div>

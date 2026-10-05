@@ -78,7 +78,7 @@ export default function HelpChat() {
       {open && (
         <section id={panelId} role="dialog" aria-labelledby={titleId}
           onKeyDown={(e) => e.key === 'Escape' && close()}
-          className="fixed inset-x-3 bottom-[calc(8.5rem+env(safe-area-inset-bottom))] top-24 z-40 flex animate-fade-up flex-col overflow-hidden rounded-2xl bg-white shadow-2xl shadow-navy/20 ring-1 ring-aqua sm:inset-x-auto sm:right-4 sm:top-auto sm:h-[34rem] sm:max-h-[calc(100dvh-12rem)] sm:w-[23rem] md:bottom-24 md:right-6">
+          className="fixed inset-x-3 bottom-[calc(9.5rem+env(safe-area-inset-bottom))] top-24 z-40 flex animate-fade-up flex-col overflow-hidden rounded-2xl bg-white shadow-2xl shadow-navy/20 ring-1 ring-aqua sm:inset-x-auto sm:right-4 sm:top-auto sm:h-[34rem] sm:max-h-[calc(100dvh-12rem)] sm:w-[23rem] md:bottom-24 md:right-6">
           <header className="flex items-center gap-3 border-b border-aqua/70 px-4 py-3">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-frost">
               <LogoMark className="h-6 w-6" />
@@ -143,7 +143,7 @@ export default function HelpChat() {
 
       <button ref={launcherRef} type="button" onClick={() => (open ? close() : setOpen(true))}
         aria-expanded={open} aria-controls={open ? panelId : undefined}
-        className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] right-4 z-40 flex h-12 items-center gap-2 rounded-full bg-navy px-3.5 text-sm font-semibold text-white shadow-lg shadow-navy/30 transition duration-200 hover:bg-navy-deep active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy md:bottom-6 md:right-6 md:h-14 md:px-5">
+        className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 z-40 flex h-12 items-center gap-2 rounded-full bg-navy px-3.5 text-sm font-semibold text-white shadow-lg shadow-navy/30 transition duration-200 hover:bg-navy-deep active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy md:bottom-6 md:right-6 md:h-14 md:px-5">
         <Icon name={open ? 'x' : 'help'} className="h-6 w-6" strokeWidth={1.8} />
         {/* icon-only on phones; the label stays available to screen readers */}
         <span className={open ? 'sr-only' : 'sr-only sm:not-sr-only'}>{open ? 'Close help' : 'Help'}</span>

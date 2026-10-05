@@ -3,19 +3,19 @@
 @theme {
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 
-  /* Brand palette */
-  --color-frost: #e3f1fb;
-  --color-aqua: #c1e4f3;
-  --color-powder: #a8d0ef;
-  --color-denim: #99c3e4;
-  --color-cream: #fff9e6;
+  /* Brand palette: Midnight Blue #1C2E4A, Dusty Blue #52677D, Ivory #BDC4D4, Deep Navy #0F1A2B, Buttercream #D1CFC9.
+     Token names predate this palette and are kept so class names across the app stay the same. */
+  --color-navy: #1c2e4a;      /* Midnight Blue: primary actions, links, headings accents (13:1 on white) */
+  --color-navy-deep: #0f1a2b; /* Deep Navy: hover/pressed state of navy */
+  --color-ink: #0f1a2b;       /* Deep Navy: body text */
+  --color-denim: #52677d;     /* Dusty Blue: interactive borders (outline buttons, hovered inputs) */
+  --color-powder: #bdc4d4;    /* Ivory: decorative shapes, focus rings, soft-button hover */
+  --color-cream: #d1cfc9;     /* Buttercream: warm accent tiles and chips */
 
-  /* The palette is all pastels, so text and primary actions use a deep blue
-     from the same hue to stay readable (navy on white is 8.6:1). */
-  --color-navy: #1f4e79;
-  --color-navy-deep: #163a5a;
-  --color-ink: #12263a;
-  --color-mist: #f5fafd;
+  /* Ivory is too dark for large backgrounds, so these are Ivory mixed with white */
+  --color-aqua: #d4d9e3;      /* 65% Ivory: light fills, active pills, avatar tiles */
+  --color-frost: #e8eaf0;     /* 35% Ivory: subtle fills, hover backgrounds */
+  --color-mist: #f7f8fa;      /* 12% Ivory: page background */
 
   --animate-fade-up: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-fade-in: fade-in 0.4s ease-out both;
@@ -53,8 +53,8 @@
     z-index: -1;
     pointer-events: none;
     background:
-      radial-gradient(44rem 26rem at 100% 0%, rgb(193 228 243 / 0.55), transparent 70%),
-      radial-gradient(34rem 22rem at 0% 100%, rgb(255 249 230 / 0.9), transparent 70%);
+      radial-gradient(44rem 26rem at 100% 0%, rgb(189 196 212 / 0.35), transparent 70%),
+      radial-gradient(34rem 22rem at 0% 100%, rgb(209 207 201 / 0.35), transparent 70%);
   }
 }
 
@@ -76,7 +76,7 @@
   /* PasswordInput has its own show/hide button, so hide Edge's built-in one */
   .input::-ms-reveal, .input::-ms-clear { display: none; }
   .label { @apply mb-1.5 block text-sm font-semibold text-slate-700; }
-  .card { @apply rounded-2xl border border-aqua/70 bg-white shadow-[0_1px_2px_rgb(18_38_58/0.04),0_8px_24px_-12px_rgb(31_78_121/0.12)]; }
+  .card { @apply rounded-2xl border border-aqua/70 bg-white shadow-[0_1px_2px_rgb(15_26_43/0.04),0_8px_24px_-12px_rgb(28_46_74/0.12)]; }
   .chip { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold; }
 
   /* Highlighter stroke behind a word in a heading */
@@ -90,12 +90,12 @@
   /* Placeholder block that shimmers while content loads */
   .skeleton {
     @apply rounded-md animate-shimmer;
-    background: linear-gradient(90deg, #e3f1fb 25%, #f1f8fd 50%, #e3f1fb 75%);
+    background: linear-gradient(90deg, #e8eaf0 25%, #f4f5f8 50%, #e8eaf0 75%);
     background-size: 200% 100%;
   }
 
   /* Thin, quiet scrollbars for chat and tables */
-  .scroll-thin { scrollbar-width: thin; scrollbar-color: #a8d0ef transparent; }
+  .scroll-thin { scrollbar-width: thin; scrollbar-color: #bdc4d4 transparent; }
 }
 
 @media (prefers-reduced-motion: reduce) {

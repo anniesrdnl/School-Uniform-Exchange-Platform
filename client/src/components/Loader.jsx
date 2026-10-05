@@ -54,7 +54,7 @@ export function ListingGridSkeleton({ count = 8, className = 'grid grid-cols-2 g
 
 export function EmptyState({ icon, title, children }) {
   return (
-    <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-denim bg-white/70 px-6 py-12 text-center animate-fade-in">
+    <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-powder bg-white/70 px-6 py-12 text-center animate-fade-in">
       {icon && <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-2xl bg-aqua text-navy">{icon}</div>}
       {title && <p className="font-bold text-ink">{title}</p>}
       {children && <div className="max-w-sm text-sm text-slate-600">{children}</div>}

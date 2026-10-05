@@ -155,7 +155,7 @@ export default function ListingDetails() {
           )}
 
           {isOwner ? (
-            <p className="rounded-xl bg-cream p-3 text-sm text-navy ring-1 ring-inset ring-amber-200/70">This is your listing.</p>
+            <p className="rounded-xl bg-cream/60 p-3 text-sm text-navy ring-1 ring-inset ring-cream">This is your listing.</p>
           ) : listing.status !== 'available' ? (
             <p className="rounded-xl bg-slate-100 p-3 text-sm text-slate-700">This uniform is {listing.status}.</p>
           ) : (

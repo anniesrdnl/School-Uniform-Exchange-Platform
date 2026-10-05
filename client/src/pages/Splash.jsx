@@ -18,7 +18,7 @@ export default function Splash() {
     <div className="space-y-16 py-2 sm:space-y-20 sm:py-6">
       <section className="grid items-center gap-12 lg:grid-cols-2 lg:gap-14">
         <div className="text-center lg:text-left">
-          <p className="chip animate-fade-up bg-cream px-3 py-1 text-navy ring-1 ring-inset ring-amber-200/70">
+          <p className="chip animate-fade-up bg-cream px-3 py-1 text-navy">
             For students, by students
           </p>
           <h1 className="mt-5 animate-fade-up text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-[3.5rem]" style={delay(80)}>

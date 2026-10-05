@@ -92,7 +92,7 @@ export default function Profile() {
               </span>
               {user.verified
                 ? <span className="chip bg-aqua text-navy"><Icon name="shield" className="h-3.5 w-3.5" /> Verified student</span>
-                : <span className="chip bg-cream text-amber-800 ring-1 ring-inset ring-amber-200">Awaiting verification</span>}
+                : <span className="chip bg-amber-50 text-amber-800 ring-1 ring-inset ring-amber-200">Awaiting verification</span>}
             </div>
           </div>
           <dl className="flex w-full justify-center gap-3 md:w-auto">

@@ -28,6 +28,9 @@
   --animate-underline: underline 0.7s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-kenburns: kenburns 18s ease-in-out infinite alternate;
   --animate-pop: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-sheen: sheen 6s linear infinite;
+  --animate-bob: bob 8s ease-in-out infinite;
+  --animate-morph: morph 14s ease-in-out infinite;
 
   @keyframes fade-up {
     from { opacity: 0; transform: translateY(12px); }
@@ -75,12 +78,28 @@
   /* Page background (Backdrop.jsx): each glow wanders on its own loop; the dot grid pans one tile at a time */
   @keyframes orb-a {
     0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(-8vw, 7vh) scale(1.12); }
-    66% { transform: translate(5vw, 12vh) scale(0.92); }
+    33% { transform: translate(-12vw, 10vh) scale(1.18); }
+    66% { transform: translate(7vw, 16vh) scale(0.9); }
   }
   @keyframes orb-b {
     0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(10vw, -9vh) scale(1.18); }
+    50% { transform: translate(14vw, -12vh) scale(1.22); }
+  }
+  /* Landing page: moving sheen on gradient text, bobbing background icons, a morphing blob, step progress */
+  @keyframes sheen {
+    to { background-position: 200% center; }
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+    50% { transform: translateY(-16px) rotate(calc(var(--r, 0deg) + 8deg)); }
+  }
+  @keyframes morph {
+    0%, 100% { border-radius: 42% 58% 63% 37% / 45% 40% 60% 55%; transform: rotate(0deg) scale(1); }
+    50% { border-radius: 60% 40% 35% 65% / 60% 55% 45% 40%; transform: rotate(8deg) scale(1.04); }
+  }
+  @keyframes progress {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
   }
   @keyframes dots-pan {
     to { transform: translate(28px, 28px); }
@@ -88,6 +107,8 @@
 }
 
 @layer base {
+  /* Mouse offset from the screen centre (-0.5..0.5) and scroll position, kept up to date by Backdrop.jsx */
+  :root { --bx: 0; --by: 0; --sy: 0; }
   html { scroll-behavior: smooth; }
   body { @apply bg-mist text-ink font-sans antialiased; overflow-x: clip; -webkit-tap-highlight-color: transparent; }
   ::selection { @apply bg-aqua text-ink; }
@@ -104,6 +125,18 @@
   /* For dark (navy) backgrounds */
   .btn-light { @apply bg-white text-navy shadow-sm hover:bg-frost focus-visible:outline-white; }
   .btn-ghost-light { @apply border-white/30 text-white hover:border-white/60 hover:bg-white/10 focus-visible:outline-white; }
+  /* Add to any button: a soft band of light sweeps across it on hover */
+  .btn-shine { position: relative; overflow: hidden; isolation: isolate; }
+  .btn-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.22) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .btn-shine:hover::after { transform: translateX(120%); }
   .btn-sm { @apply rounded-lg px-3 py-1.5 text-xs; }
 
   /* text-base on phones stops iOS Safari from zooming in when an input is focused */
@@ -166,7 +199,7 @@
   .reveal.is-shown { opacity: 1; transform: none; }
 
   /* Living page background (Backdrop.jsx). --bx/--by: mouse offset from centre (-0.5..0.5), --sy: scroll in px */
-  .backdrop { --bx: 0; --by: 0; --sy: 0; position: fixed; inset: 0; z-index: -10; overflow: hidden; pointer-events: none; }
+  .backdrop { position: fixed; inset: 0; z-index: -10; overflow: hidden; pointer-events: none; }
   .backdrop-glows {
     position: absolute;
     inset: -12%;
@@ -174,11 +207,11 @@
     transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .orb { position: absolute; border-radius: 9999px; will-change: transform; }
-  .orb-1 { width: 46rem; height: 46rem; top: -6rem; right: -8rem; background: radial-gradient(closest-side, rgb(16 46 74 / 0.11), transparent); animation: orb-a 26s ease-in-out infinite; }
-  .orb-2 { width: 44rem; height: 44rem; bottom: -8rem; left: -8rem; background: radial-gradient(closest-side, rgb(247 231 198 / 0.95), transparent); animation: orb-b 32s ease-in-out infinite; }
-  .orb-3 { width: 32rem; height: 32rem; top: 28%; left: 12%; background: radial-gradient(closest-side, rgb(183 187 183 / 0.28), transparent); animation: orb-a 38s ease-in-out infinite reverse; }
-  .orb-4 { width: 36rem; height: 36rem; top: 40%; right: 2%; background: radial-gradient(closest-side, rgb(247 231 198 / 0.75), transparent); animation: orb-b 29s ease-in-out -10s infinite reverse; }
-  .orb-5 { width: 24rem; height: 24rem; top: 8%; left: 38%; background: radial-gradient(closest-side, rgb(88 106 121 / 0.10), transparent); animation: orb-a 22s ease-in-out -6s infinite; }
+  .orb-1 { width: 46rem; height: 46rem; top: -6rem; right: -8rem; background: radial-gradient(closest-side, rgb(16 46 74 / 0.14), transparent); animation: orb-a 16s ease-in-out infinite; }
+  .orb-2 { width: 44rem; height: 44rem; bottom: -8rem; left: -8rem; background: radial-gradient(closest-side, rgb(247 231 198 / 0.95), transparent); animation: orb-b 20s ease-in-out infinite; }
+  .orb-3 { width: 32rem; height: 32rem; top: 28%; left: 12%; background: radial-gradient(closest-side, rgb(183 187 183 / 0.35), transparent); animation: orb-a 24s ease-in-out infinite reverse; }
+  .orb-4 { width: 36rem; height: 36rem; top: 40%; right: 2%; background: radial-gradient(closest-side, rgb(247 231 198 / 0.75), transparent); animation: orb-b 18s ease-in-out -10s infinite reverse; }
+  .orb-5 { width: 24rem; height: 24rem; top: 8%; left: 38%; background: radial-gradient(closest-side, rgb(88 106 121 / 0.13), transparent); animation: orb-a 14s ease-in-out -6s infinite; }
   .backdrop-dots {
     position: absolute;
     inset: -28px 0 0 -28px;

@@ -1,22 +1,21 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 // Living page background behind every page: soft palette glows drift slowly, a faint dot grid pans,
 // and the glows lean a little away from the mouse and rise as you scroll. Decoration only (styles in index.css).
+// The mouse/scroll values are set on <html> (--bx, --by, --sy) so any page can add its own parallax.
 export default function Backdrop() {
-  const ref = useRef(null);
-
   useEffect(() => {
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined;
-    const el = ref.current;
+    const root = document.documentElement;
     let raf = 0;
     let mx = 0;
     let my = 0;
     // one style write per frame, however many events arrive
     const paint = () => {
       raf = 0;
-      el.style.setProperty('--bx', mx.toFixed(3));
-      el.style.setProperty('--by', my.toFixed(3));
-      el.style.setProperty('--sy', Math.min(window.scrollY, 1500).toFixed(0));
+      root.style.setProperty('--bx', mx.toFixed(3));
+      root.style.setProperty('--by', my.toFixed(3));
+      root.style.setProperty('--sy', Math.min(window.scrollY, 1500).toFixed(0));
     };
     const queue = () => { if (!raf) raf = requestAnimationFrame(paint); };
     const onMove = (e) => {
@@ -35,7 +34,7 @@ export default function Backdrop() {
   }, []);
 
   return (
-    <div ref={ref} className="backdrop" aria-hidden="true">
+    <div className="backdrop" aria-hidden="true">
       <div className="backdrop-glows">
         <span className="orb orb-1" />
         <span className="orb orb-2" />

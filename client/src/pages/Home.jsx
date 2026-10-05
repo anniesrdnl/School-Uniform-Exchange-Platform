@@ -6,8 +6,10 @@ import ListingCard from '../components/ListingCard.jsx';
 import SearchBar from '../components/SearchBar.jsx';
 import Icon from '../components/Icon.jsx';
 import Reveal from '../components/Reveal.jsx';
+import CategoryGrid from '../components/CategoryGrid.jsx';
+import { prefersReducedMotion, useCountUp } from '../hooks.js';
 import { EmptyState, ListingGridSkeleton } from '../components/Loader.jsx';
-import { CATEGORIES, CATEGORY_STYLES, formatPrice } from '../constants.js';
+import { CATEGORIES, formatPrice } from '../constants.js';
 import uniformImg from '../assets/uniforms.jpg';
 
 const WORDS = ['school polo', 'PE uniform', 'pleated skirt', 'necktie', 'slacks'];
@@ -24,30 +26,9 @@ const STACK = [
   'left-0 top-14 z-10 -rotate-[7deg]',
 ];
 
-const prefersReducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-
 function greeting() {
   const h = new Date().getHours();
   return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
-}
-
-// Counts from 0 up to target with an ease-out, once target is known
-function useCountUp(target, ms = 1000) {
-  const [n, setN] = useState(0);
-  useEffect(() => {
-    if (target == null) return undefined;
-    if (prefersReducedMotion()) { setN(target); return undefined; }
-    let raf;
-    const start = performance.now();
-    const tick = (now) => {
-      const p = Math.min((now - start) / ms, 1);
-      setN(Math.round(target * (1 - (1 - p) ** 3)));
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [target, ms]);
-  return n;
 }
 
 // The cream word in the headline: cycles through uniform pieces, sliding each one up into place
@@ -137,7 +118,6 @@ export default function Home() {
   const [failed, setFailed] = useState(false);
   const [newest, setNewest] = useState([]); // unfiltered newest listings for the hero
   const [total, setTotal] = useState(null);
-  const [counts, setCounts] = useState({});
   const shownTotal = useCountUp(total);
 
   useEffect(() => {
@@ -154,12 +134,6 @@ export default function Home() {
       .finally(() => !ignore && setLoading(false));
     return () => { ignore = true; };
   }, [category]);
-
-  // How many listings each category has, for the category cards
-  useEffect(() => {
-    Promise.allSettled(CATEGORIES.map((c) => api.get('/listings', { params: { category: c, limit: 1 } })))
-      .then((results) => setCounts(Object.fromEntries(results.map((r, i) => [CATEGORIES[i], r.status === 'fulfilled' ? r.value.data.total : null]))));
-  }, []);
 
   // Cursor position over the hero as 0–1, read by the spotlight and the card tilt
   const track = (e) => {
@@ -239,26 +213,7 @@ export default function Home() {
         <Reveal className="mb-4 flex items-end justify-between gap-4">
           <h2 id="categories-heading" className="section-title">Shop by category</h2>
         </Reveal>
-        {/* 2 columns until there is room for 4; icon sits above the label on phones so long names never get squeezed */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-          {CATEGORIES.map((c, i) => (
-            <Reveal key={c} delay={i * 80}>
-              <Link to={`/browse?category=${encodeURIComponent(c)}`}
-                className="card group flex h-full flex-col items-start gap-3 p-4 transition duration-300 hover:-translate-y-1 hover:border-powder hover:shadow-lg hover:shadow-navy/10 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:flex-row sm:items-center">
-                <span className="icon-tile h-11 w-11 transition duration-300 group-hover:-rotate-6 group-hover:scale-110 group-hover:bg-navy group-hover:text-mist group-hover:ring-navy sm:h-12 sm:w-12">
-                  <Icon name={CATEGORY_STYLES[c].icon} className="h-6 w-6" />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold leading-snug text-ink transition-colors group-hover:text-navy">{c}</span>
-                  {counts[c] === undefined
-                    ? <span className="skeleton mt-1.5 block h-3 w-14" />
-                    : counts[c] !== null && <span className="mt-0.5 block text-xs text-slate-500">{counts[c]} {counts[c] === 1 ? 'listing' : 'listings'}</span>}
-                </span>
-                <Icon name="arrow-right" className="hidden h-4 w-4 shrink-0 -translate-x-2 text-navy opacity-0 transition duration-300 group-hover:translate-x-0 group-hover:opacity-100 sm:block" />
-              </Link>
-            </Reveal>
-          ))}
-        </div>
+        <CategoryGrid />
       </section>
 
       <section aria-labelledby="recent-heading">

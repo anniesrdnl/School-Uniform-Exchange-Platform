@@ -24,8 +24,9 @@ export default function App() {
     <>
       <Backdrop />
       <Navbar />
-      {/* extra bottom room where the floating help button sits, so it never covers the end of a page */}
-      <main className={`mx-auto max-w-7xl px-4 pt-4 sm:pt-6 lg:px-8 ${showsHelpChat(location.pathname)
+      {/* overflow-x-clip: decorative shapes that lean past the edge (rotating, tilting) never cause sideways scrolling.
+          extra bottom room where the floating help button sits, so it never covers the end of a page */}
+      <main className={`mx-auto max-w-7xl overflow-x-clip px-4 pt-4 sm:pt-6 lg:px-8 ${showsHelpChat(location.pathname)
         ? 'pb-[calc(9.5rem+env(safe-area-inset-bottom))] md:pb-28'
         : 'pb-[calc(7rem+env(safe-area-inset-bottom))] md:pb-12'}`}>
         {/* keyed by path so each page fades in on navigation */}

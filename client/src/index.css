@@ -3,33 +3,33 @@
 @theme {
   --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
 
-  /* Brand palette: Off-white #F8F9FA and Deep navy #18263A. Every other shade is a blend of the two (or a darker
-     navy), so the site stays strictly two-tone.
+  /* Brand palette: Snow White #FFFFFF and Deep Sea #141B2D. Every other shade is a blend of the two (or a darker
+     Deep Sea), so the site stays strictly two-tone.
      Token names predate this palette and are kept so class names across the app stay the same. */
-  --color-ink: #131e2e;       /* deep navy, darkened: body text (15.8:1 on the background) */
-  --color-navy: #18263a;      /* deep navy: primary buttons, links, dark panels (15.3:1 with white) */
-  --color-navy-deep: #0f1824; /* hover/pressed state of navy */
-  --color-denim: #5b6574;     /* 30% off-white: accent text, interactive borders (5.6:1 on the background) */
-  --color-powder: #b5bac0;    /* 70% off-white: decorative shapes, focus rings, soft-button hover */
-  --color-cream: #dde0e3;     /* 88% off-white: highlight chips; light accent text on navy */
+  --color-ink: #101624;       /* Deep Sea, darkened: body text (18:1 on white) */
+  --color-navy: #141b2d;      /* Deep Sea: primary buttons, links, dark panels (17.4:1 with white) */
+  --color-navy-deep: #0c111c; /* hover/pressed state of navy */
+  --color-denim: #5b5f6c;     /* 30% white: accent text, interactive borders (6.4:1 on white) */
+  --color-powder: #b9bbc0;    /* 70% white: decorative shapes, focus rings, soft-button hover */
+  --color-cream: #e3e4e6;     /* 88% white: highlight chips; light accent text on Deep Sea */
 
-  /* Light blends of navy into off-white for fills, and off-white itself as the page background */
-  --color-aqua: #d9dbdf;      /* 86% off-white: light fills, active pills, avatar tiles, card borders */
-  --color-frost: #e8eaed;     /* 93% off-white: subtle fills, hover backgrounds */
-  --color-mist: #f8f9fa;      /* off-white: page background */
+  /* Light blends of Deep Sea into white for fills, and Snow White itself as the page background */
+  --color-aqua: #dedfe2;      /* 86% white: light fills, active pills, avatar tiles, card borders */
+  --color-frost: #efeff0;     /* 93% white: subtle fills, hover backgrounds */
+  --color-mist: #ffffff;      /* Snow White: page background */
 
   /* Tailwind's grey scale (secondary text, placeholders, borders) remapped to blends of the same two colours,
      so no other hue appears anywhere. 500+ pass AA as text on the background and on white. */
-  --color-slate-50: #f1f3f4;
-  --color-slate-100: #e8eaed;
-  --color-slate-200: #d9dbdf;
-  --color-slate-300: #bec2c8;
-  --color-slate-400: #8c949e;
-  --color-slate-500: #606a77;
-  --color-slate-600: #525d6c;
-  --color-slate-700: #3c4859;
-  --color-slate-800: #2a3749;
-  --color-slate-900: #1f2c40;
+  --color-slate-50: #f8f8f9;
+  --color-slate-100: #efeff0;
+  --color-slate-200: #dedfe2;
+  --color-slate-300: #c2c4c8;
+  --color-slate-400: #8e929a;
+  --color-slate-500: #5f6470;
+  --color-slate-600: #515664;
+  --color-slate-700: #3a3f4f;
+  --color-slate-800: #272d3e;
+  --color-slate-900: #1b2233;
 
   --animate-fade-up: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-fade-in: fade-in 0.4s ease-out both;
@@ -174,7 +174,7 @@
   /* PasswordInput has its own show/hide button, so hide Edge's built-in one */
   .input::-ms-reveal, .input::-ms-clear { display: none; }
   .label { @apply mb-1.5 block text-sm font-semibold text-slate-700; }
-  .card { @apply rounded-2xl border border-aqua/70 bg-white shadow-[0_1px_2px_rgb(24_38_58/0.04),0_8px_24px_-12px_rgb(24_38_58/0.12)]; }
+  .card { @apply rounded-2xl border border-aqua/70 bg-white shadow-[0_1px_2px_rgb(20_27_45/0.04),0_8px_24px_-12px_rgb(20_27_45/0.12)]; }
   /* Shared type scale: every page title, subtitle and section heading uses these */
   .page-title { @apply text-2xl font-bold tracking-[-0.015em] text-ink sm:text-3xl; }
   .page-subtitle { @apply mt-1 text-sm text-slate-600 sm:text-base; }
@@ -206,7 +206,7 @@
   /* Placeholder block that shimmers while content loads */
   .skeleton {
     @apply rounded-md animate-shimmer;
-    background: linear-gradient(90deg, #e8eaed 25%, #f0f2f3 50%, #e8eaed 75%);
+    background: linear-gradient(90deg, #efeff0 25%, #f7f7f8 50%, #efeff0 75%);
     background-size: 200% 100%;
   }
 
@@ -234,15 +234,15 @@
     transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .orb { position: absolute; border-radius: 9999px; will-change: transform; }
-  .orb-1 { width: 46rem; height: 46rem; top: -6rem; right: -8rem; background: radial-gradient(closest-side, rgb(24 38 58 / 0.14), transparent); animation: orb-a 16s ease-in-out infinite; }
-  .orb-2 { width: 44rem; height: 44rem; bottom: -8rem; left: -8rem; background: radial-gradient(closest-side, rgb(24 38 58 / 0.07), transparent); animation: orb-b 20s ease-in-out infinite; }
-  .orb-3 { width: 32rem; height: 32rem; top: 28%; left: 12%; background: radial-gradient(closest-side, rgb(181 186 192 / 0.35), transparent); animation: orb-a 24s ease-in-out infinite reverse; }
-  .orb-4 { width: 36rem; height: 36rem; top: 40%; right: 2%; background: radial-gradient(closest-side, rgb(181 186 192 / 0.45), transparent); animation: orb-b 18s ease-in-out -10s infinite reverse; }
-  .orb-5 { width: 24rem; height: 24rem; top: 8%; left: 38%; background: radial-gradient(closest-side, rgb(91 101 116 / 0.12), transparent); animation: orb-a 14s ease-in-out -6s infinite; }
+  .orb-1 { width: 46rem; height: 46rem; top: -6rem; right: -8rem; background: radial-gradient(closest-side, rgb(20 27 45 / 0.14), transparent); animation: orb-a 16s ease-in-out infinite; }
+  .orb-2 { width: 44rem; height: 44rem; bottom: -8rem; left: -8rem; background: radial-gradient(closest-side, rgb(20 27 45 / 0.07), transparent); animation: orb-b 20s ease-in-out infinite; }
+  .orb-3 { width: 32rem; height: 32rem; top: 28%; left: 12%; background: radial-gradient(closest-side, rgb(185 187 192 / 0.35), transparent); animation: orb-a 24s ease-in-out infinite reverse; }
+  .orb-4 { width: 36rem; height: 36rem; top: 40%; right: 2%; background: radial-gradient(closest-side, rgb(185 187 192 / 0.45), transparent); animation: orb-b 18s ease-in-out -10s infinite reverse; }
+  .orb-5 { width: 24rem; height: 24rem; top: 8%; left: 38%; background: radial-gradient(closest-side, rgb(91 95 108 / 0.12), transparent); animation: orb-a 14s ease-in-out -6s infinite; }
   .backdrop-dots {
     position: absolute;
     inset: -28px 0 0 -28px;
-    background-image: radial-gradient(rgb(24 38 58 / 0.08) 1px, transparent 1.5px);
+    background-image: radial-gradient(rgb(20 27 45 / 0.08) 1px, transparent 1.5px);
     background-size: 28px 28px;
     -webkit-mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, #000 15%, transparent 75%);
     mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, #000 15%, transparent 75%);
@@ -250,7 +250,7 @@
   }
 
   /* Thin, quiet scrollbars for chat and tables */
-  .scroll-thin { scrollbar-width: thin; scrollbar-color: #b5bac0 transparent; }
+  .scroll-thin { scrollbar-width: thin; scrollbar-color: #b9bbc0 transparent; }
 }
 
 @media (prefers-reduced-motion: reduce) {

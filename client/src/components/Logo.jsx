@@ -14,7 +14,7 @@ export function LogoMark({ className = 'h-11 w-11' }) {
 export default function Logo() {
   return (
     <span className="group flex items-center gap-2.5 lg:gap-3">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:h-10 sm:w-10 bg-linear-to-br from-[#2e3b4d] to-navy-deep shadow-md shadow-navy/25 transition duration-300 group-hover:-rotate-6 group-hover:scale-105">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:h-10 sm:w-10 bg-linear-to-br from-[#2c3242] to-navy-deep shadow-md shadow-navy/25 transition duration-300 group-hover:-rotate-6 group-hover:scale-105">
         <LogoMark className="h-6 w-6 brightness-0 invert" />
       </span>
       <span className="flex flex-col leading-tight">

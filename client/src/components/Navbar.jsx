@@ -1,11 +1,45 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import api from '../api.js';
 import Icon from './Icon.jsx';
 import Logo from './Logo.jsx';
 import Avatar from './Avatar.jsx';
 import UserMenu from './UserMenu.jsx';
 import { showsHelpChat } from './HelpChat.jsx';
+
+// Number of chats with unread messages (muted chats don't count). Checked every 30 seconds while the tab is visible,
+// and updated straight away by the Messages page (a 'sueps:unread' event) as chats are read, muted or deleted.
+function useUnreadCount(userId) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!userId) { setCount(0); return undefined; }
+    const load = () => {
+      if (!document.hidden) api.get('/messages/unread').then((r) => setCount(r.data.count)).catch(() => {});
+    };
+    const onUpdate = (e) => setCount(e.detail);
+    load();
+    const timer = setInterval(load, 30000);
+    window.addEventListener('sueps:unread', onUpdate);
+    document.addEventListener('visibilitychange', load);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('sueps:unread', onUpdate);
+      document.removeEventListener('visibilitychange', load);
+    };
+  }, [userId]);
+  return count;
+}
+
+// Small count bubble; screen readers hear "N unread"
+function UnreadBadge({ count, className = '' }) {
+  if (!count) return null;
+  return (
+    <span className={`inline-flex h-[1.125rem] min-w-[1.125rem] animate-pop items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white ${className}`}>
+      {count > 9 ? '9+' : count}<span className="sr-only"> unread</span>
+    </span>
+  );
+}
 
 // Phone tab: solid icon + Midnight label when active, outline icon when not (shape changes too, not just colour)
 function Tab({ tab, user }) {
@@ -14,7 +48,8 @@ function Tab({ tab, user }) {
       className={({ isActive }) => `group flex h-[3.85rem] min-w-0 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors duration-200 ${isActive ? 'text-navy' : 'text-slate-500 hover:text-navy'}`}>
       {({ isActive }) => (
         <>
-          <span className="flex h-7 w-7 items-center justify-center transition-transform duration-200 group-hover:-translate-y-0.5 group-active:scale-90">
+          <span className="relative flex h-7 w-7 items-center justify-center transition-transform duration-200 group-hover:-translate-y-0.5 group-active:scale-90">
+            <UnreadBadge count={tab.badge} className="absolute -right-2 -top-1 ring-2 ring-white" />
             {tab.avatar
               ? <Avatar name={user.fullName} src={user.avatar}
                   className={`h-7 w-7 text-xs ring-2 ring-offset-2 ring-offset-white transition ${isActive ? 'ring-navy' : 'ring-transparent'}`} />
@@ -50,6 +85,7 @@ export default function Navbar() {
   // Logged-in users are redirected from / to /home, so Home must point there to ever show as active
   const home = user ? '/home' : '/';
   const { pathname } = useLocation();
+  const unread = useUnreadCount(user?._id);
   // Once you scroll, the info strip folds away and the card's shadow deepens
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
@@ -63,7 +99,7 @@ export default function Navbar() {
   const links = [
     { to: home, label: 'Home', end: true },
     { to: '/browse', label: 'Browse' },
-    ...(user ? [{ to: '/messages', label: 'Messages' }] : []),
+    ...(user ? [{ to: '/messages', label: 'Messages', badge: unread }] : []),
   ];
 
   // Phone tab bar: same notched design either way. The middle button is raised:
@@ -73,7 +109,7 @@ export default function Navbar() {
         { to: home, label: 'Home', icon: 'home', end: true },
         { to: '/browse', label: 'Browse', icon: 'search' },
         { to: '/sell', label: 'Sell', icon: 'plus', center: true },
-        { to: '/messages', label: 'Messages', icon: 'chat' },
+        { to: '/messages', label: 'Messages', icon: 'chat', badge: unread },
         { to: '/profile', label: 'Profile', avatar: true },
       ]
     : [
@@ -118,7 +154,7 @@ export default function Navbar() {
                   className={({ isActive }) => `relative rounded-full px-3 py-2 text-sm font-semibold transition-colors duration-200 after:absolute after:inset-x-3 after:bottom-0.5 lg:px-4 lg:after:inset-x-4 after:h-0.5 after:rounded-full after:bg-navy after:transition-transform after:duration-200 focus-visible:outline-2 focus-visible:outline-navy ${isActive
                     ? 'text-navy after:scale-x-100'
                     : 'text-slate-500 after:scale-x-0 hover:text-navy hover:after:scale-x-50'}`}>
-                  {l.label}
+                  {l.label}{l.badge > 0 && <UnreadBadge count={l.badge} className="ml-1.5 align-[1px]" />}
                 </NavLink>
               ))}
             </nav>

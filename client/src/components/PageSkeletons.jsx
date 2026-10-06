@@ -294,6 +294,7 @@ export function MessagesPageSkeleton({ chatOpen = false }) {
         <div className="space-y-3 border-b border-aqua/70 p-4">
           <div className="flex items-center justify-between"><Bone className="h-7 w-32" /><Bone className="h-5 w-8 rounded-full" /></div>
           <Bone className="h-11 rounded-full" />
+          <Bone className="h-10 rounded-xl" />
         </div>
         <ConversationListSkeleton />
       </div>

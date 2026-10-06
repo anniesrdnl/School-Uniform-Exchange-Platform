@@ -168,6 +168,34 @@ create table if not exists public.messages (
 
 create index if not exists messages_conversation_idx on public.messages (conversation, created_at);
 
+-- editing and deleting single messages
+alter table public.messages add column if not exists edited_at  timestamptz;                -- shown as "edited"
+alter table public.messages add column if not exists deleted_at timestamptz;                -- deleted for everyone
+alter table public.messages add column if not exists hidden_for uuid[] not null default '{}'; -- deleted for these people only
+
+-- who sent the latest message (for unread: a chat is unread when someone else spoke after I last read it)
+alter table public.conversations add column if not exists last_sender uuid references public.profiles (id) on delete set null;
+
+-- conversation_members: each person's own settings for a chat; none of them change the chat for the other person
+create table if not exists public.conversation_members (
+  conversation uuid not null references public.conversations (id) on delete cascade,
+  member       uuid not null references public.profiles (id) on delete cascade,
+  muted        boolean not null default false, -- no unread highlight or badge for this chat
+  archived     boolean not null default false, -- out of the inbox until a new message arrives
+  hidden       boolean not null default false, -- deleted: out of the list until a new message arrives
+  cleared_at   timestamptz,                    -- deleted: messages up to this time stay hidden for this person
+  last_read_at timestamptz,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now(),
+  primary key (conversation, member)
+);
+
+create index if not exists conversation_members_member_idx on public.conversation_members (member);
+
+drop trigger if exists conversation_members_updated_at on public.conversation_members;
+create trigger conversation_members_updated_at before update on public.conversation_members
+  for each row execute function public.set_updated_at();
+
 -- ---------------------------------------------------------------------------
 -- reviews: rating left after a completed exchange
 -- ---------------------------------------------------------------------------
@@ -211,6 +239,7 @@ alter table public.listings      enable row level security;
 alter table public.requests      enable row level security;
 alter table public.conversations enable row level security;
 alter table public.messages      enable row level security;
+alter table public.conversation_members enable row level security;
 alter table public.reviews       enable row level security;
 alter table public.reports       enable row level security;
 

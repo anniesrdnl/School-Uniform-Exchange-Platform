@@ -154,7 +154,7 @@ router.delete('/conversations/:id', async (req, res, next) => {
 
 // Messages in a chat (minus any I deleted). Opening a chat marks it read.
 // ?since=<newest updatedAt the browser already has>: only messages sent, edited or deleted after that. The open chat
-// checks every 1.5 seconds, so this keeps each check small and quick.
+// checks every second, so this keeps each check small and quick.
 router.get('/conversations/:id/messages', async (req, res, next) => {
   try {
     // the chat and my settings for it don't depend on each other, so look both up at once

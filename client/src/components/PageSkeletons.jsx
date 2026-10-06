@@ -278,7 +278,6 @@ export function MessagesPageSkeleton({ chatOpen = false }) {
         <div className="space-y-3 border-b border-aqua/70 p-4">
           <div className="flex items-center justify-between"><Bone className="h-7 w-32" /><Bone className="h-5 w-8 rounded-full" /></div>
           <Bone className="h-11 rounded-full" />
-          <Bone className="h-10 rounded-xl" />
         </div>
         <ConversationListSkeleton />
       </div>
@@ -308,32 +307,31 @@ export function ProfileSkeleton() {
   return (
     <Shell label="Loading profile" className="space-y-6 sm:space-y-8">
       <section className="card overflow-hidden">
-        <div className="h-20 bg-aqua sm:h-24" />
+        <div className="h-24 bg-navy sm:h-28" />
         <div className="flex flex-col items-center gap-4 px-5 pb-5 sm:px-6 md:flex-row md:items-end">
-          <Bone className="relative -mt-10 h-20 w-20 shrink-0 rounded-full ring-4 ring-white" />
-          <div className="flex min-w-0 flex-1 flex-col items-center gap-2 md:items-start">
+          <Bone className="relative -mt-12 h-24 w-24 shrink-0 rounded-full ring-4 ring-white" />
+          <div className="flex min-w-0 flex-1 flex-col items-center gap-2 md:items-start md:pb-1">
             <Bone className="h-7 w-48" />
             <Bone className="h-4 w-64 max-w-full" />
             <div className="mt-1 flex gap-2"><Bone className="h-5 w-28 rounded-full" /><Bone className="h-5 w-32 rounded-full" /></div>
           </div>
-          <div className="flex w-full justify-center gap-3 md:w-auto">
-            {[0, 1].map((i) => (
-              <div key={i} className="flex flex-1 flex-col items-center gap-1.5 rounded-xl bg-frost px-4 py-2.5 sm:min-w-24 md:flex-none">
-                <Bone className="h-7 w-8" /><Bone className="h-3 w-16" />
+          <div className="grid w-full grid-cols-3 gap-2 md:w-auto">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="flex flex-col items-center gap-1.5 rounded-xl bg-frost px-4 py-2.5 sm:min-w-24">
+                <Bone className="h-7 w-8" /><Bone className="h-3 w-14" />
               </div>
             ))}
           </div>
         </div>
       </section>
-      {['w-56', 'w-36', 'w-32'].map((w, i) => (
-        <section key={w}>
-          <div className="mb-3 flex items-center justify-between gap-2">
-            <Bone className={`h-6 ${w}`} />
-            {i === 2 && <Bone className="h-8 w-36 rounded-lg" />}
-          </div>
-          <div className="card overflow-hidden"><RowsSkeleton /></div>
-        </section>
-      ))}
+      <div>
+        {/* tabs, then the open tab's rows */}
+        <div className="flex items-end justify-between gap-3">
+          <TabRow widths={['w-32', 'w-28', 'w-28']} />
+          <Bone className="mb-1.5 hidden h-9 w-36 shrink-0 rounded-lg sm:block" />
+        </div>
+        <div className="card mt-4 overflow-hidden sm:mt-5"><RowsSkeleton count={3} /></div>
+      </div>
     </Shell>
   );
 }

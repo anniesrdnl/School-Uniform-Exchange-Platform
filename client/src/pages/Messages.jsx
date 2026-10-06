@@ -14,7 +14,7 @@ import { presence } from '../constants.js';
 import { Spinner } from '../components/Loader.jsx';
 import shrinkImage from '../shrinkImage.js';
 
-const CHAT_POLL_MS = 1500; // open chat: how often to check for new, edited or deleted messages
+const CHAT_POLL_MS = 1000; // open chat: how often to check for new messages (the API runs next to the database, so each check is quick)
 const LIST_POLL_MS = 5000; // chat list: previews, unread dots, online status
 const GROUP_MS = 5 * 60 * 1000; // messages from one person less than 5 minutes apart sit together
 const QUICK_REPLIES = ['Hi! Is this still available?', 'Can we meet on campus?', 'Could you send more photos?'];
@@ -140,53 +140,10 @@ function ChatPhoto({ src, onLoad }) {
   );
 }
 
-// One message. Clicking (or tapping, or Enter on) the bubble opens its options right next to it: Edit,
-// Delete for you, Delete for everyone. Messages that are still sending have no options yet.
-function Bubble({ m, mine, person, first, last, editing, actions, onImageLoad }) {
+// One message bubble. Messages that were edited or deleted earlier still show "Edited" / "deleted".
+function Bubble({ m, mine, person, first, last, onImageLoad }) {
   const corner = mine ? (last ? 'rounded-br-md' : '') : (last ? 'rounded-bl-md' : '');
-  const deleted = Boolean(m.deletedAt);
-  const clickable = !m.pending && actions.length > 0;
-
-  const bubble = ({ open, ...trigger } = {}) => {
-    const shape = `rounded-2xl px-3.5 py-2 text-sm ${corner} ${clickable
-      ? `cursor-pointer transition duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${open || editing ? 'ring-2 ring-offset-2 ring-offset-white ring-denim' : ''}`
-      : ''}`;
-    // dragging to select text (to copy it) doesn't open the menu; a plain click or tap does
-    const onClick = (e) => { if (!String(window.getSelection() || '')) trigger.onClick(e); };
-    const props = clickable ? { ...trigger, onClick, role: 'button', tabIndex: 0 } : {};
-    const hint = clickable && <span className="sr-only">. Message options</span>;
-
-    if (deleted) {
-      return (
-        <div {...props} className={`flex items-center gap-1.5 bg-white/70 italic text-slate-500 ring-1 ring-inset ring-aqua hover:bg-white ${shape}`}>
-          <Icon name="no-symbol" className="h-4 w-4 shrink-0" />
-          {mine ? 'You deleted this message' : 'This message was deleted'}
-          {hint}
-        </div>
-      );
-    }
-    return (
-      <div {...props} title={m.pending ? 'Sending…' : clock(m.createdAt)}
-        className={`break-words leading-relaxed shadow-sm hover:shadow-md ${shape} ${m.pending ? 'opacity-70' : ''} ${mine
-          ? `bg-navy text-white shadow-navy/20 ${clickable ? 'hover:bg-navy-deep' : ''}`
-          : `bg-white text-ink ring-1 ring-aqua ${clickable ? 'hover:bg-frost' : ''}`}`}>
-        {m.image && m.pending && (
-          <img src={m.image} alt="Photo being sent" onLoad={onImageLoad} className={`-mx-1.5 mb-1 block max-h-60 w-auto rounded-xl ${m.text ? '' : '-mb-0.5'}`} />
-        )}
-        {m.image && !m.pending && (
-          // the photo still opens full size; clicking it doesn't open the message options
-          <a href={m.image} target="_blank" rel="noopener noreferrer" aria-label="Open photo in a new tab"
-            onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}
-            className={`-mx-1.5 mb-1 block overflow-hidden rounded-xl ${m.text ? '' : '-mb-0.5'} ${focusRing}`}>
-            <ChatPhoto src={m.image} onLoad={onImageLoad} />
-          </a>
-        )}
-        {m.text && <p className="whitespace-pre-line">{m.text}</p>}
-        {m.editedAt && <span className={`mt-0.5 block text-right text-[10px] ${mine ? 'text-white/70' : 'text-slate-500'}`}>Edited</span>}
-        {hint}
-      </div>
-    );
-  };
+  const shape = `rounded-2xl px-3.5 py-2 text-sm ${corner}`;
 
   return (
     <div className={`flex animate-fade-up items-end gap-2 ${mine ? 'justify-end' : ''} ${first ? 'mt-3' : 'mt-0.5'}`}>
@@ -195,9 +152,29 @@ function Bubble({ m, mine, person, first, last, editing, actions, onImageLoad })
         ? <Avatar name={person?.fullName} src={person?.avatar} className="h-7 w-7 text-[11px]" />
         : <span className="w-7 shrink-0" />)}
       <div className={`flex max-w-[78%] flex-col sm:max-w-[65%] ${mine ? 'items-end' : 'items-start'}`}>
-        {clickable
-          ? <ActionMenu label="Message options" items={actions} align={mine ? 'end' : 'start'} className="max-w-full" trigger={bubble} />
-          : bubble()}
+        {m.deletedAt ? (
+          <div className={`flex items-center gap-1.5 bg-white/70 italic text-slate-500 ring-1 ring-inset ring-aqua ${shape}`}>
+            <Icon name="no-symbol" className="h-4 w-4 shrink-0" />
+            {mine ? 'You deleted this message' : 'This message was deleted'}
+          </div>
+        ) : (
+          <div title={m.pending ? 'Sending…' : clock(m.createdAt)}
+            className={`break-words leading-relaxed shadow-sm transition duration-200 hover:shadow-md ${shape} ${m.pending ? 'opacity-70' : ''} ${mine
+              ? 'bg-navy text-white shadow-navy/20'
+              : 'bg-white text-ink ring-1 ring-aqua'}`}>
+            {m.image && m.pending && (
+              <img src={m.image} alt="Photo being sent" onLoad={onImageLoad} className={`-mx-1.5 mb-1 block max-h-60 w-auto rounded-xl ${m.text ? '' : '-mb-0.5'}`} />
+            )}
+            {m.image && !m.pending && (
+              <a href={m.image} target="_blank" rel="noopener noreferrer" aria-label="Open photo in a new tab"
+                className={`-mx-1.5 mb-1 block overflow-hidden rounded-xl ${m.text ? '' : '-mb-0.5'} ${focusRing}`}>
+                <ChatPhoto src={m.image} onLoad={onImageLoad} />
+              </a>
+            )}
+            {m.text && <p className="whitespace-pre-line">{m.text}</p>}
+            {m.editedAt && <span className={`mt-0.5 block text-right text-[10px] ${mine ? 'text-white/70' : 'text-slate-500'}`}>Edited</span>}
+          </div>
+        )}
         {last && (m.pending
           ? <span className="mt-1 flex items-center gap-1 px-1 text-[11px] text-slate-500"><Spinner className="h-3 w-3" /> Sending…</span>
           : <span className="mt-1 px-1 text-[11px] text-slate-500">{clock(m.createdAt)}</span>)}
@@ -219,7 +196,7 @@ function PaneMessage({ title, children }) {
   );
 }
 
-// Short note at the bottom of the screen ("Chat archived · Undo"). Portalled so it's fixed to the screen,
+// Short note at the bottom of the screen ("Chat muted", "Chat deleted"). Portalled so it's fixed to the screen,
 // not to the page wrapper (which animates with a transform).
 function Toast({ notice, onUndo, onDismiss }) {
   if (!notice) return null;
@@ -249,11 +226,9 @@ export default function Messages() {
   // Messages for every chat opened so far ({ [conversationId]: [...] }), so going back to a chat is instant.
   // A chat that isn't in here yet is still loading.
   const [chats, setChats] = useState({});
-  const [view, setView] = useState('inbox'); // 'inbox' | 'archived'
   const [search, setSearch] = useState('');
   const [text, setText] = useState('');
-  const [editing, setEditing] = useState(null); // the message being edited, or null
-  const [confirm, setConfirm] = useState(null); // { kind: 'chat' | 'everyone' | 'me', convo?, message? }
+  const [confirm, setConfirm] = useState(null); // { convo } while the "Delete this chat?" box is open
   const [notice, setNotice] = useState(null); // { text, undo?, key }
   const [error, setError] = useState('');
   const listRef = useRef(null);
@@ -307,7 +282,6 @@ export default function Messages() {
   useEffect(() => {
     if (!activeId) return undefined;
     setError('');
-    setEditing(null);
     updateConvo(activeId, { unread: false });
     let alive = true;
     let first = true; // the first check after opening loads the whole chat; later ones only fetch what changed
@@ -381,7 +355,7 @@ export default function Messages() {
     if (el && el.scrollHeight - el.scrollTop - el.clientHeight < 320) el.scrollTo({ top: el.scrollHeight });
   };
 
-  // ---------------------------------------------------------------- sending and editing
+  // ---------------------------------------------------------------- sending
 
   // The message shows in the chat at once (faded, "Sending…") and is swapped for the saved one when the server replies
   const send = async (file) => {
@@ -404,11 +378,11 @@ export default function Messages() {
           const rest = prev.filter((m) => m._id !== tempId);
           return rest.some((m) => m._id === data._id) ? rest : [...rest, data];
         });
-        // move this chat to the top of the inbox with its new preview (a new message un-archives it)
+        // move this chat to the top of the list with its new preview
         setConvos((prev) => {
           const convo = prev?.find((c) => c._id === id);
           if (!convo) return prev;
-          return [{ ...convo, archived: false, lastMessage: body || 'Sent a photo', lastMessageAt: data.createdAt }, ...prev.filter((c) => c !== convo)];
+          return [{ ...convo, lastMessage: body || 'Sent a photo', lastMessageAt: data.createdAt }, ...prev.filter((c) => c !== convo)];
         });
       } catch (err) {
         setChat(id, (prev = []) => prev.filter((m) => m._id !== tempId));
@@ -420,51 +394,19 @@ export default function Messages() {
     });
   };
 
-  const startEdit = (m) => {
-    setEditing(m);
-    setText(m.text);
-    setError('');
-    requestAnimationFrame(() => inputRef.current?.focus());
-  };
-  const cancelEdit = () => { setEditing(null); setText(''); };
-
-  // Saves straight away on screen; puts the old text back if the server refuses
-  const saveEdit = async () => {
-    const original = editing;
-    const body = text.trim();
-    if (body === original.text) return cancelEdit();
-    if (!body && !original.image) return setError("A message can't be empty.");
-    const id = activeId;
-    const isLatest = messages?.filter((m) => !m.pending).at(-1)?._id === original._id;
-    setChat(id, (list = []) => list.map((m) => (m._id === original._id ? { ...m, text: body, editedAt: new Date().toISOString() } : m)));
-    cancelEdit();
-    setError('');
-    await busy(id, async () => {
-      try {
-        const { data } = await api.patch(`/messages/conversations/${id}/messages/${original._id}`, { text: body });
-        setChat(id, (list = []) => list.map((m) => (m._id === data._id ? data : m)));
-        if (isLatest) updateConvo(id, { lastMessage: body || 'Sent a photo' });
-      } catch (err) {
-        setChat(id, (list = []) => list.map((m) => (m._id === original._id ? original : m)));
-        setError(errMsg(err));
-      }
-    });
-  };
-
   const submit = (e) => {
     e.preventDefault();
-    if (editing) saveEdit();
-    else send();
+    send();
   };
 
-  // ---------------------------------------------------------------- chat settings (mute, archive, delete)
+  // ---------------------------------------------------------------- chat settings (mute, delete)
 
-  const changeSettings = async (convo, fields, doneText, undoFields) => {
-    const before = { muted: convo.muted, archived: convo.archived };
+  const changeSettings = async (convo, fields, doneText) => {
+    const before = { muted: convo.muted };
     updateConvo(convo._id, fields);
     try {
       await api.patch(`/messages/conversations/${convo._id}/settings`, fields);
-      flash(doneText, undoFields && (() => changeSettings({ ...convo, ...fields }, undoFields, 'Undone')));
+      flash(doneText);
     } catch (err) {
       updateConvo(convo._id, before);
       flash(errMsg(err));
@@ -475,34 +417,17 @@ export default function Messages() {
     convo.muted
       ? { label: 'Unmute', icon: 'bell', onSelect: () => changeSettings(convo, { muted: false }, 'Chat unmuted') }
       : { label: 'Mute', icon: 'bell-slash', onSelect: () => changeSettings(convo, { muted: true }, "Muted. This chat won't light up or count as unread.") },
-    convo.archived
-      ? { label: 'Move to inbox', icon: 'inbox', onSelect: () => changeSettings(convo, { archived: false }, 'Moved to your inbox', { archived: true }) }
-      : { label: 'Archive', icon: 'archive', onSelect: () => changeSettings(convo, { archived: true }, 'Chat archived', { archived: false }) },
-    { label: 'Delete chat', icon: 'trash', danger: true, onSelect: () => setConfirm({ kind: 'chat', convo }) },
+    { label: 'Delete chat', icon: 'trash', danger: true, onSelect: () => setConfirm({ convo }) },
   ];
 
-  // ---------------------------------------------------------------- single messages
+  // ---------------------------------------------------------------- deleting a chat
 
-  const messageActions = (m) => {
-    if (m.pending) return [];
-    const mine = m.sender === user._id;
-    const live = !m.deletedAt;
-    return [
-      ...(mine && live ? [{ label: 'Edit', icon: 'pencil', onSelect: () => startEdit(m) }] : []),
-      { label: 'Delete for you', icon: 'trash', danger: true, onSelect: () => setConfirm({ kind: 'me', message: m }) },
-      ...(mine && live ? [{ label: 'Delete for everyone', icon: 'trash', danger: true, onSelect: () => setConfirm({ kind: 'everyone', message: m }) }] : []),
-    ];
-  };
-
-  // ---------------------------------------------------------------- confirmed deletes
-
-  // Deletes take effect on screen the moment you confirm; the server is told in the background.
-  // If it refuses, whatever was removed comes back and the reason is shown.
+  // Takes effect on screen the moment you confirm; the server is told in the background.
+  // If it refuses, the chat comes back and the reason is shown.
   const runConfirmed = () => {
-    const { kind, convo, message } = confirm;
+    const { convo } = confirm;
     setConfirm(null);
-    if (kind === 'chat') deleteChat(convo);
-    else deleteMessage(message, kind === 'everyone');
+    deleteChat(convo);
   };
 
   const deleteChat = async (convo) => {
@@ -525,54 +450,22 @@ export default function Messages() {
     }
   };
 
-  const deleteMessage = async (message, forEveryone) => {
-    const id = activeId;
-    const now = new Date().toISOString();
-    setChat(id, (list = []) => (forEveryone
-      ? list.map((m) => (m._id === message._id ? { ...m, text: '', image: '', deletedAt: now } : m))
-      : list.filter((m) => m._id !== message._id)));
-    if (editing?._id === message._id) cancelEdit();
-    flash(forEveryone ? 'Message deleted for everyone' : 'Message deleted for you');
-    try {
-      await busy(id, async () => {
-        const { data } = await api.delete(`/messages/conversations/${id}/messages/${message._id}${forEveryone ? '?for=everyone' : ''}`);
-        if (forEveryone) setChat(id, (list = []) => list.map((m) => (m._id === message._id ? data : m)));
-      });
-    } catch (err) {
-      // put the message back where it was
-      setChat(id, (list = []) => {
-        const rest = list.filter((m) => m._id !== message._id);
-        return [...rest, message].sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
-      });
-      flash(`Couldn't delete the message. ${errMsg(err)}`);
-    }
-  };
 
   // ---------------------------------------------------------------- what's on screen
 
   const other = (c) => c?.participants.find((p) => p._id !== user._id);
   const active = convos?.find((c) => c._id === activeId);
   const person = other(active);
-  const firstName = person?.fullName?.split(' ')[0] || 'They';
   const status = presence(person?.lastSeenAt); // refreshed with the chat list every few seconds
   const isUnread = (c) => c.unread && c._id !== activeId;
-  const archivedCount = (convos || []).filter((c) => c.archived).length;
-  const inboxUnread = (convos || []).filter((c) => !c.archived && isUnread(c) && !c.muted).length;
+  const unreadCount = (convos || []).filter((c) => isUnread(c) && !c.muted).length;
   const term = search.trim().toLowerCase();
-  const shown = (convos || []).filter((c) => (view === 'archived' ? c.archived : !c.archived) && (!term
+  const shown = (convos || []).filter((c) => !term
     || other(c)?.fullName?.toLowerCase().includes(term)
-    || c.listing?.title?.toLowerCase().includes(term)));
+    || c.listing?.title?.toLowerCase().includes(term));
   const listing = active?.listing;
 
-  const CONFIRM_TEXT = {
-    chat: {
-      title: 'Delete this chat?',
-      body: `It will be removed from your messages and its history cleared for you. ${other(confirm?.convo)?.fullName?.split(' ')[0] || 'The other person'} keeps their copy. If either of you sends a new message, the chat comes back.`,
-      button: 'Delete chat',
-    },
-    everyone: { title: 'Delete for everyone?', body: `This message will be removed for you and ${firstName}. A note saying it was deleted stays in its place.`, button: 'Delete for everyone' },
-    me: { title: 'Delete for you?', body: `The message will be removed from your chat only. ${firstName} will still see it.`, button: 'Delete for you' },
-  }[confirm?.kind || 'me'];
+  const confirmName = other(confirm?.convo)?.fullName?.split(' ')[0] || 'The other person';
 
   return (
     <>
@@ -583,7 +476,7 @@ export default function Messages() {
           <div className="space-y-3 border-b border-aqua/70 p-4">
             <div className="flex items-center justify-between gap-2">
               <h1 className="text-xl font-bold tracking-[-0.015em] text-ink">Messages</h1>
-              {inboxUnread > 0 && <span className="chip bg-navy text-white">{inboxUnread} unread</span>}
+              {unreadCount > 0 && <span className="chip bg-navy text-white">{unreadCount} unread</span>}
             </div>
             {convos?.length > 0 && (
               <>
@@ -592,18 +485,6 @@ export default function Messages() {
                   <label htmlFor="chat-search" className="sr-only">Search conversations</label>
                   <input id="chat-search" type="search" className="input rounded-full bg-frost/70 pl-9 hover:bg-white focus:bg-white" placeholder="Search by name or uniform"
                     value={search} onChange={(e) => setSearch(e.target.value)} />
-                </div>
-                {/* Inbox / Archived switch */}
-                <div className="grid grid-cols-2 rounded-xl bg-frost p-1 ring-1 ring-inset ring-aqua/70" role="group" aria-label="Show">
-                  {[['inbox', 'Inbox', 'inbox'], ['archived', 'Archived', 'archive']].map(([value, label, icon]) => (
-                    <button key={value} type="button" onClick={() => setView(value)} aria-pressed={view === value}
-                      className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold transition duration-200 active:scale-[0.98] ${focusRing} ${view === value
-                        ? 'bg-white text-navy shadow-sm shadow-navy/10 ring-1 ring-aqua'
-                        : 'text-slate-500 hover:text-navy'}`}>
-                      <Icon name={icon} className="h-4 w-4" /> {label}
-                      {value === 'archived' && archivedCount > 0 && <span className="text-xs font-medium text-slate-500">({archivedCount})</span>}
-                    </button>
-                  ))}
                 </div>
               </>
             )}
@@ -622,14 +503,7 @@ export default function Messages() {
                 </Link>
               </div>
             ) : shown.length === 0 ? (
-              <div className="flex flex-col items-center gap-2 px-6 py-10 text-center text-sm text-slate-600 animate-fade-up">
-                <span className="icon-tile h-10 w-10"><Icon name={view === 'archived' ? 'archive' : 'inbox'} className="h-5 w-5" /></span>
-                {term
-                  ? <p>No chats match “{search.trim()}”.</p>
-                  : view === 'archived'
-                    ? <p>No archived chats. Archive a chat to tidy your inbox without deleting it.</p>
-                    : <p>Your inbox is empty. {archivedCount} archived {archivedCount === 1 ? 'chat' : 'chats'}.</p>}
-              </div>
+              <p className="px-6 py-10 text-center text-sm text-slate-600">No chats match “{search.trim()}”.</p>
             ) : (
               <ul className="space-y-1 p-2">
                 {shown.map((c) => (
@@ -706,23 +580,16 @@ export default function Messages() {
                     </div>
                   ) : (
                     <Bubble key={row.key} m={row.m} mine={row.m.sender === user._id} person={person} first={row.first} last={row.last}
-                      editing={editing?._id === row.m._id} actions={messageActions(row.m)} onImageLoad={keepAtBottom} />
+                      onImageLoad={keepAtBottom} />
                   )))
                 )}
               </div>
 
               {error && <p role="alert" className="relative mx-3 mb-1 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 ring-1 ring-inset ring-red-200 sm:mx-4">{error}</p>}
 
-              {editing && (
-                <div className="relative flex animate-fade-up items-center gap-2 border-t border-aqua/70 bg-frost/90 py-1.5 pl-4 pr-2 text-xs text-navy backdrop-blur">
-                  <Icon name="pencil" className="h-4 w-4 shrink-0" />
-                  <span className="min-w-0 flex-1"><b>Editing message</b> <span className="text-slate-500">· Esc to cancel</span></span>
-                  <button type="button" onClick={cancelEdit} className={`rounded-full px-3 py-1 font-semibold transition hover:bg-white ${focusRing}`}>Cancel</button>
-                </div>
-              )}
 
-              <form onSubmit={submit} className={`relative flex items-center gap-2 bg-white/90 p-2 backdrop-blur sm:p-3 ${editing ? '' : 'border-t border-aqua/70'}`}>
-                {!editing && (
+              <form onSubmit={submit} className="relative flex items-center gap-2 border-t border-aqua/70 bg-white/90 p-2 backdrop-blur sm:p-3">
+                {(
                   <label title="Attach a photo"
                     className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-slate-600 transition duration-200 hover:bg-frost hover:text-navy active:scale-95 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-navy">
                     <Icon name="photo" className="h-5 w-5" />
@@ -731,15 +598,13 @@ export default function Messages() {
                       onChange={(e) => { const file = e.target.files[0]; e.target.value = ''; if (file) send(file); }} />
                   </label>
                 )}
-                <label htmlFor="chat-input" className="sr-only">{editing ? 'Edit message' : 'Message'}</label>
+                <label htmlFor="chat-input" className="sr-only">Message</label>
                 <input id="chat-input" ref={inputRef} autoComplete="off" maxLength={2000} className="input h-11 rounded-full px-4"
-                  placeholder={editing ? 'Edit your message…' : 'Write a message…'} value={text} onChange={(e) => setText(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Escape' && editing) { e.preventDefault(); cancelEdit(); } }} />
-                <button type="submit" aria-label={editing ? 'Save changes' : 'Send message'} title={editing ? 'Save changes' : 'Send'}
-                  disabled={!text.trim() && !(editing && editing.image)}
+                  placeholder="Write a message…" value={text} onChange={(e) => setText(e.target.value)} />
+                <button type="submit" aria-label="Send message" title="Send"
+                  disabled={!text.trim()}
                   className="btn-primary group/send h-11 w-11 shrink-0 rounded-full p-0">
-                  <Icon name={editing ? 'check' : 'send'} strokeWidth={editing ? 2.2 : 1.5}
-                    className={`h-5 w-5 transition-transform duration-200 ${editing ? 'group-hover/send:scale-110' : 'group-hover/send:-translate-y-0.5 group-hover/send:translate-x-0.5'}`} />
+                  <Icon name="send" className="h-5 w-5 transition-transform duration-200 group-hover/send:-translate-y-0.5 group-hover/send:translate-x-0.5" />
                 </button>
               </form>
             </>
@@ -747,9 +612,10 @@ export default function Messages() {
         </section>
       </div>
 
-      <ConfirmDialog open={Boolean(confirm)} title={CONFIRM_TEXT.title} confirmLabel={CONFIRM_TEXT.button}
+      <ConfirmDialog open={Boolean(confirm)} title="Delete this chat?" confirmLabel="Delete chat"
         onConfirm={runConfirmed} onClose={() => setConfirm(null)}>
-        {CONFIRM_TEXT.body}
+        It will be removed from your messages and its history cleared for you. {confirmName} keeps their copy.
+        If either of you sends a new message, the chat comes back.
       </ConfirmDialog>
 
       <Toast notice={notice} onDismiss={() => setNotice(null)}

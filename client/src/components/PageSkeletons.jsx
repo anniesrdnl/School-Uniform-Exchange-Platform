@@ -49,11 +49,13 @@ function TabRow({ widths }) {
 
 /* ---------------------------------------------------------------- Home (logged in) */
 
+const HERO_STACK = ['left-1/2 top-8 z-30 -translate-x-1/2', 'right-0 top-0 z-20 rotate-[6deg]', 'left-0 top-14 z-10 -rotate-[7deg]'];
+
 export function HomeSkeleton() {
   return (
     <Shell label="Loading home" className="space-y-8 sm:space-y-14">
       <section className="rounded-3xl bg-navy px-5 py-7 shadow-xl shadow-navy/20 sm:px-10 sm:py-10 lg:px-12 lg:py-12">
-        <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_25rem]">
           <div className="min-w-0">
             <Dark className="h-4 w-40" />
             <div className="mt-3 space-y-2.5">
@@ -66,14 +68,17 @@ export function HomeSkeleton() {
             <div className="mt-3 flex flex-wrap gap-2">
               {['w-14', 'w-16', 'w-20', 'w-20'].map((w, i) => <Dark key={i} className={`h-7 rounded-full ${w}`} />)}
             </div>
-            <Dark className="mt-6 h-5 w-64 max-w-full sm:mt-8" />
+            <div className="mt-6 flex items-center gap-5 sm:mt-8"><Dark className="h-11 w-40 rounded-xl" /><Dark className="h-5 w-64 max-w-full" /></div>
           </div>
-          {/* shortcut tiles: Sell, Messages, My profile */}
-          <div className="hidden gap-2.5 lg:grid">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="flex items-center gap-3.5 rounded-2xl bg-white/[0.07] p-3.5 ring-1 ring-inset ring-white/10">
-                <Dark className="h-11 w-11 shrink-0 rounded-xl" />
-                <div className="flex-1 space-y-1.5"><Dark className="h-3.5 w-28" /><Dark className="h-3 w-40 max-w-full" /></div>
+          {/* the fanned listing photos */}
+          <div className="relative hidden h-[23rem] lg:block">
+            {HERO_STACK.map((pos) => (
+              <div key={pos} className={`absolute ${pos}`}>
+                <div className="w-48 space-y-2 rounded-2xl bg-white/10 p-2 ring-1 ring-white/15">
+                  <Dark className="aspect-square rounded-xl" />
+                  <Dark className="h-3.5 w-3/4" />
+                  <Dark className="h-3 w-1/3" />
+                </div>
               </div>
             ))}
           </div>

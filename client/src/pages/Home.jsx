@@ -8,7 +8,8 @@ import Icon from '../components/Icon.jsx';
 import Reveal from '../components/Reveal.jsx';
 import CategoryGrid from '../components/CategoryGrid.jsx';
 import { EmptyState, ListingGridSkeleton } from '../components/Loader.jsx';
-import { CATEGORIES } from '../constants.js';
+import { CATEGORIES, formatPrice } from '../constants.js';
+import uniformImg from '../assets/uniforms.jpg';
 
 const POPULAR = ['Polo', 'Skirt', 'PE shirt', 'Necktie'];
 const STEPS = [
@@ -17,29 +18,73 @@ const STEPS = [
   ['chat', 'Chat and meet up', 'Agree on a safe spot on campus and hand it over.'],
 ];
 const focusCream = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream';
+// Fanned card positions in the hero, front card first
+const STACK = [
+  'left-1/2 top-8 z-30 -translate-x-1/2',
+  'right-0 top-0 z-20 rotate-[6deg]',
+  'left-0 top-14 z-10 -rotate-[7deg]',
+];
 
 function greeting() {
   const h = new Date().getHours();
   return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
 
-// Shortcut on the right of the welcome panel (laptops and up; phones have the same links in the bottom tab bar)
-function QuickLink({ to, icon, title, text, badge }) {
+// Hero card photo; a link that fails to load shows the same placeholder as ListingCard
+function CardPhoto({ src }) {
+  const [broken, setBroken] = useState(false);
+  return broken
+    ? <span className="flex aspect-square w-full items-center justify-center rounded-xl bg-frost text-slate-400"><Icon name="photo" className="h-8 w-8" /></span>
+    : <img src={src} alt="" onError={() => setBroken(true)} className="aspect-square w-full rounded-xl bg-frost object-cover" />;
+}
+
+// Desktop-only fan of the newest listings' photos. The cards stay still; hovering one lifts it to the front.
+function HeroPhotos({ listings, loading }) {
+  const picks = listings.filter((l) => l.images?.[0]).slice(0, 3);
+  const card = `block w-48 rounded-2xl bg-white p-2 text-ink shadow-2xl shadow-navy-deep/50 transition duration-200 hover:-translate-y-1.5 hover:shadow-navy-deep/60 active:scale-[0.98] ${focusCream} focus-visible:outline-offset-4`;
+
   return (
-    <Link to={to}
-      className={`group flex items-center gap-3.5 rounded-2xl bg-white/[0.07] p-3.5 ring-1 ring-inset ring-white/10 transition duration-200 hover:bg-white/[0.13] hover:ring-white/25 active:scale-[0.98] ${focusCream}`}>
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-navy shadow-sm transition-transform duration-200 group-hover:scale-105">
-        <Icon name={icon} className="h-5 w-5" strokeWidth={1.8} />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-sm font-semibold text-white">{title}</span>
-        <span className="block truncate text-xs text-mist/65">{text}</span>
-      </span>
-      {badge > 0 && (
-        <span className="rounded-full bg-cream px-2 py-0.5 text-[11px] font-bold text-navy">{badge}<span className="sr-only"> unread</span></span>
-      )}
-      <Icon name="arrow-right" className="h-4 w-4 shrink-0 text-cream/50 transition duration-200 group-hover:translate-x-0.5 group-hover:text-cream" />
-    </Link>
+    <div className="relative hidden h-[23rem] lg:block">
+      {loading
+        ? STACK.map((pos) => (
+            <div key={pos} className={`absolute ${pos}`}>
+              {/* placeholder shaped like the listing card that will replace it */}
+              <div className="w-48 space-y-2 rounded-2xl bg-white/10 p-2 ring-1 ring-white/15" aria-hidden="true">
+                <div className="skeleton-dark aspect-square rounded-xl" />
+                <div className="skeleton-dark h-3.5 w-3/4" />
+                <div className="skeleton-dark h-3 w-1/3" />
+              </div>
+            </div>
+          ))
+        : picks.length
+          ? picks.map((l, i) => (
+              <div key={l._id} className={`absolute ${STACK[i]} hover:z-40 focus-within:z-40`}>
+                <Link to={`/listings/${l._id}`} className={card}>
+                  <CardPhoto src={l.images[0]} />
+                  <span className="block px-1.5 pb-1 pt-2.5">
+                    <span className="block truncate text-sm font-semibold">{l.title}</span>
+                    <span className="mt-1 flex items-center justify-between gap-2">
+                      <span className="font-bold text-navy">{formatPrice(l.price)}</span>
+                      <span className="chip bg-frost text-navy">Size {l.size}</span>
+                    </span>
+                  </span>
+                </Link>
+              </div>
+            ))
+          : (
+            <div className={`absolute ${STACK[0]}`}>
+              <Link to="/sell" className={`${card} w-52`}>
+                <img src={uniformImg} alt="" className="aspect-square w-full rounded-xl object-cover" />
+                <span className="block px-1.5 pb-1 pt-2.5 text-sm font-semibold">Your uniform could be here</span>
+              </Link>
+            </div>
+          )}
+
+      <p className="absolute bottom-4 left-2 z-40 flex items-center gap-2 rounded-full bg-white/95 py-2 pl-2 pr-4 text-sm font-semibold text-navy shadow-xl shadow-navy-deep/40">
+        <span className="icon-tile h-7 w-7 rounded-full"><Icon name="shield" className="h-4 w-4" /></span>
+        Meet up safely on campus
+      </p>
+    </div>
   );
 }
 
@@ -50,8 +95,8 @@ export default function Home() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
+  const [newest, setNewest] = useState([]); // unfiltered newest listings for the hero photos
   const [total, setTotal] = useState(null);
-  const [unread, setUnread] = useState(0);
 
   useEffect(() => {
     let ignore = false; // a slower response for a previous tab must not overwrite this one
@@ -61,20 +106,12 @@ export default function Home() {
       .then((r) => {
         if (ignore) return;
         setItems(r.data.items);
-        if (!category) setTotal(r.data.total);
+        if (!category) { setNewest(r.data.items); setTotal(r.data.total); }
       })
       .catch(() => !ignore && setFailed(true))
       .finally(() => !ignore && setLoading(false));
     return () => { ignore = true; };
   }, [category]);
-
-  // unread chats for the Messages shortcut (kept in step with the header badge)
-  useEffect(() => {
-    api.get('/messages/unread').then((r) => setUnread(r.data.count)).catch(() => {});
-    const onUpdate = (e) => setUnread(e.detail);
-    window.addEventListener('sueps:unread', onUpdate);
-    return () => window.removeEventListener('sueps:unread', onUpdate);
-  }, []);
 
   const browseLink = category ? `/browse?category=${encodeURIComponent(category)}` : '/browse';
 
@@ -89,7 +126,7 @@ export default function Home() {
             style={{ backgroundImage: 'radial-gradient(rgb(255 255 255 / 0.1) 1px, transparent 1px)', backgroundSize: '22px 22px', maskImage: 'linear-gradient(100deg, transparent 45%, #000)' }} />
         </div>
 
-        <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_25rem]">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-cream/90">{greeting()}, {user.fullName?.split(' ')[0] || 'student'}</p>
             <h1 className="mt-2 text-3xl font-bold leading-[1.15] tracking-[-0.02em] sm:text-4xl lg:text-[2.75rem]">
@@ -113,8 +150,8 @@ export default function Home() {
             </div>
 
             <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 sm:mt-8">
-              <Link to="/sell" className="btn-light h-11 px-5 lg:hidden">
-                <Icon name="plus" className="h-4 w-4" strokeWidth={2.2} /> Sell a uniform
+              <Link to="/sell" className="btn-light group/sell h-11 px-5 hover:-translate-y-0.5 hover:shadow-lg">
+                <Icon name="plus" className="h-4 w-4 transition-transform duration-200 group-hover/sell:rotate-90" strokeWidth={2.2} /> Sell a uniform
               </Link>
               {total != null && (
                 <p className="flex items-center gap-2 text-sm text-mist/75">
@@ -128,11 +165,7 @@ export default function Home() {
             </div>
           </div>
 
-          <nav aria-label="Shortcuts" className="hidden gap-2.5 lg:grid">
-            <QuickLink to="/sell" icon="plus" title="Sell a uniform" text="Photos, a price, and you're done" />
-            <QuickLink to="/messages" icon="chat" title="Messages" text={unread ? 'New messages waiting' : 'Chat with buyers and sellers'} badge={unread} />
-            <QuickLink to="/profile" icon="user" title="My profile" text="Requests and your listings" />
-          </nav>
+          <HeroPhotos listings={newest} loading={loading && !newest.length && !failed} />
         </div>
       </section>
 

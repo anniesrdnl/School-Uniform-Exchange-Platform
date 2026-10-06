@@ -94,15 +94,14 @@
     60% { transform: scale(1.15); }
     100% { transform: scale(1); }
   }
-  /* Page background (Backdrop.jsx): each glow wanders on its own loop; the dot grid pans one tile at a time */
+  /* Page background (Backdrop.jsx): each glow drifts a short way on its own slow loop; the dot grid pans one tile at a time */
   @keyframes orb-a {
     0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(-22vw, 16vh) scale(1.25); }
-    66% { transform: translate(14vw, 26vh) scale(0.9); }
+    50% { transform: translate(7vw, 5vh) scale(1.08); }
   }
   @keyframes orb-b {
     0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(24vw, -20vh) scale(1.3); }
+    50% { transform: translate(-6vw, 7vh) scale(1.1); }
   }
   /* Landing page: moving sheen on gradient text, bobbing background icons, a morphing blob, step progress */
   @keyframes sheen {
@@ -225,29 +224,31 @@
   }
   .reveal.is-shown { opacity: 1; transform: none; }
 
-  /* Living page background (Backdrop.jsx): navy and blue-grey glows drift and overlap so the colours keep shifting.
+  /* Page background (Backdrop.jsx): a white page with a faint navy wash across the top, three soft navy glows that
+     drift slowly near the top (never grey smudges at the edges), and a light dot texture under the header.
      --bx/--by: mouse offset from centre (-0.5..0.5), --sy: scroll in px */
-  .backdrop { position: fixed; inset: 0; z-index: -10; overflow: hidden; pointer-events: none; }
+  .backdrop {
+    position: fixed; inset: 0; z-index: -10; overflow: hidden; pointer-events: none;
+    background: radial-gradient(120% 55% at 50% -12%, rgb(14 54 97 / 0.07), transparent 70%), #ffffff;
+  }
   .backdrop-glows {
     position: absolute;
-    inset: -12%;
-    transform: translate3d(calc(var(--bx) * -50px), calc(var(--by) * -50px - var(--sy) * 0.08px), 0);
-    transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+    inset: -10%;
+    transform: translate3d(calc(var(--bx) * -24px), calc(var(--by) * -24px - var(--sy) * 0.05px), 0);
+    transition: transform 1.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .orb { position: absolute; border-radius: 9999px; will-change: transform; }
-  .orb-1 { width: 46rem; height: 46rem; top: -6rem; right: -8rem; background: radial-gradient(closest-side, rgb(14 54 97 / 0.22), transparent); animation: orb-a 13s ease-in-out infinite; }
-  .orb-2 { width: 44rem; height: 44rem; bottom: -8rem; left: -8rem; background: radial-gradient(closest-side, rgb(14 54 97 / 0.16), transparent); animation: orb-b 16s ease-in-out infinite; }
-  .orb-3 { width: 34rem; height: 34rem; top: 28%; left: 12%; background: radial-gradient(closest-side, rgb(183 195 208 / 0.6), transparent); animation: orb-a 18s ease-in-out infinite reverse; }
-  .orb-4 { width: 38rem; height: 38rem; top: 40%; right: 2%; background: radial-gradient(closest-side, rgb(72 102 135 / 0.18), transparent); animation: orb-b 14s ease-in-out -7s infinite reverse; }
-  .orb-5 { width: 28rem; height: 28rem; top: 8%; left: 38%; background: radial-gradient(closest-side, rgb(72 102 135 / 0.14), transparent); animation: orb-a 11s ease-in-out -5s infinite; }
+  .orb-1 { width: 44rem; height: 30rem; top: -4rem; left: -6rem; background: radial-gradient(closest-side, rgb(14 54 97 / 0.09), transparent); animation: orb-a 26s ease-in-out infinite; }
+  .orb-2 { width: 40rem; height: 28rem; top: 2rem; right: -8rem; background: radial-gradient(closest-side, rgb(14 54 97 / 0.08), transparent); animation: orb-b 32s ease-in-out infinite; }
+  .orb-3 { width: 36rem; height: 26rem; top: 34%; left: 40%; background: radial-gradient(closest-side, rgb(14 54 97 / 0.04), transparent); animation: orb-a 38s ease-in-out -14s infinite reverse; }
   .backdrop-dots {
     position: absolute;
     inset: -28px 0 0 -28px;
-    background-image: radial-gradient(rgb(14 54 97 / 0.08) 1px, transparent 1.5px);
+    background-image: radial-gradient(rgb(14 54 97 / 0.06) 1px, transparent 1.5px);
     background-size: 28px 28px;
-    -webkit-mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, #000 15%, transparent 75%);
-    mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, #000 15%, transparent 75%);
-    animation: dots-pan 9s linear infinite;
+    -webkit-mask-image: radial-gradient(ellipse 70% 45% at 50% 0%, #000 10%, transparent 75%);
+    mask-image: radial-gradient(ellipse 70% 45% at 50% 0%, #000 10%, transparent 75%);
+    animation: dots-pan 12s linear infinite;
   }
 
   /* Page background (PageBackdrop.jsx, used by the listing and messages pages), layered over the site backdrop:
@@ -255,16 +256,16 @@
      under the top of the page */
   .page-bg { position: fixed; inset: 0; z-index: -9; overflow: hidden; pointer-events: none; }
   .page-bg-glow { position: absolute; border-radius: 9999px; will-change: transform; }
-  .page-bg-glow-1 { width: 52rem; height: 52rem; top: -20rem; left: -16rem; background: radial-gradient(closest-side, rgb(14 54 97 / 0.2), transparent); animation: page-glow-a 22s ease-in-out infinite; }
-  .page-bg-glow-2 { width: 46rem; height: 46rem; top: 12%; right: -18rem; background: radial-gradient(closest-side, rgb(72 102 135 / 0.24), transparent); animation: page-glow-b 26s ease-in-out infinite; }
-  .page-bg-glow-3 { width: 38rem; height: 38rem; bottom: -16rem; left: 28%; background: radial-gradient(closest-side, rgb(183 195 208 / 0.7), transparent); animation: page-glow-a 30s ease-in-out -12s infinite reverse; }
+  .page-bg-glow-1 { width: 46rem; height: 32rem; top: -10rem; left: -10rem; background: radial-gradient(closest-side, rgb(14 54 97 / 0.08), transparent); animation: page-glow-a 26s ease-in-out infinite; }
+  .page-bg-glow-2 { width: 40rem; height: 30rem; top: 6%; right: -12rem; background: radial-gradient(closest-side, rgb(14 54 97 / 0.07), transparent); animation: page-glow-b 30s ease-in-out infinite; }
+  .page-bg-glow-3 { width: 34rem; height: 24rem; top: 45%; left: 35%; background: radial-gradient(closest-side, rgb(14 54 97 / 0.035), transparent); animation: page-glow-a 36s ease-in-out -12s infinite reverse; }
   .page-bg-weave {
     position: absolute;
     inset: 0 -48px 0 -48px;
     /* 1px line every 16px at 135deg repeats every 22.627px horizontally, so the pan below loops seamlessly */
-    background-image: repeating-linear-gradient(135deg, rgb(14 54 97 / 0.055) 0 1px, transparent 1px 16px);
-    -webkit-mask-image: radial-gradient(ellipse 75% 55% at 50% 0%, #000 10%, transparent 75%);
-    mask-image: radial-gradient(ellipse 75% 55% at 50% 0%, #000 10%, transparent 75%);
+    background-image: repeating-linear-gradient(135deg, rgb(14 54 97 / 0.04) 0 1px, transparent 1px 16px);
+    -webkit-mask-image: radial-gradient(ellipse 70% 45% at 50% 0%, #000 10%, transparent 75%);
+    mask-image: radial-gradient(ellipse 70% 45% at 50% 0%, #000 10%, transparent 75%);
     animation: page-weave 6s linear infinite;
   }
 
@@ -291,12 +292,11 @@
 /* Page background loops (plain keyframes, used by the .page-bg and .chat-bg classes) */
 @keyframes page-glow-a {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  35% { transform: translate(26vw, 14vh) scale(1.15); }
-  70% { transform: translate(8vw, 30vh) scale(0.92); }
+  50% { transform: translate(8vw, 6vh) scale(1.08); }
 }
 @keyframes page-glow-b {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-30vw, 22vh) scale(1.2); }
+  50% { transform: translate(-7vw, 8vh) scale(1.1); }
 }
 @keyframes page-weave {
   to { transform: translateX(22.627px); }

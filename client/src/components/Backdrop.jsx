@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
-// Living page background behind every page: soft navy and blue-grey glows drift around so the colours slowly
-// shift, a faint dot grid pans, and the glows lean a little away from the mouse and rise as you scroll.
+// Page background behind every page: a faint navy wash at the top, three soft navy glows that drift slowly, and a
+// light dot texture under the header. The glows lean a little away from the mouse and rise as you scroll.
 // Decoration only (styles in index.css). The mouse/scroll values are set on <html> (--bx, --by, --sy)
 // so any page can add its own parallax.
 export default function Backdrop() {
@@ -40,8 +40,6 @@ export default function Backdrop() {
         <span className="orb orb-1" />
         <span className="orb orb-2" />
         <span className="orb orb-3" />
-        <span className="orb orb-4" />
-        <span className="orb orb-5" />
       </div>
       <div className="backdrop-dots" />
     </div>

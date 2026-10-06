@@ -51,9 +51,16 @@ function DetailsSkeleton() {
 function Gallery({ images, title }) {
   const [active, setActive] = useState(0);
   const [broken, setBroken] = useState(false);
+  const [loaded, setLoaded] = useState(false); // shimmer placeholder until the current photo has downloaded
   const touchX = useRef(null);
   const count = images.length;
-  const show = (i) => { setBroken(false); setActive((i + count) % count); };
+  const show = (i) => {
+    const next = (i + count) % count;
+    if (next === active) return;
+    setBroken(false);
+    setLoaded(false);
+    setActive(next);
+  };
   const go = (step) => show(active + step);
 
   // Arrow keys when the photo has focus, and a sideways swipe on touch screens
@@ -80,15 +87,15 @@ function Gallery({ images, title }) {
           onTouchStart: (e) => { touchX.current = e.touches[0].clientX; },
           onTouchEnd,
         })}
-        className={`group relative aspect-square overflow-hidden rounded-3xl bg-frost shadow-[0_1px_2px_rgb(14_54_97/0.05),0_18px_40px_-20px_rgb(14_54_97/0.35)] ring-1 ring-aqua/80 sm:aspect-[4/3] ${focusRing} focus-visible:outline-offset-4`}>
+        className={`group relative aspect-square overflow-hidden rounded-3xl ${count > 0 && !broken && !loaded ? 'skeleton' : 'bg-frost'} shadow-[0_1px_2px_rgb(14_54_97/0.05),0_18px_40px_-20px_rgb(14_54_97/0.35)] ring-1 ring-aqua/80 sm:aspect-[4/3] ${focusRing} focus-visible:outline-offset-4`}>
         {count > 0 && !broken ? (
           <>
             {/* the same photo, blurred, fills the frame so wide or tall photos never sit on empty grey bars */}
             <img key={`fill-${active}`} src={images[active]} alt="" aria-hidden="true"
-              className="absolute inset-0 h-full w-full scale-125 animate-fade-in object-cover opacity-50 blur-2xl" />
-            <div className="absolute inset-0 bg-white/35" aria-hidden="true" />
-            <img key={active} src={images[active]} alt={`${title}, photo ${active + 1} of ${count}`} onError={() => setBroken(true)}
-              className="relative h-full w-full animate-fade-in object-contain transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
+              className={`absolute inset-0 h-full w-full scale-125 object-cover blur-2xl transition-opacity duration-500 ${loaded ? 'opacity-50' : 'opacity-0'}`} />
+            {loaded && <div className="absolute inset-0 bg-white/35" aria-hidden="true" />}
+            <img key={active} src={images[active]} alt={`${title}, photo ${active + 1} of ${count}`} onLoad={() => setLoaded(true)} onError={() => setBroken(true)}
+              className={`relative h-full w-full object-contain transition duration-700 ease-out group-hover:scale-[1.03] ${loaded ? 'opacity-100' : 'opacity-0'}`} />
           </>
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-2 text-slate-500">

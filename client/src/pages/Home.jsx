@@ -68,7 +68,12 @@ function HeroStack({ listings, loading }) {
         {loading
           ? STACK.map((pos, i) => (
               <div key={pos} className={`absolute ${pos}`}>
-                <div className="h-64 w-48 animate-pulse rounded-2xl bg-white/10 ring-1 ring-white/15" style={{ animationDelay: `${i * 150}ms` }} />
+                {/* placeholder shaped like the listing card that will replace it */}
+                <div className="w-48 space-y-2 rounded-2xl bg-white/10 p-2 ring-1 ring-white/15" aria-hidden="true">
+                  <div className="skeleton-dark aspect-square rounded-xl" style={{ animationDelay: `${i * 150}ms` }} />
+                  <div className="skeleton-dark h-3.5 w-3/4" style={{ animationDelay: `${i * 150}ms` }} />
+                  <div className="skeleton-dark h-3 w-1/3" style={{ animationDelay: `${i * 150}ms` }} />
+                </div>
               </div>
             ))
           : picks.length

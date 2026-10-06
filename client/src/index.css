@@ -203,6 +203,12 @@
     background: linear-gradient(90deg, #eef1f4 25%, #f7f8f9 50%, #eef1f4 75%);
     background-size: 200% 100%;
   }
+  /* Same placeholder for dark (navy) panels, like the Home hero */
+  .skeleton-dark {
+    @apply rounded-md animate-shimmer;
+    background: linear-gradient(90deg, rgb(255 255 255 / 0.1) 25%, rgb(255 255 255 / 0.2) 50%, rgb(255 255 255 / 0.1) 75%);
+    background-size: 200% 100%;
+  }
 
   /* Phone tab bar: circular cut-out at the top centre for the raised button (3.75rem wide, so ~0.5rem gap) */
   .tabbar-notch {

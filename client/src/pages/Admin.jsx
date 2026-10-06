@@ -15,15 +15,21 @@ const HEADERS = {
 export default function Admin() {
   const [stats, setStats] = useState(null);
   const [tab, setTab] = useState('Users');
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState(null); // null while the tab's rows load (placeholder rows show)
 
   const loadStats = () => api.get('/admin/stats').then((r) => setStats(r.data));
-  const loadRows = () => api.get(`/admin/${tab.toLowerCase()}`).then((r) => setRows(r.data));
+  const fetchRows = (t) => api.get(`/admin/${t.toLowerCase()}`).then((r) => r.data);
 
   useEffect(() => { loadStats(); }, []);
-  useEffect(() => { setRows([]); loadRows(); }, [tab]);
+  useEffect(() => {
+    let ignore = false; // switching tabs quickly: only the latest tab's rows are shown
+    setRows(null);
+    fetchRows(tab).then((data) => !ignore && setRows(data)).catch(() => !ignore && setRows([]));
+    return () => { ignore = true; };
+  }, [tab]);
 
-  const act = async (fn) => { await fn(); loadRows(); loadStats(); };
+  // after an action, refresh in place (the current rows stay on screen until the new ones arrive)
+  const act = async (fn) => { await fn(); setRows(await fetchRows(tab)); loadStats(); };
 
   const cards = stats && [
     ['Total users', stats.totalUsers, 'users'],
@@ -67,16 +73,23 @@ export default function Admin() {
       {/* wide tables scroll sideways inside their own box on phones. "relative" keeps the sr-only header label
           positioned inside this box; without it, it escaped and widened the whole page on phones */}
       <Reveal className="card scroll-thin relative overflow-x-auto">
-        <table className="w-full min-w-[560px] text-left text-sm">
+        <table className="w-full min-w-[560px] text-left text-sm" aria-busy={rows === null}>
           <thead className="bg-frost/60 text-xs uppercase tracking-wide text-slate-600">
             <tr>
               {HEADERS[tab].map((h, i) => <th key={i} scope="col" className={`px-4 py-3 font-semibold ${i === 2 ? 'text-right' : ''}`}>{h || <span className="sr-only">Actions</span>}</th>)}
             </tr>
           </thead>
           <tbody className="divide-y divide-aqua/60">
-            {rows.length === 0 && <tr><td colSpan={3} className="px-4 py-6 text-slate-600">Nothing to show.</td></tr>}
+            {rows === null && [0, 1, 2, 3].map((i) => (
+              <tr key={i} aria-hidden="true">
+                <td className="px-4 py-3"><div className="skeleton h-4 w-40" /><div className="skeleton mt-1.5 h-3 w-56" /></td>
+                <td className="px-4 py-3"><div className="skeleton h-5 w-20 rounded-full" /></td>
+                <td className="px-4 py-3"><div className="skeleton ml-auto h-7 w-28 rounded-lg" /></td>
+              </tr>
+            ))}
+            {rows?.length === 0 && <tr><td colSpan={3} className="px-4 py-6 text-slate-600">Nothing to show.</td></tr>}
 
-            {tab === 'Users' && rows.map((u) => (
+            {tab === 'Users' && rows?.map((u) => (
               <tr key={u._id}>
                 <td className="px-4 py-3"><b>{u.fullName}</b><br /><span className="text-xs text-slate-500">{u.studentId} · {u.email}</span></td>
                 <td className="px-4 py-3">
@@ -96,7 +109,7 @@ export default function Admin() {
               </tr>
             ))}
 
-            {tab === 'Listings' && rows.map((l) => (
+            {tab === 'Listings' && rows?.map((l) => (
               <tr key={l._id}>
                 <td className="px-4 py-3"><b>{l.title}</b><br /><span className="text-xs text-slate-500">by {l.seller?.fullName} · {formatPrice(l.price)}</span></td>
                 <td className="px-4 py-3"><StatusBadge status={l.status} /></td>
@@ -104,7 +117,7 @@ export default function Admin() {
               </tr>
             ))}
 
-            {tab === 'Reports' && rows.map((r) => (
+            {tab === 'Reports' && rows?.map((r) => (
               <tr key={r._id}>
                 <td className="px-4 py-3"><b className="capitalize">{r.targetType}</b> reported by {r.reporter?.fullName}<br /><span className="text-xs text-slate-500">{r.reason}</span></td>
                 <td className="px-4 py-3"><StatusBadge status={r.status} /></td>

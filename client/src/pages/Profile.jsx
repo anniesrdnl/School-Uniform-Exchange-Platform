@@ -6,6 +6,7 @@ import Icon from '../components/Icon.jsx';
 import Reveal from '../components/Reveal.jsx';
 import Avatar from '../components/Avatar.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
+import { RowsSkeleton } from '../components/Loader.jsx';
 import { formatPrice } from '../constants.js';
 
 // Small listing photo for request and listing rows
@@ -16,7 +17,8 @@ function Thumb({ src }) {
     : <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-frost text-slate-500"><Icon name="photo" className="h-5 w-5" /></span>;
 }
 
-function Section({ title, action, empty, children }) {
+// `loading`: show placeholder rows until the list arrives
+function Section({ title, action, empty, loading, children }) {
   return (
     <Reveal as="section">
       <div className="mb-3 flex items-center justify-between gap-2">
@@ -24,7 +26,9 @@ function Section({ title, action, empty, children }) {
         {action}
       </div>
       <div className="card divide-y divide-aqua/60 overflow-hidden">
-        {children?.length ? children : <p className="p-5 text-sm text-slate-600">{empty}</p>}
+        {loading
+          ? <RowsSkeleton label={`Loading ${title.toLowerCase()}`} />
+          : children?.length ? children : <p className="p-5 text-sm text-slate-600">{empty}</p>}
       </div>
     </Reveal>
   );
@@ -35,17 +39,22 @@ const actionsCls = 'flex shrink-0 gap-2 [&>*]:flex-1 sm:[&>*]:flex-none';
 
 export default function Profile() {
   const { user } = useAuth();
-  const [stats, setStats] = useState({ itemsListed: 0, completedExchanges: 0 });
-  const [listings, setListings] = useState([]);
-  const [incoming, setIncoming] = useState([]);
-  const [outgoing, setOutgoing] = useState([]);
+  // null = still loading (skeletons show); reloads after an action keep the current data on screen
+  const [stats, setStats] = useState(null);
+  const [listings, setListings] = useState(null);
+  const [incoming, setIncoming] = useState(null);
+  const [outgoing, setOutgoing] = useState(null);
   const [error, setError] = useState('');
 
   const load = () => {
-    api.get('/users/me/stats').then((r) => setStats(r.data));
-    api.get('/listings/mine').then((r) => setListings(r.data));
-    api.get('/requests/incoming').then((r) => setIncoming(r.data));
-    api.get('/requests/outgoing').then((r) => setOutgoing(r.data));
+    const fetchInto = (url, set, fallback) => api.get(url).then((r) => set(r.data)).catch((e) => {
+      set((prev) => prev ?? fallback);
+      setError(errMsg(e));
+    });
+    fetchInto('/users/me/stats', setStats, { itemsListed: 0, completedExchanges: 0 });
+    fetchInto('/listings/mine', setListings, []);
+    fetchInto('/requests/incoming', setIncoming, []);
+    fetchInto('/requests/outgoing', setOutgoing, []);
   };
   useEffect(load, []);
 
@@ -71,8 +80,12 @@ export default function Profile() {
 
   const remove = async (id) => {
     if (!confirm('Delete this listing?')) return;
-    await api.delete(`/listings/${id}`);
-    load();
+    try {
+      await api.delete(`/listings/${id}`);
+      load();
+    } catch (e) {
+      setError(errMsg(e));
+    }
   };
 
   return (
@@ -98,10 +111,10 @@ export default function Profile() {
             </div>
           </div>
           <dl className="flex w-full justify-center gap-3 md:w-auto">
-            {[['Items listed', stats.itemsListed], ['Completed', stats.completedExchanges]].map(([label, n]) => (
+            {[['Items listed', stats?.itemsListed], ['Completed', stats?.completedExchanges]].map(([label, n]) => (
               <div key={label} className="flex min-w-0 flex-1 flex-col-reverse rounded-xl bg-frost px-3 py-2.5 text-center sm:min-w-24 sm:px-4 md:flex-none">
                 <dt className="text-xs text-slate-600">{label}</dt>
-                <dd className="text-2xl font-bold text-navy">{n}</dd>
+                <dd className="text-2xl font-bold text-navy">{n ?? <span className="skeleton mx-auto my-1 block h-6 w-8" aria-label="Loading" />}</dd>
               </div>
             ))}
           </dl>
@@ -110,8 +123,8 @@ export default function Profile() {
 
       {error && <p role="alert" className="alert-error">{error}</p>}
 
-      <Section title="Requests for my uniforms" empty="No requests yet. They'll show up here when someone wants one of your uniforms.">
-        {incoming.map((r) => (
+      <Section title="Requests for my uniforms" loading={incoming === null} empty="No requests yet. They'll show up here when someone wants one of your uniforms.">
+        {incoming?.map((r) => (
           <div key={r._id} className={rowCls}>
             <div className="flex min-w-0 gap-3">
               <Thumb src={r.listing?.images?.[0]} />
@@ -133,8 +146,8 @@ export default function Profile() {
         ))}
       </Section>
 
-      <Section title="My requests" empty="You haven't requested anything yet.">
-        {outgoing.map((r) => (
+      <Section title="My requests" loading={outgoing === null} empty="You haven't requested anything yet.">
+        {outgoing?.map((r) => (
           <div key={r._id} className={rowCls}>
             <div className="flex min-w-0 items-center gap-3">
               <Thumb src={r.listing?.images?.[0]} />
@@ -151,9 +164,9 @@ export default function Profile() {
         ))}
       </Section>
 
-      <Section title="My listings" empty="You haven't posted anything yet."
+      <Section title="My listings" loading={listings === null} empty="You haven't posted anything yet."
         action={<Link to="/sell" className="btn-primary btn-sm"><Icon name="plus" className="h-4 w-4" strokeWidth={2} /> Post a uniform</Link>}>
-        {listings.map((l) => (
+        {listings?.map((l) => (
           <div key={l._id} className="flex items-center justify-between gap-3 p-4 text-sm">
             <Link to={`/listings/${l._id}`} className="group flex min-w-0 items-center gap-3">
               <Thumb src={l.images?.[0]} />

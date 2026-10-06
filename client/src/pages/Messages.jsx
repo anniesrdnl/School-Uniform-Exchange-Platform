@@ -71,6 +71,30 @@ function ListSkeleton() {
   );
 }
 
+// Placeholder chat while its messages load: bubbles on both sides, like a real conversation
+const BUBBLE_SKELETON = [['in', 'w-44'], ['in', 'w-60'], ['out', 'w-52'], ['in', 'w-36'], ['out', 'w-64'], ['out', 'w-40'], ['in', 'w-56']];
+function MessagesSkeleton() {
+  return (
+    <div className="flex min-h-full flex-col justify-end gap-2.5" role="status" aria-label="Loading messages">
+      {BUBBLE_SKELETON.map(([side, width], i) => (
+        <div key={i} className={`flex items-end gap-2 ${side === 'out' ? 'justify-end' : ''}`}>
+          {side === 'in' && <div className="skeleton h-7 w-7 shrink-0 rounded-full" />}
+          <div className={`skeleton h-9 max-w-[70%] rounded-2xl ${width}`} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function HeaderSkeleton() {
+  return (
+    <div className="flex flex-1 items-center gap-3" aria-hidden="true">
+      <div className="skeleton h-10 w-10 shrink-0 rounded-full" />
+      <div className="flex-1 space-y-1.5"><div className="skeleton h-3.5 w-36" /><div className="skeleton h-3 w-24" /></div>
+    </div>
+  );
+}
+
 function ConversationRow({ convo, person, active, onOpen }) {
   const thumb = convo.listing?.images?.[0];
   return (
@@ -102,6 +126,17 @@ function ConversationRow({ convo, person, active, onOpen }) {
   );
 }
 
+// Shared photo in a chat bubble: a shimmering box holds its place until it has downloaded
+function ChatPhoto({ src, onLoad }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <span className={`block ${loaded ? '' : 'skeleton h-40 w-56 max-w-full rounded-xl'}`}>
+      <img src={src} alt="Shared photo" onLoad={() => { setLoaded(true); onLoad(); }}
+        className={`max-h-60 w-auto transition duration-300 hover:scale-[1.03] ${loaded ? 'opacity-100' : 'h-0 opacity-0'}`} />
+    </span>
+  );
+}
+
 function Bubble({ m, mine, person, first, last, onImageLoad }) {
   const corner = mine ? (last ? 'rounded-br-md' : '') : (last ? 'rounded-bl-md' : '');
   return (
@@ -111,19 +146,24 @@ function Bubble({ m, mine, person, first, last, onImageLoad }) {
         ? <Avatar name={person?.fullName} src={person?.avatar} className="h-7 w-7 text-[11px]" />
         : <span className="w-7 shrink-0" />)}
       <div className={`flex max-w-[80%] flex-col sm:max-w-[65%] ${mine ? 'items-end' : 'items-start'}`}>
-        <div title={clock(m.createdAt)}
-          className={`break-words rounded-2xl px-3.5 py-2 text-sm leading-relaxed shadow-sm transition duration-200 hover:shadow-md ${corner} ${mine
+        <div title={m.pending ? 'Sending…' : clock(m.createdAt)}
+          className={`break-words rounded-2xl px-3.5 py-2 text-sm leading-relaxed shadow-sm transition duration-200 hover:shadow-md ${corner} ${m.pending ? 'opacity-70' : ''} ${mine
             ? 'bg-navy text-white shadow-navy/20'
             : 'bg-white text-ink ring-1 ring-aqua'}`}>
-          {m.image && (
+          {m.image && m.pending && (
+            <img src={m.image} alt="Photo being sent" onLoad={onImageLoad} className={`-mx-1.5 mb-1 block max-h-60 w-auto rounded-xl ${m.text ? '' : '-mb-0.5'}`} />
+          )}
+          {m.image && !m.pending && (
             <a href={m.image} target="_blank" rel="noopener noreferrer" aria-label="Open photo in a new tab"
               className={`-mx-1.5 mb-1 block overflow-hidden rounded-xl ${m.text ? '' : '-mb-0.5'} ${focusRing}`}>
-              <img src={m.image} alt="Shared photo" onLoad={onImageLoad} className="max-h-60 w-auto transition duration-300 hover:scale-[1.03]" />
+              <ChatPhoto src={m.image} onLoad={onImageLoad} />
             </a>
           )}
           {m.text && <p className="whitespace-pre-line">{m.text}</p>}
         </div>
-        {last && <span className="mt-1 px-1 text-[11px] text-slate-500">{clock(m.createdAt)}</span>}
+        {last && (m.pending
+          ? <span className="mt-1 flex items-center gap-1 px-1 text-[11px] text-slate-500"><Spinner className="h-3 w-3" /> Sending…</span>
+          : <span className="mt-1 px-1 text-[11px] text-slate-500">{clock(m.createdAt)}</span>)}
       </div>
     </div>
   );
@@ -147,15 +187,19 @@ export default function Messages() {
   const [params, setParams] = useSearchParams();
   const activeId = params.get('c'); // the open chat lives in the URL (?c=<id>), so links and the back button work
   const [convos, setConvos] = useState(null); // null while loading
-  const [messages, setMessages] = useState(null);
+  // Messages for every chat opened so far ({ [conversationId]: [...] }), so going back to a chat is instant.
+  // A chat that isn't in here yet is still loading.
+  const [chats, setChats] = useState({});
   const [search, setSearch] = useState('');
   const [text, setText] = useState('');
-  const [sending, setSending] = useState(''); // 'text' | 'photo' while a message is on its way
   const [error, setError] = useState('');
   const listRef = useRef(null);
   const inputRef = useRef(null);
-  const shownCount = useRef(0);
+  const scrolled = useRef({ id: null, count: 0 });
+  const sendingTo = useRef({}); // { [conversationId]: sends in flight }: polls wait, so a message being sent never flickers
+  const messages = activeId ? chats[activeId] : undefined;
 
+  const setChat = (id, update) => setChats((prev) => ({ ...prev, [id]: update(prev[id]) }));
   const open = (id) => setParams(id ? { c: id } : {});
 
   // Serverless hosting (Vercel) can't hold open sockets, so new messages arrive by polling (paused while the tab is hidden)
@@ -166,36 +210,47 @@ export default function Messages() {
     return () => clearInterval(timer);
   }, []);
 
-  // Open a conversation: load its history, then keep checking for new messages
+  // Open a conversation: load its history (a chat opened before shows straight away), then keep checking for new messages
   useEffect(() => {
     if (!activeId) return undefined;
-    setMessages(null);
     setError('');
     let alive = true;
     let first = true;
-    const load = () => api.get(`/messages/conversations/${activeId}/messages`)
-      .then((r) => {
-        if (!alive) return;
-        // keep the same array when nothing changed, so the list doesn't re-render every poll
-        setMessages((prev) => (prev && prev.length === r.data.length && prev.at(-1)?._id === r.data.at(-1)?._id ? prev : r.data));
-      })
-      .catch((e) => {
-        if (alive && first) { setError(errMsg(e)); setMessages([]); }
-      })
-      .finally(() => { first = false; });
+    const load = () => {
+      if (sendingTo.current[activeId]) return;
+      api.get(`/messages/conversations/${activeId}/messages`)
+        .then((r) => {
+          if (!alive || sendingTo.current[activeId]) return;
+          setChat(activeId, (prev) => {
+            const saved = (prev || []).filter((m) => !m.pending);
+            // same messages as before: keep the old array so the list doesn't re-render every poll
+            if (prev && saved.length === r.data.length && saved.at(-1)?._id === r.data.at(-1)?._id) return prev;
+            return [...r.data, ...(prev || []).filter((m) => m.pending)];
+          });
+        })
+        .catch((e) => {
+          if (!alive || !first) return;
+          setError(errMsg(e));
+          setChat(activeId, (prev) => prev ?? []);
+        })
+        .finally(() => { first = false; });
+    };
     load();
     const timer = setInterval(() => { if (!document.hidden) load(); }, POLL_MS);
     return () => { alive = false; clearInterval(timer); };
   }, [activeId]);
 
-  // Jump to the newest message: instantly when a chat opens, smoothly when a new one arrives
+  // Jump to the newest message when a chat opens; scroll smoothly when a new one arrives in the open chat
   useEffect(() => {
     const el = listRef.current;
-    if (!messages) { shownCount.current = 0; return; } // a chat is (re)loading: its first batch jumps, not scrolls
-    if (!el) return;
-    el.scrollTo({ top: el.scrollHeight, behavior: shownCount.current ? 'smooth' : 'auto' });
-    shownCount.current = messages.length;
-  }, [messages]);
+    if (!activeId) { scrolled.current = { id: null, count: 0 }; return; }
+    if (!el || !messages) return;
+    const same = scrolled.current.id === activeId;
+    if (!same || messages.length !== scrolled.current.count) {
+      el.scrollTo({ top: el.scrollHeight, behavior: same ? 'smooth' : 'auto' });
+    }
+    scrolled.current = { id: activeId, count: messages.length };
+  }, [messages, activeId]);
 
   // A photo that finishes loading makes the chat taller: stay pinned to the bottom if the reader was already there
   const keepAtBottom = () => {
@@ -203,30 +258,41 @@ export default function Messages() {
     if (el && el.scrollHeight - el.scrollTop - el.clientHeight < 320) el.scrollTo({ top: el.scrollHeight });
   };
 
+  // The message shows in the chat at once (faded, "Sending…") and is swapped for the saved one when the server replies
   const send = async (e, file) => {
     e?.preventDefault();
     const body = text.trim();
-    if ((!body && !file) || sending) return;
-    setSending(file ? 'photo' : 'text');
+    if (!body && !file) return;
+    const id = activeId;
+    const tempId = `pending-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const preview = file ? URL.createObjectURL(file) : '';
+    setChat(id, (prev) => [...(prev || []),
+      { _id: tempId, pending: true, sender: user._id, text: body, image: preview, createdAt: new Date().toISOString() }]);
+    setText('');
     setError('');
+    sendingTo.current[id] = (sendingTo.current[id] || 0) + 1;
     try {
       const form = new FormData();
       form.append('text', body);
       if (file) form.append('photo', await shrinkImage(file));
-      const { data } = await api.post(`/messages/conversations/${activeId}/messages`, form);
-      setMessages((prev) => (prev?.some((m) => m._id === data._id) ? prev : [...(prev || []), data]));
+      const { data } = await api.post(`/messages/conversations/${id}/messages`, form);
+      setChat(id, (prev = []) => {
+        const rest = prev.filter((m) => m._id !== tempId);
+        return rest.some((m) => m._id === data._id) ? rest : [...rest, data];
+      });
       // move this chat to the top of the list with its new preview
       setConvos((prev) => {
-        const convo = prev?.find((c) => c._id === activeId);
+        const convo = prev?.find((c) => c._id === id);
         if (!convo) return prev;
         return [{ ...convo, lastMessage: body || 'Sent a photo', lastMessageAt: data.createdAt }, ...prev.filter((c) => c !== convo)];
       });
-      setText('');
     } catch (err) {
+      setChat(id, (prev = []) => prev.filter((m) => m._id !== tempId));
+      setText((current) => current || body); // give the unsent words back
       setError(errMsg(err));
     } finally {
-      setSending('');
-      inputRef.current?.focus();
+      sendingTo.current[id] -= 1;
+      if (preview) URL.revokeObjectURL(preview);
     }
   };
 
@@ -303,9 +369,10 @@ export default function Messages() {
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-navy transition hover:bg-frost active:scale-95 md:hidden ${focusRing}`}>
                   <Icon name="arrow-left" className="h-5 w-5" />
                 </button>
+                {!active ? <HeaderSkeleton /> : <>
                 <Avatar name={person?.fullName} src={person?.avatar} className="h-10 w-10 text-sm" />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-ink">{person?.fullName || '…'}</p>
+                  <p className="truncate font-semibold text-ink">{person?.fullName}</p>
                   {active?.listing && (
                     <Link to={`/listings/${active.listing._id}`} className="block truncate text-xs font-medium text-navy hover:underline sm:hidden">
                       {active.listing.title}
@@ -325,12 +392,11 @@ export default function Messages() {
                     <Icon name="arrow-right" className="h-3.5 w-3.5 shrink-0 text-slate-400 transition group-hover/listing:translate-x-0.5 group-hover/listing:text-navy" />
                   </Link>
                 )}
+                </>}
               </header>
 
               <div ref={listRef} role="log" aria-live="polite" aria-label="Messages" className="scroll-thin relative min-h-0 flex-1 overflow-y-auto px-3 py-4 sm:px-5">
-                {messages === null ? (
-                  <div className="flex h-full items-center justify-center text-navy" role="status" aria-label="Loading messages"><Spinner className="h-7 w-7" /></div>
-                ) : messages.length === 0 ? (
+                {messages === undefined ? <MessagesSkeleton /> : messages.length === 0 ? (
                   <div className="flex h-full flex-col items-center justify-center gap-3 px-4 text-center animate-fade-up">
                     <Avatar name={person?.fullName} src={person?.avatar} className="h-14 w-14 text-lg ring-4 ring-white" />
                     <div>
@@ -359,20 +425,18 @@ export default function Messages() {
 
               <form onSubmit={send} className="relative flex items-center gap-2 border-t border-aqua/70 bg-white/90 p-2 backdrop-blur sm:p-3">
                 <label title="Attach a photo"
-                  className={`flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-slate-600 transition duration-200 hover:bg-frost hover:text-navy active:scale-95 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-navy ${sending ? 'pointer-events-none opacity-60' : ''}`}>
-                  {sending === 'photo' ? <Spinner className="h-5 w-5 text-navy" /> : <Icon name="photo" className="h-5 w-5" />}
-                  <span className="sr-only">{sending === 'photo' ? 'Sending photo' : 'Attach a photo'}</span>
-                  <input type="file" accept="image/*" className="sr-only" disabled={!!sending}
+                  className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-slate-600 transition duration-200 hover:bg-frost hover:text-navy active:scale-95 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-navy">
+                  <Icon name="photo" className="h-5 w-5" />
+                  <span className="sr-only">Attach a photo</span>
+                  <input type="file" accept="image/*" className="sr-only"
                     onChange={(e) => { const file = e.target.files[0]; e.target.value = ''; if (file) send(null, file); }} />
                 </label>
                 <label htmlFor="chat-input" className="sr-only">Message</label>
                 <input id="chat-input" ref={inputRef} autoComplete="off" maxLength={2000} className="input h-11 rounded-full px-4"
                   placeholder="Write a message…" value={text} onChange={(e) => setText(e.target.value)} />
-                <button type="submit" aria-label="Send message" disabled={!text.trim() || !!sending}
+                <button type="submit" aria-label="Send message" disabled={!text.trim()}
                   className="btn-primary group/send h-11 w-11 shrink-0 rounded-full p-0">
-                  {sending === 'text'
-                    ? <Spinner className="h-5 w-5" />
-                    : <Icon name="send" className="h-5 w-5 transition-transform duration-200 group-hover/send:-translate-y-0.5 group-hover/send:translate-x-0.5" />}
+                  <Icon name="send" className="h-5 w-5 transition-transform duration-200 group-hover/send:-translate-y-0.5 group-hover/send:translate-x-0.5" />
                 </button>
               </form>
             </>

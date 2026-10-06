@@ -184,7 +184,7 @@ export default function Browse() {
         <section aria-labelledby="results-heading">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 id="results-heading" aria-live="polite" className="text-sm text-slate-600">
-              {loading ? 'Loading…' : (
+              {loading ? <><span className="skeleton inline-block h-4 w-28 align-middle" aria-hidden="true" /><span className="sr-only">Loading uniforms</span></> : (
                 <><b className="font-bold text-ink">{data.total}</b> uniform{data.total === 1 ? '' : 's'}{q && <> for <b className="font-semibold text-ink">“{q}”</b></>}</>
               )}
             </h2>

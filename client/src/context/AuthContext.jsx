@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import api from '../api.js';
-import { FullScreenLoader } from '../components/Loader.jsx';
+import { AppSkeleton } from '../components/Loader.jsx';
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -48,9 +48,9 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  // Prevent white screen by displaying a fallback spinner/message during initial check
+  // Show the app's skeleton (header + page of cards) while the saved login is checked
   if (loading) {
-    return <FullScreenLoader />;
+    return <AppSkeleton />;
   }
 
   return (

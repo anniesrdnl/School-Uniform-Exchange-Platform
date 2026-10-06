@@ -254,13 +254,15 @@ export default function Messages() {
   const [text, setText] = useState('');
   const [editing, setEditing] = useState(null); // the message being edited, or null
   const [confirm, setConfirm] = useState(null); // { kind: 'chat' | 'everyone' | 'me', convo?, message? }
-  const [confirmBusy, setConfirmBusy] = useState(false);
   const [notice, setNotice] = useState(null); // { text, undo?, key }
   const [error, setError] = useState('');
   const listRef = useRef(null);
   const inputRef = useRef(null);
   const scrolled = useRef({ id: null, count: 0 });
   const busyIn = useRef({}); // { [conversationId]: changes in flight }: polls wait, so nothing flickers back
+  // Chats deleted on this page: { [conversationId]: its lastMessageAt when deleted }. A list refresh that was already
+  // on its way can't bring them back; only a newer message does (which is also when the server shows them again).
+  const removedChats = useRef({});
   const messages = activeId ? chats[activeId] : undefined;
   const chatsRef = useRef(chats);
   chatsRef.current = chats; // read by the polling timer, which outlives a single render
@@ -281,7 +283,12 @@ export default function Messages() {
     const load = () => {
       if (running || document.hidden) return;
       running = true;
-      api.get('/messages/conversations').then((r) => setConvos(r.data)).catch(() => setConvos((prev) => prev ?? []))
+      api.get('/messages/conversations')
+        .then((r) => setConvos(r.data.filter((c) => {
+          const removedAt = removedChats.current[c._id];
+          return !removedAt || Date.parse(c.lastMessageAt) > Date.parse(removedAt);
+        })))
+        .catch(() => setConvos((prev) => prev ?? []))
         .finally(() => { running = false; });
     };
     load();
@@ -489,34 +496,55 @@ export default function Messages() {
 
   // ---------------------------------------------------------------- confirmed deletes
 
-  const runConfirmed = async () => {
+  // Deletes take effect on screen the moment you confirm; the server is told in the background.
+  // If it refuses, whatever was removed comes back and the reason is shown.
+  const runConfirmed = () => {
     const { kind, convo, message } = confirm;
-    setConfirmBusy(true);
+    setConfirm(null);
+    if (kind === 'chat') deleteChat(convo);
+    else deleteMessage(message, kind === 'everyone');
+  };
+
+  const deleteChat = async (convo) => {
+    const id = convo._id;
+    const savedChat = chatsRef.current[id];
+    removedChats.current[id] = convo.lastMessageAt;
+    setConvos((prev) => prev?.filter((c) => c._id !== id));
+    setChats((prev) => { const next = { ...prev }; delete next[id]; return next; });
+    if (activeId === id) open(null);
+    flash('Chat deleted');
     try {
-      if (kind === 'chat') {
-        await api.delete(`/messages/conversations/${convo._id}`);
-        setConvos((prev) => prev?.filter((c) => c._id !== convo._id));
-        setChats((prev) => { const next = { ...prev }; delete next[convo._id]; return next; });
-        if (activeId === convo._id) open(null);
-        flash('Chat deleted');
-      } else {
-        const id = activeId;
-        const forEveryone = kind === 'everyone';
-        await busy(id, async () => {
-          const { data } = await api.delete(`/messages/conversations/${id}/messages/${message._id}${forEveryone ? '?for=everyone' : ''}`);
-          setChat(id, (list = []) => (forEveryone
-            ? list.map((m) => (m._id === message._id ? data : m))
-            : list.filter((m) => m._id !== message._id)));
-        });
-        if (editing?._id === message._id) cancelEdit();
-        flash(forEveryone ? 'Message deleted for everyone' : 'Message deleted for you');
-      }
-      setConfirm(null);
+      await busy(id, () => api.delete(`/messages/conversations/${id}`));
     } catch (err) {
-      setConfirm(null);
-      flash(errMsg(err));
-    } finally {
-      setConfirmBusy(false);
+      delete removedChats.current[id];
+      setConvos((prev) => (prev && !prev.some((c) => c._id === id)
+        ? [...prev, convo].sort((a, b) => Date.parse(b.lastMessageAt) - Date.parse(a.lastMessageAt))
+        : prev));
+      if (savedChat) setChat(id, (list) => list ?? savedChat);
+      flash(`Couldn't delete the chat. ${errMsg(err)}`);
+    }
+  };
+
+  const deleteMessage = async (message, forEveryone) => {
+    const id = activeId;
+    const now = new Date().toISOString();
+    setChat(id, (list = []) => (forEveryone
+      ? list.map((m) => (m._id === message._id ? { ...m, text: '', image: '', deletedAt: now } : m))
+      : list.filter((m) => m._id !== message._id)));
+    if (editing?._id === message._id) cancelEdit();
+    flash(forEveryone ? 'Message deleted for everyone' : 'Message deleted for you');
+    try {
+      await busy(id, async () => {
+        const { data } = await api.delete(`/messages/conversations/${id}/messages/${message._id}${forEveryone ? '?for=everyone' : ''}`);
+        if (forEveryone) setChat(id, (list = []) => list.map((m) => (m._id === message._id ? data : m)));
+      });
+    } catch (err) {
+      // put the message back where it was
+      setChat(id, (list = []) => {
+        const rest = list.filter((m) => m._id !== message._id);
+        return [...rest, message].sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
+      });
+      flash(`Couldn't delete the message. ${errMsg(err)}`);
     }
   };
 
@@ -719,8 +747,8 @@ export default function Messages() {
         </section>
       </div>
 
-      <ConfirmDialog open={Boolean(confirm)} title={CONFIRM_TEXT.title} confirmLabel={CONFIRM_TEXT.button} busy={confirmBusy}
-        onConfirm={runConfirmed} onClose={() => !confirmBusy && setConfirm(null)}>
+      <ConfirmDialog open={Boolean(confirm)} title={CONFIRM_TEXT.title} confirmLabel={CONFIRM_TEXT.button}
+        onConfirm={runConfirmed} onClose={() => setConfirm(null)}>
         {CONFIRM_TEXT.body}
       </ConfirmDialog>
 

@@ -20,4 +20,4 @@ export function toClient(value) {
 }
 
 // Column lists for embedded profiles (the "populate" equivalents)
-export const PUBLIC_PROFILE = 'id, full_name, avatar, program, year_level, rating_avg, rating_count';
+export const PUBLIC_PROFILE = 'id, full_name, avatar, program, year_level, verified, rating_avg, rating_count';

@@ -5,12 +5,15 @@ import Icon from './Icon.jsx';
 const ITEM_HEIGHT = 40; // px per item, used to decide whether the menu fits below the button
 const MENU_WIDTH = 208; // w-52
 
-// "⋯" button that opens a small menu of actions (chat list rows, chat header, single messages).
+// "⋯" button that opens a small menu of actions (chat list rows, chat header). Pass `trigger` to open it from
+// something else instead, e.g. a whole message bubble: trigger(props) must render one element and spread `props`
+// onto it (ref, click and key handlers, ARIA). `open` tells it whether the menu is showing.
+// align: 'end' lines the menu up with the trigger's right edge, 'start' with its left edge.
 // The menu is portalled to <body> and placed with position: fixed beside the button, so scrolling lists and
 // overflow-hidden cards never clip it. It opens upward when there's no room below, and closes on an outside
 // click, Escape, scrolling or picking an item. Arrow keys move between items.
 // items: [{ label, icon, onSelect, danger? }]
-export default function ActionMenu({ label, items, className = '', buttonClassName = '', iconClassName = 'h-5 w-5' }) {
+export default function ActionMenu({ label, items, className = '', buttonClassName = '', iconClassName = 'h-5 w-5', align = 'end', trigger }) {
   const [pos, setPos] = useState(null); // null = closed
   const buttonRef = useRef(null);
   const menuRef = useRef(null);
@@ -27,7 +30,7 @@ export default function ActionMenu({ label, items, className = '', buttonClassNa
     const r = buttonRef.current.getBoundingClientRect();
     const height = items.length * ITEM_HEIGHT + 12;
     const up = r.bottom + height + 8 > window.innerHeight && r.top > height + 8;
-    const left = Math.min(Math.max(8, r.right - MENU_WIDTH), window.innerWidth - MENU_WIDTH - 8);
+    const left = Math.min(Math.max(8, align === 'end' ? r.right - MENU_WIDTH : r.left), window.innerWidth - MENU_WIDTH - 8);
     setPos({ top: up ? r.top - height - 6 : r.bottom + 6, left });
   };
 
@@ -59,13 +62,28 @@ export default function ActionMenu({ label, items, className = '', buttonClassNa
     };
   }, [pos]);
 
+  const triggerProps = {
+    ref: buttonRef,
+    onClick: toggle,
+    // a custom trigger may be a plain element, so Enter and Space open it like a button
+    onKeyDown: (e) => {
+      if (e.target !== e.currentTarget || (e.key !== 'Enter' && e.key !== ' ')) return;
+      e.preventDefault();
+      toggle(e);
+    },
+    'aria-haspopup': 'menu',
+    'aria-expanded': Boolean(pos),
+    'aria-controls': pos ? menuId : undefined,
+  };
+
   return (
     <div className={className} data-open={pos ? '' : undefined}>
-      <button ref={buttonRef} type="button" onClick={toggle} aria-label={label} title={label}
-        aria-haspopup="menu" aria-expanded={Boolean(pos)} aria-controls={pos ? menuId : undefined}
-        className={`flex items-center justify-center rounded-full transition duration-200 active:scale-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${pos ? 'bg-frost text-navy' : ''} ${buttonClassName}`}>
-        <Icon name="dots" className={iconClassName} strokeWidth={2} />
-      </button>
+      {trigger ? trigger({ ...triggerProps, open: Boolean(pos) }) : (
+        <button type="button" {...triggerProps} aria-label={label} title={label}
+          className={`flex items-center justify-center rounded-full transition duration-200 active:scale-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${pos ? 'bg-frost text-navy' : ''} ${buttonClassName}`}>
+          <Icon name="dots" className={iconClassName} strokeWidth={2} />
+        </button>
+      )}
 
       {pos && createPortal(
         <div ref={menuRef} id={menuId} role="menu" aria-label={label} style={{ top: pos.top, left: pos.left, width: MENU_WIDTH }}

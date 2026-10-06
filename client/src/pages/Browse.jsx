@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api.js';
 import ListingCard from '../components/ListingCard.jsx';
@@ -12,6 +13,7 @@ import { BROWSE_GRID, CATEGORIES, CATEGORY_STYLES, CONDITIONS, CONDITION_HINTS, 
 const FILTER_KEYS = ['category', 'size', 'condition', 'minPrice', 'maxPrice'];
 const SORTS = [['newest', 'Newest first'], ['price-asc', 'Price: low to high'], ['price-desc', 'Price: high to low']];
 const GRID = BROWSE_GRID;
+const focusRing = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy';
 
 // One-tap price ranges; a custom min/max form sits under them
 const PRICE_RANGES = [
@@ -21,16 +23,78 @@ const PRICE_RANGES = [
   { min: '1000', max: '', label: 'Over ₱1,000' },
 ];
 
-// A filter group: title on the left, the current choice on the right
-function FilterSection({ id, title, value, children }) {
+const PANEL_WIDTH = 288; // w-72
+
+// Filter button in the filter row: shows its current value ("Size: M") and opens a small panel of choices.
+// The panel is portalled and position: fixed under the button, so the sideways-scrolling row on phones never
+// clips it. It closes on an outside click, Escape, scrolling, or once a choice is made (children get `close`).
+function FilterButton({ label, value, children }) {
+  const [pos, setPos] = useState(null); // null = closed
+  const buttonRef = useRef(null);
+  const panelRef = useRef(null);
+  const panelId = useId();
+  const active = Boolean(value);
+
+  const close = (focusButton = false) => {
+    setPos(null);
+    if (focusButton) buttonRef.current?.focus();
+  };
+  const toggle = () => {
+    if (pos) return close();
+    const r = buttonRef.current.getBoundingClientRect();
+    const width = Math.min(PANEL_WIDTH, window.innerWidth - 32);
+    setPos({ top: r.bottom + 8, left: Math.min(Math.max(16, r.left), window.innerWidth - width - 16), width });
+  };
+
+  useEffect(() => {
+    if (!pos) return undefined;
+    panelRef.current?.querySelector('button, input')?.focus();
+    const onPointer = (e) => {
+      if (!panelRef.current?.contains(e.target) && !buttonRef.current?.contains(e.target)) close();
+    };
+    const onKey = (e) => { if (e.key === 'Escape') { e.preventDefault(); close(true); } };
+    const onScroll = (e) => { if (!panelRef.current?.contains(e.target)) close(); };
+    const onResize = () => close();
+    document.addEventListener('pointerdown', onPointer);
+    document.addEventListener('keydown', onKey);
+    window.addEventListener('scroll', onScroll, true);
+    window.addEventListener('resize', onResize);
+    return () => {
+      document.removeEventListener('pointerdown', onPointer);
+      document.removeEventListener('keydown', onKey);
+      window.removeEventListener('scroll', onScroll, true);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [pos]);
+
   return (
-    <section aria-labelledby={id} className="py-5 first:pt-0 last:pb-0">
-      <div className="mb-3 flex items-baseline justify-between gap-2">
-        <h3 id={id} className="text-sm font-bold text-ink">{title}</h3>
-        <span className="truncate text-xs font-medium text-slate-500">{value}</span>
-      </div>
-      {children}
-    </section>
+    <>
+      <button ref={buttonRef} type="button" onClick={toggle} aria-expanded={Boolean(pos)} aria-haspopup="dialog" aria-controls={pos ? panelId : undefined}
+        className={`inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full pl-4 pr-3 text-sm font-semibold ring-1 ring-inset transition duration-200 active:scale-[0.97] ${focusRing} ${active
+          ? 'bg-navy text-white ring-navy hover:bg-navy-deep'
+          : pos ? 'bg-frost text-navy ring-denim/50' : 'bg-white text-ink ring-aqua hover:bg-frost hover:ring-denim/50'}`}>
+        {label}{active && <span className="max-w-32 truncate font-medium text-cream">: {value}</span>}
+        <Icon name="chevron-down" strokeWidth={2} className={`h-4 w-4 transition-transform duration-200 ${pos ? 'rotate-180' : ''} ${active ? 'text-cream' : 'text-slate-500'}`} />
+      </button>
+
+      {pos && createPortal(
+        <div ref={panelRef} id={panelId} role="dialog" aria-label={`${label} filter`} style={{ top: pos.top, left: pos.left, width: pos.width }}
+          className="fixed z-[70] animate-fade-in rounded-2xl bg-white p-3 shadow-xl shadow-navy/15 ring-1 ring-aqua">
+          {children(() => close(true))}
+        </div>,
+        document.body,
+      )}
+    </>
+  );
+}
+
+// Panel header: the filter's name and a Clear link when it's set
+function PanelHead({ title, onClear }) {
+  return (
+    <div className="mb-2.5 flex items-center justify-between px-1">
+      <p className="text-sm font-bold text-ink">{title}</p>
+      {onClear && <button type="button" onClick={onClear} className={`rounded text-xs font-semibold text-navy hover:underline ${focusRing}`}>Clear</button>}
+    </div>
   );
 }
 
@@ -39,12 +103,11 @@ export default function Browse() {
   const [data, setData] = useState({ items: [], total: 0, pages: 1 });
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
 
   const get = (k) => params.get(k) || '';
   const page = Number(get('page') || 1);
   const [q, category, size, condition, minPrice, maxPrice] = ['q', ...FILTER_KEYS].map(get);
-  const panelFilters = [size, condition, minPrice || maxPrice].filter(Boolean).length; // the ones inside the Filters panel
+  const narrowing = Boolean(q || category || size || condition || minPrice || maxPrice);
 
   const update = (changes) => {
     const next = new URLSearchParams(params);
@@ -53,8 +116,8 @@ export default function Browse() {
     setParams(next);
   };
   const setParam = (key, value) => update({ [key]: value });
-  const toggle = (key, value) => setParam(key, get(key) === value ? '' : value); // tapping the active choice clears it
   const clearAll = () => update(Object.fromEntries(['q', ...FILTER_KEYS].map((k) => [k, ''])));
+  const clearFilters = () => update({ size: '', condition: '', minPrice: '', maxPrice: '' });
 
   useEffect(() => {
     setLoading(true);
@@ -65,26 +128,18 @@ export default function Browse() {
       .finally(() => setLoading(false));
   }, [params]);
 
-
-  const priceLabel = minPrice && maxPrice ? `${formatPrice(minPrice)} – ${formatPrice(maxPrice)}`
-    : minPrice ? `${formatPrice(minPrice)} and up` : `Up to ${formatPrice(maxPrice)}`;
-
-  // Removable summary of everything that narrows the results
-  const chips = [
-    q && { label: `“${q}”`, clear: { q: '' } },
-    category && { label: category, clear: { category: '' } },
-    size && { label: `Size ${size}`, clear: { size: '' } },
-    condition && { label: condition, clear: { condition: '' } },
-    (minPrice || maxPrice) && { label: priceLabel, clear: { minPrice: '', maxPrice: '' } },
-  ].filter(Boolean);
-
   const activeRange = PRICE_RANGES.find((r) => r.min === minPrice && r.max === maxPrice);
-  const resetPanel = () => update({ size: '', condition: '', minPrice: '', maxPrice: '' });
-  const applyCustomPrice = (e) => {
-    e.preventDefault();
-    const f = new FormData(e.currentTarget);
-    update({ minPrice: f.get('minPrice').trim(), maxPrice: f.get('maxPrice').trim() });
-  };
+  const priceLabel = !minPrice && !maxPrice ? ''
+    : activeRange ? activeRange.label
+      : minPrice && maxPrice ? `${formatPrice(minPrice)}–${formatPrice(maxPrice)}`
+        : minPrice ? `${formatPrice(minPrice)}+` : `Up to ${formatPrice(maxPrice)}`;
+
+  const option = (selected) => `flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left transition duration-200 active:scale-[0.98] ${focusRing} ${selected
+    ? 'bg-frost text-navy'
+    : 'text-ink hover:bg-frost/70'}`;
+  const chip = (selected) => `rounded-lg py-2 text-xs font-semibold ring-1 ring-inset transition duration-200 active:scale-95 ${focusRing} ${selected
+    ? 'bg-navy text-mist ring-navy'
+    : 'bg-white text-slate-700 ring-aqua hover:bg-frost hover:text-navy'}`;
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -109,160 +164,148 @@ export default function Browse() {
         </div>
       </header>
 
-      <div className="lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
-        {/* Filters: sticky sidebar on laptops and up, opened with the Filters button on smaller screens */}
-        <aside id="filters" aria-label="Filters"
-          className={`card mb-4 p-4 sm:mb-5 sm:p-5 lg:sticky lg:top-24 lg:mb-0 lg:block ${showFilters ? 'block animate-fade-up' : 'hidden'}`}>
-          <div className="mb-5 flex items-center justify-between border-b border-aqua/70 pb-4">
-            <h2 className="flex items-center gap-2 font-bold text-ink">
-              <Icon name="filter" className="h-4 w-4 text-navy" /> Filters
-              {panelFilters > 0 && <span className="chip bg-navy px-2 text-mist">{panelFilters}</span>}
-            </h2>
-            {panelFilters > 0 && (
-              <button type="button" onClick={resetPanel} className="rounded text-sm font-semibold text-navy hover:underline">Reset</button>
-            )}
-          </div>
-
-          <div className="divide-y divide-aqua/70">
-            <FilterSection id="f-size" title="Size" value={size || 'Any'}>
-              {/* same segmented style as the site's other switches; tapping the selected size clears it */}
-              <div className="grid grid-cols-6 gap-1 rounded-xl bg-frost p-1">
-                {SIZES.map((s) => (
-                  <button key={s} type="button" onClick={() => toggle('size', s)} aria-pressed={size === s} aria-label={`Size ${s}`}
-                    className={`rounded-lg py-2 text-xs font-semibold transition duration-200 active:scale-95 ${size === s ? 'bg-white text-navy shadow-sm shadow-navy/10' : 'text-slate-600 hover:bg-white/60 hover:text-navy'}`}>
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </FilterSection>
-
-            <FilterSection id="f-condition" title="Condition" value={condition || 'Any'}>
-              <div role="radiogroup" aria-labelledby="f-condition" className="-mx-2 space-y-0.5">
-                {['', ...CONDITIONS].map((c) => (
-                  <label key={c || 'any'} className="relative flex cursor-pointer items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-frost has-[:checked]:bg-frost">
-                    <input type="radio" name="condition" value={c} checked={condition === c} onChange={() => setParam('condition', c)} className="peer sr-only" />
-                    <span aria-hidden="true"
-                      className="h-[18px] w-[18px] shrink-0 rounded-full border-2 border-slate-300 bg-white transition-all peer-checked:border-[5px] peer-checked:border-navy peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-navy" />
-                    <span className="min-w-0">
-                      <span className="block text-sm font-semibold text-ink">{c || 'Any condition'}</span>
-                      {c && <span className="block text-xs text-slate-500">{CONDITION_HINTS[c]}</span>}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </FilterSection>
-
-            <FilterSection id="f-price" title="Price" value={minPrice || maxPrice ? priceLabel : 'Any'}>
-              <div className="grid grid-cols-2 gap-1.5">
-                {PRICE_RANGES.map((r) => {
-                  const on = activeRange === r;
-                  return (
-                    <button key={r.label} type="button" aria-pressed={on} onClick={() => update(on ? { minPrice: '', maxPrice: '' } : { minPrice: r.min, maxPrice: r.max })}
-                      className={`rounded-lg px-2 py-2 text-xs font-semibold ring-1 ring-inset transition duration-200 active:scale-95 ${on ? 'bg-navy text-mist ring-navy' : 'bg-white text-slate-700 ring-aqua hover:bg-frost hover:text-navy'}`}>
-                      {r.label}
+      {/* Filter row: one compact button per filter (its panel opens on tap), sort on the right.
+          On phones the filter buttons scroll sideways while Sort stays put. */}
+      <div className="flex items-center gap-2">
+        <div role="group" aria-label="Filters" className="-mx-4 flex min-w-0 flex-1 items-center gap-2 overflow-x-auto px-4 py-1 [scrollbar-width:none] sm:mx-0 sm:px-0">
+          <FilterButton label="Size" value={size}>
+            {(close) => (
+              <>
+                <PanelHead title="Size" onClear={size ? () => { setParam('size', ''); close(); } : null} />
+                <div className="grid grid-cols-3 gap-1.5">
+                  {SIZES.map((s) => (
+                    <button key={s} type="button" aria-pressed={size === s} onClick={() => { setParam('size', size === s ? '' : s); close(); }} className={chip(size === s)}>
+                      {s}
                     </button>
-                  );
-                })}
-              </div>
-              {/* custom range: keyed by the URL values so presets and removed chips refresh the boxes */}
-              <form onSubmit={applyCustomPrice} aria-label="Custom price range" className="mt-3 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-                {[['minPrice', 'Min', 'Minimum price'], ['maxPrice', 'Max', 'Maximum price']].map(([key, placeholder, label], i) => (
-                  <div key={key} className={`relative min-w-0 ${i ? 'col-start-3' : ''}`}>
-                    <label htmlFor={key} className="sr-only">{label}</label>
-                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500" aria-hidden="true">₱</span>
-                    <input id={key} name={key} key={get(key)} defaultValue={get(key)} type="number" min="0" inputMode="numeric"
-                      placeholder={placeholder} className="input no-spin py-2 pl-7" />
-                  </div>
-                ))}
-                <span className="col-start-2 row-start-1 text-slate-400" aria-hidden="true">–</span>
-                <button className="btn-outline col-span-3 py-2">Apply price</button>
-              </form>
-            </FilterSection>
-          </div>
-        </aside>
-
-        <section aria-labelledby="results-heading">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 id="results-heading" aria-live="polite" className="text-sm text-slate-600">
-              {loading ? <><span className="skeleton inline-block h-4 w-28 align-middle" aria-hidden="true" /><span className="sr-only">Loading uniforms</span></> : (
-                <><b className="font-bold text-ink">{data.total}</b> uniform{data.total === 1 ? '' : 's'}{q && <> for <b className="font-semibold text-ink">“{q}”</b></>}</>
-              )}
-            </h2>
-            <div className="flex items-center gap-2">
-              <button type="button" onClick={() => setShowFilters(!showFilters)} aria-expanded={showFilters} aria-controls="filters"
-                className={`control lg:hidden ${showFilters ? 'bg-frost' : ''}`}>
-                <Icon name="filter" className="h-4 w-4" />
-                Filters
-                {panelFilters > 0 && <span className="chip bg-navy px-2 text-mist">{panelFilters}</span>}
-              </button>
-              {/* native select (best on phones and for screen readers) dressed as a control */}
-              <div className="relative">
-                <label htmlFor="sort" className="sr-only">Sort by</label>
-                <Icon name="sort" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-                <select id="sort" className="control cursor-pointer appearance-none pl-9 pr-9" value={get('sort') || 'newest'} onChange={(e) => setParam('sort', e.target.value)}>
-                  {SORTS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                </select>
-                <Icon name="chevron-down" className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" strokeWidth={2} />
-              </div>
-            </div>
-          </div>
-
-          {chips.length > 0 && (
-            <ul className="mt-3 flex flex-wrap items-center gap-2" aria-label="Active filters">
-              {chips.map((c) => (
-                <li key={c.label}>
-                  <button type="button" onClick={() => update(c.clear)} aria-label={`Remove filter: ${c.label}`}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-frost py-1.5 pl-3 pr-2 text-xs font-semibold text-navy ring-1 ring-inset ring-aqua transition hover:bg-aqua active:scale-95">
-                    {c.label} <Icon name="x" className="h-3.5 w-3.5" strokeWidth={2.2} />
-                  </button>
-                </li>
-              ))}
-              <li>
-                <button type="button" onClick={clearAll} className="px-1 text-xs font-semibold text-slate-600 underline-offset-2 hover:text-navy hover:underline">
-                  Clear all
-                </button>
-              </li>
-            </ul>
-          )}
-
-          <div className="mt-4">
-            {loading ? (
-              <ListingGridSkeleton count={8} className={GRID} />
-            ) : failed ? (
-              <EmptyState icon={<Icon name="warning" className="h-6 w-6" />} title="Couldn't load uniforms">
-                Check your connection and try again.
-              </EmptyState>
-            ) : data.items.length === 0 ? (
-              <EmptyState icon={<Icon name="search" className="h-6 w-6" />} title={chips.length ? 'No matches' : 'No uniforms yet'}>
-                {chips.length ? (
-                  <>
-                    <p>No uniforms match your search and filters.</p>
-                    <button type="button" onClick={clearAll} className="btn-outline mt-4">Clear filters</button>
-                  </>
-                ) : 'Nothing has been posted yet. Check back soon.'}
-              </EmptyState>
-            ) : (
-              <div className={GRID}>
-                {data.items.map((l, i) => (
-                  <Reveal key={l._id} delay={(i % 4) * 60}><ListingCard listing={l} /></Reveal>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </>
             )}
-          </div>
+          </FilterButton>
 
-          {data.pages > 1 && !failed && (
-            <nav aria-label="Pagination" className="mt-8 flex items-center justify-center gap-3">
-              <button className="btn-outline" disabled={page <= 1} onClick={() => update({ page: String(page - 1) })}>
-                <Icon name="arrow-left" className="h-4 w-4" /> Previous
-              </button>
-              <span className="text-sm font-medium text-slate-600">Page {page} of {data.pages}</span>
-              <button className="btn-outline" disabled={page >= data.pages} onClick={() => update({ page: String(page + 1) })}>
-                Next <Icon name="arrow-right" className="h-4 w-4" />
-              </button>
-            </nav>
+          <FilterButton label="Condition" value={condition}>
+            {(close) => (
+              <>
+                <PanelHead title="Condition" onClear={condition ? () => { setParam('condition', ''); close(); } : null} />
+                <div className="space-y-0.5">
+                  {CONDITIONS.map((c) => (
+                    <button key={c} type="button" aria-pressed={condition === c} onClick={() => { setParam('condition', condition === c ? '' : c); close(); }} className={option(condition === c)}>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-semibold">{c}</span>
+                        <span className="block truncate text-xs text-slate-500">{CONDITION_HINTS[c]}</span>
+                      </span>
+                      {condition === c && <Icon name="check" className="h-4 w-4 shrink-0 text-navy" strokeWidth={2.5} />}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </FilterButton>
+
+          <FilterButton label="Price" value={priceLabel}>
+            {(close) => (
+              <>
+                <PanelHead title="Price" onClear={priceLabel ? () => { update({ minPrice: '', maxPrice: '' }); close(); } : null} />
+                <div className="grid grid-cols-2 gap-1.5">
+                  {PRICE_RANGES.map((r) => {
+                    const on = activeRange === r;
+                    return (
+                      <button key={r.label} type="button" aria-pressed={on} className={`px-2 ${chip(on)}`}
+                        onClick={() => { update(on ? { minPrice: '', maxPrice: '' } : { minPrice: r.min, maxPrice: r.max }); close(); }}>
+                        {r.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                {/* custom range */}
+                <form aria-label="Custom price range" className="mt-3 border-t border-aqua/70 pt-3"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const f = new FormData(e.currentTarget);
+                    update({ minPrice: f.get('minPrice').trim(), maxPrice: f.get('maxPrice').trim() });
+                    close();
+                  }}>
+                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+                    {[['minPrice', 'Min', 'Minimum price'], ['maxPrice', 'Max', 'Maximum price']].map(([key, placeholder, label], i) => (
+                      <div key={key} className={`relative min-w-0 ${i ? 'col-start-3' : ''}`}>
+                        <label htmlFor={key} className="sr-only">{label}</label>
+                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500" aria-hidden="true">₱</span>
+                        <input id={key} name={key} defaultValue={get(key)} type="number" min="0" inputMode="numeric"
+                          placeholder={placeholder} className="input no-spin py-2 pl-7" />
+                      </div>
+                    ))}
+                    <span className="col-start-2 row-start-1 text-slate-400" aria-hidden="true">–</span>
+                  </div>
+                  <button className="btn-primary mt-2 w-full py-2">Apply price</button>
+                </form>
+              </>
+            )}
+          </FilterButton>
+
+          {(size || condition || minPrice || maxPrice) && (
+            <button type="button" onClick={clearFilters}
+              className={`inline-flex h-10 shrink-0 items-center gap-1 rounded-full px-3 text-sm font-semibold text-slate-600 transition hover:bg-frost hover:text-navy active:scale-[0.97] ${focusRing}`}>
+              <Icon name="x" className="h-4 w-4" strokeWidth={2} /> Clear
+            </button>
           )}
-        </section>
+        </div>
+
+        {/* native select (best on phones and for screen readers) dressed as a filter button */}
+        <div className="relative shrink-0">
+          <label htmlFor="sort" className="sr-only">Sort by</label>
+          <Icon name="sort" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <select id="sort" value={get('sort') || 'newest'} onChange={(e) => setParam('sort', e.target.value)}
+            className={`h-10 w-[2.5rem] cursor-pointer appearance-none rounded-full bg-white pl-9 text-sm font-semibold text-transparent ring-1 ring-inset ring-aqua transition hover:bg-frost hover:ring-denim/50 sm:w-auto sm:pr-9 sm:text-ink ${focusRing}`}>
+            {SORTS.map(([v, l]) => <option key={v} value={v} className="text-ink">{l}</option>)}
+          </select>
+          <Icon name="chevron-down" className="pointer-events-none absolute right-3 top-1/2 hidden h-4 w-4 -translate-y-1/2 text-slate-500 sm:block" strokeWidth={2} />
+        </div>
       </div>
+
+      <section aria-labelledby="results-heading">
+        <h2 id="results-heading" aria-live="polite" className="text-sm text-slate-600">
+          {loading ? <><span className="skeleton inline-block h-4 w-28 align-middle" aria-hidden="true" /><span className="sr-only">Loading uniforms</span></> : (
+            <><b className="font-bold text-ink">{data.total}</b> uniform{data.total === 1 ? '' : 's'}{q && <> for <b className="font-semibold text-ink">“{q}”</b></>}</>
+          )}
+        </h2>
+
+        <div className="mt-3 sm:mt-4">
+          {loading ? (
+            <ListingGridSkeleton count={8} className={GRID} />
+          ) : failed ? (
+            <EmptyState icon={<Icon name="warning" className="h-6 w-6" />} title="Couldn't load uniforms">
+              Check your connection and try again.
+            </EmptyState>
+          ) : data.items.length === 0 ? (
+            <EmptyState icon={<Icon name="search" className="h-6 w-6" />} title={narrowing ? 'No matches' : 'No uniforms yet'}>
+              {narrowing ? (
+                <>
+                  <p>No uniforms match your search and filters.</p>
+                  <button type="button" onClick={clearAll} className="btn-outline mt-4">Clear search and filters</button>
+                </>
+              ) : 'Nothing has been posted yet. Check back soon.'}
+            </EmptyState>
+          ) : (
+            <div className={GRID}>
+              {data.items.map((l, i) => (
+                <Reveal key={l._id} delay={(i % 4) * 60}><ListingCard listing={l} /></Reveal>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {data.pages > 1 && !failed && (
+          <nav aria-label="Pagination" className="mt-8 flex items-center justify-center gap-3">
+            <button className="btn-outline" disabled={page <= 1} onClick={() => update({ page: String(page - 1) })}>
+              <Icon name="arrow-left" className="h-4 w-4" /> Previous
+            </button>
+            <span className="text-sm font-medium text-slate-600">Page {page} of {data.pages}</span>
+            <button className="btn-outline" disabled={page >= data.pages} onClick={() => update({ page: String(page + 1) })}>
+              Next <Icon name="arrow-right" className="h-4 w-4" />
+            </button>
+          </nav>
+        )}
+      </section>
     </div>
   );
 }

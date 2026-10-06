@@ -55,7 +55,7 @@
         .boot .split-hero { grid-template-columns: minmax(0, 1fr) 22rem; gap: 40px; align-items: center; } .boot .split-2 { grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
         .boot .hero { padding: 56px; } .boot .split-chat { grid-template-columns: 360px 1fr; }
       }
-      @media (min-width: 1280px) { .boot .g-browse { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+      @media (min-width: 1024px) { .boot .g-browse { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
       @media (min-width: 1536px) { .boot-bar, .boot-main { max-width: 88rem; } .boot .g-browse { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
       @keyframes boot-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
       @media (prefers-reduced-motion: reduce) { .boot .b, .boot .dk { animation: none; } }
@@ -104,9 +104,8 @@
               + '<div>' + b('100%', 'auto', 'aspect-ratio:4/3;border-radius:24px') + '</div></div>',
             browse: title('240px', '384px') + '<div class="row card" style="height:52px;max-width:42rem;margin-top:16px;padding:0 6px 0 16px;border-radius:16px">' + b('20px', '20px', 'border-radius:99px') + b('192px', '16px') + b('88px', '42px', 'margin-left:auto;border-radius:12px') + '</div>'
               + '<div style="margin:14px 0 20px">' + tabs(['40px', '112px', '112px', '96px', '112px']) + '</div>'
-              + '<div class="split-browse"><div class="card pad show-lg">' + b('80px', '20px', 'margin-bottom:20px') + b('48px', '16px') + b('100%', '36px', 'margin:12px 0 24px;border-radius:12px') + b('80px', '16px')
-              + times(5, '<div class="row" style="margin-top:12px">' + b('18px', '18px', 'border-radius:99px') + b('112px', '14px') + '</div>') + '</div>'
-              + '<div><div class="row" style="justify-content:space-between">' + b('112px', '16px') + b('144px', '40px', 'border-radius:12px') + '</div><div class="g-browse" style="margin-top:16px">' + times(8, card) + '</div></div></div>',
+              + '<div class="row" style="gap:8px;padding:4px 0">' + b('80px', '40px', 'border-radius:99px') + b('112px', '40px', 'border-radius:99px') + b('80px', '40px', 'border-radius:99px') + b('40px', '40px', 'margin-left:auto;border-radius:99px') + '</div>'
+              + b('112px', '16px', 'margin-top:20px') + '<div class="g-browse" style="margin-top:16px">' + times(8, card) + '</div>',
             detail: '<div class="row" style="gap:8px">' + b('56px', '16px') + b('96px', '16px') + b('128px', '16px') + '</div><div class="split-detail" style="margin-top:20px"><div>' + b('100%', 'auto', '', false).replace('class="b"', 'class="b ar"')
               + '<div class="row" style="gap:8px;margin-top:18px">' + times(3, b('72px', '72px', 'border-radius:12px')) + '</div></div>'
               + '<div class="card" style="padding:20px;align-self:start"><div class="row" style="justify-content:space-between"><div class="row" style="gap:8px">' + b('80px', '24px', 'border-radius:99px') + b('96px', '24px', 'border-radius:99px') + '</div>' + b('96px', '12px') + '</div>'

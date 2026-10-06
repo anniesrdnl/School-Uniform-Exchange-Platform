@@ -154,34 +154,17 @@ export function BrowseSkeleton() {
         <TabRow widths={['w-10', 'w-28', 'w-28', 'w-24', 'w-28']} />
       </div>
 
-      <div className="lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
-        <div className="card hidden p-5 lg:block">
-          <div className="mb-5 border-b border-aqua/70 pb-4"><Bone className="h-5 w-20" /></div>
-          <div className="space-y-6">
-            <div className="space-y-3"><Bone className="h-4 w-12" /><Bone className="h-9 rounded-xl" /></div>
-            <div className="space-y-3">
-              <Bone className="h-4 w-20" />
-              {[0, 1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex items-center gap-3"><Bone className="h-[18px] w-[18px] shrink-0 rounded-full" /><Bone className="h-3.5 w-28" /></div>
-              ))}
-            </div>
-            <div className="space-y-3">
-              <Bone className="h-4 w-12" />
-              <div className="grid grid-cols-2 gap-1.5">{[0, 1, 2, 3].map((i) => <Bone key={i} className="h-8 rounded-lg" />)}</div>
-              <Bone className="h-10 rounded-xl" />
-            </div>
-          </div>
-        </div>
+      {/* filter row: Size, Condition, Price buttons, and Sort on the right */}
+      <div className="flex items-center gap-2 py-1">
+        <Bone className="h-10 w-20 rounded-full" />
+        <Bone className="h-10 w-28 rounded-full" />
+        <Bone className="h-10 w-20 rounded-full" />
+        <Bone className="ml-auto h-10 w-10 rounded-full sm:w-44" />
+      </div>
 
-        <div>
-          <div className="flex items-center justify-between gap-3">
-            <Bone className="h-4 w-28" />
-            <div className="flex gap-2"><Bone className="h-10 w-24 rounded-xl lg:hidden" /><Bone className="h-10 w-36 rounded-xl" /></div>
-          </div>
-          <div className="mt-4">
-            <div className={BROWSE_GRID}>{Array.from({ length: 8 }, (_, i) => <ListingCardSkeleton key={i} />)}</div>
-          </div>
-        </div>
+      <div>
+        <Bone className="h-4 w-28" />
+        <div className={`mt-3 sm:mt-4 ${BROWSE_GRID}`}>{Array.from({ length: 8 }, (_, i) => <ListingCardSkeleton key={i} />)}</div>
       </div>
     </Shell>
   );

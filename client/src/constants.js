@@ -7,7 +7,7 @@ export const EXCHANGE_OPTIONS = ['Buy Only', 'Exchange Only', 'Buy or Exchange']
 export const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
 // Browse results grid (shared with its loading placeholder in components/PageSkeletons.jsx)
-export const BROWSE_GRID = 'grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4 2xl:grid-cols-5';
+export const BROWSE_GRID = 'grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 2xl:grid-cols-5';
 
 // Icon (components/Icon.jsx) for each category
 export const CATEGORY_STYLES = {

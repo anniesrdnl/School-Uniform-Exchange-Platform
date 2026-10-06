@@ -153,27 +153,34 @@ router.delete('/conversations/:id', async (req, res, next) => {
 });
 
 // Messages in a chat (minus any I deleted). Opening a chat marks it read.
+// ?since=<newest updatedAt the browser already has>: only messages sent, edited or deleted after that. The open chat
+// checks every 1.5 seconds, so this keeps each check small and quick.
 router.get('/conversations/:id/messages', async (req, res, next) => {
   try {
-    const convo = await getMyConversation(req.params.id, req.user.id);
+    // the chat and my settings for it don't depend on each other, so look both up at once
+    const [convo, settings] = await Promise.all([
+      getMyConversation(req.params.id, req.user.id),
+      settingsFor(req.user.id, [req.params.id]),
+    ]);
     if (!convo) return res.status(404).json({ message: 'Conversation not found.' });
-    const mine = { ...DEFAULTS, ...(await settingsFor(req.user.id, [convo.id]))[convo.id] };
+    const mine = { ...DEFAULTS, ...settings[convo.id] };
+    const since = typeof req.query.since === 'string' && !Number.isNaN(Date.parse(req.query.since)) ? req.query.since : null;
 
     const load = (skipHidden) => {
       let query = supabase.from('messages').select('*').eq('conversation', convo.id);
       if (mine.cleared_at) query = query.gt('created_at', mine.cleared_at);
+      if (since) query = query.gt('updated_at', since);
       if (skipHidden) query = query.not('hidden_for', 'cs', `{${req.user.id}}`); // "delete for you"
       return query.order('created_at', { ascending: true });
     };
-    let result = await load(true);
+    // mark it read (only when something arrived since I last read it) while the messages load
+    const markRead = time(convo.last_message_at) > time(mine.last_read_at)
+      ? optional(saveSettings(convo.id, req.user.id, { last_read_at: new Date().toISOString() }))
+      : null;
+    let [result] = await Promise.all([load(true), markRead]);
     if (notMigrated(result.error)) result = await load(false);
-    const messages = check(result);
 
-    // only write when something new arrived since I last read it (this route is polled every few seconds)
-    if (time(convo.last_message_at) > time(mine.last_read_at)) {
-      await optional(saveSettings(convo.id, req.user.id, { last_read_at: new Date().toISOString() }));
-    }
-    res.json(toClient(messages));
+    res.json(toClient(check(result)));
   } catch (err) {
     next(err);
   }

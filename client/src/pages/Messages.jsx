@@ -14,14 +14,14 @@ import { presence } from '../constants.js';
 import { Spinner } from '../components/Loader.jsx';
 import shrinkImage from '../shrinkImage.js';
 
-const POLL_MS = 3000;
+const CHAT_POLL_MS = 1500; // open chat: how often to check for new, edited or deleted messages
+const LIST_POLL_MS = 5000; // chat list: previews, unread dots, online status
 const GROUP_MS = 5 * 60 * 1000; // messages from one person less than 5 minutes apart sit together
 const QUICK_REPLIES = ['Hi! Is this still available?', 'Can we meet on campus?', 'Could you send more photos?'];
 const focusRing = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy';
 // "⋯" buttons: always shown on touch screens; with a mouse they appear on hover or keyboard focus, and stay while open
 // (written out in full so Tailwind can find the class names)
 const REVEAL_IN_ROW = 'transition-opacity pointer-fine:opacity-0 pointer-fine:group-hover/row:opacity-100 pointer-fine:focus-within:opacity-100 pointer-fine:data-open:opacity-100';
-const REVEAL_IN_MESSAGE = 'transition-opacity pointer-fine:opacity-0 pointer-fine:group-hover/msg:opacity-100 pointer-fine:focus-within:opacity-100 pointer-fine:data-open:opacity-100';
 
 const DAY_MS = 86400000;
 const dayStart = (date) => { const d = new Date(date); return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); };
@@ -58,8 +58,18 @@ function buildRows(messages) {
   return rows;
 }
 
-// Fingerprint of a chat's saved messages, so polling also notices edits and deletions (not just new messages)
+// Fingerprint of a chat's saved messages, so a full reload that changed nothing keeps the same array
 const fingerprint = (list) => list.map((m) => `${m._id}:${m.updatedAt}:${m.deletedAt || ''}`).join('|');
+
+// The newest updatedAt in a chat, sent back as ?since= so the server only returns what changed after it
+const newestChange = (list) => list.reduce((best, m) => (m.updatedAt && (!best || Date.parse(m.updatedAt) > Date.parse(best)) ? m.updatedAt : best), null);
+
+// Fold changed messages (new, edited or deleted for everyone) into a chat, keeping it in time order
+function mergeChanges(list, changes) {
+  const byId = new Map(list.map((m) => [m._id, m]));
+  changes.forEach((m) => byId.set(m._id, m));
+  return [...byId.values()].sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
+}
 
 // Soft glows and the moving pinstripe behind the chat pane (styles: .chat-bg in index.css)
 function ChatBackground() {
@@ -130,51 +140,68 @@ function ChatPhoto({ src, onLoad }) {
   );
 }
 
+// One message. Clicking (or tapping, or Enter on) the bubble opens its options right next to it: Edit,
+// Delete for you, Delete for everyone. Messages that are still sending have no options yet.
 function Bubble({ m, mine, person, first, last, editing, actions, onImageLoad }) {
   const corner = mine ? (last ? 'rounded-br-md' : '') : (last ? 'rounded-bl-md' : '');
   const deleted = Boolean(m.deletedAt);
-  const menu = !m.pending && actions.length > 0 && (
-    <ActionMenu label="Message options" items={actions} iconClassName="h-4 w-4"
-      className={`shrink-0 self-center ${REVEAL_IN_MESSAGE}`}
-      buttonClassName="h-7 w-7 text-slate-500 hover:bg-white hover:text-navy hover:shadow-sm" />
-  );
+  const clickable = !m.pending && actions.length > 0;
+
+  const bubble = ({ open, ...trigger } = {}) => {
+    const shape = `rounded-2xl px-3.5 py-2 text-sm ${corner} ${clickable
+      ? `cursor-pointer transition duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${open || editing ? 'ring-2 ring-offset-2 ring-offset-white ring-denim' : ''}`
+      : ''}`;
+    // dragging to select text (to copy it) doesn't open the menu; a plain click or tap does
+    const onClick = (e) => { if (!String(window.getSelection() || '')) trigger.onClick(e); };
+    const props = clickable ? { ...trigger, onClick, role: 'button', tabIndex: 0 } : {};
+    const hint = clickable && <span className="sr-only">. Message options</span>;
+
+    if (deleted) {
+      return (
+        <div {...props} className={`flex items-center gap-1.5 bg-white/70 italic text-slate-500 ring-1 ring-inset ring-aqua hover:bg-white ${shape}`}>
+          <Icon name="no-symbol" className="h-4 w-4 shrink-0" />
+          {mine ? 'You deleted this message' : 'This message was deleted'}
+          {hint}
+        </div>
+      );
+    }
+    return (
+      <div {...props} title={m.pending ? 'Sending…' : clock(m.createdAt)}
+        className={`break-words leading-relaxed shadow-sm hover:shadow-md ${shape} ${m.pending ? 'opacity-70' : ''} ${mine
+          ? `bg-navy text-white shadow-navy/20 ${clickable ? 'hover:bg-navy-deep' : ''}`
+          : `bg-white text-ink ring-1 ring-aqua ${clickable ? 'hover:bg-frost' : ''}`}`}>
+        {m.image && m.pending && (
+          <img src={m.image} alt="Photo being sent" onLoad={onImageLoad} className={`-mx-1.5 mb-1 block max-h-60 w-auto rounded-xl ${m.text ? '' : '-mb-0.5'}`} />
+        )}
+        {m.image && !m.pending && (
+          // the photo still opens full size; clicking it doesn't open the message options
+          <a href={m.image} target="_blank" rel="noopener noreferrer" aria-label="Open photo in a new tab"
+            onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}
+            className={`-mx-1.5 mb-1 block overflow-hidden rounded-xl ${m.text ? '' : '-mb-0.5'} ${focusRing}`}>
+            <ChatPhoto src={m.image} onLoad={onImageLoad} />
+          </a>
+        )}
+        {m.text && <p className="whitespace-pre-line">{m.text}</p>}
+        {m.editedAt && <span className={`mt-0.5 block text-right text-[10px] ${mine ? 'text-white/70' : 'text-slate-500'}`}>Edited</span>}
+        {hint}
+      </div>
+    );
+  };
 
   return (
-    <div className={`group/msg flex animate-fade-up items-end gap-2 ${mine ? 'justify-end' : ''} ${first ? 'mt-3' : 'mt-0.5'}`}>
+    <div className={`flex animate-fade-up items-end gap-2 ${mine ? 'justify-end' : ''} ${first ? 'mt-3' : 'mt-0.5'}`}>
       {/* their avatar sits beside the last bubble of a run; an empty slot keeps the others aligned */}
       {!mine && (last
         ? <Avatar name={person?.fullName} src={person?.avatar} className="h-7 w-7 text-[11px]" />
         : <span className="w-7 shrink-0" />)}
-      {mine && menu}
       <div className={`flex max-w-[78%] flex-col sm:max-w-[65%] ${mine ? 'items-end' : 'items-start'}`}>
-        {deleted ? (
-          <div className={`flex items-center gap-1.5 rounded-2xl px-3.5 py-2 text-sm italic text-slate-500 ring-1 ring-inset ring-aqua ${corner} bg-white/70`}>
-            <Icon name="no-symbol" className="h-4 w-4 shrink-0" />
-            {mine ? 'You deleted this message' : 'This message was deleted'}
-          </div>
-        ) : (
-          <div title={m.pending ? 'Sending…' : clock(m.createdAt)}
-            className={`break-words rounded-2xl px-3.5 py-2 text-sm leading-relaxed shadow-sm transition duration-200 hover:shadow-md ${corner} ${m.pending ? 'opacity-70' : ''} ${editing ? 'ring-2 ring-offset-2 ring-offset-white ring-denim' : ''} ${mine
-              ? 'bg-navy text-white shadow-navy/20'
-              : 'bg-white text-ink ring-1 ring-aqua'}`}>
-            {m.image && m.pending && (
-              <img src={m.image} alt="Photo being sent" onLoad={onImageLoad} className={`-mx-1.5 mb-1 block max-h-60 w-auto rounded-xl ${m.text ? '' : '-mb-0.5'}`} />
-            )}
-            {m.image && !m.pending && (
-              <a href={m.image} target="_blank" rel="noopener noreferrer" aria-label="Open photo in a new tab"
-                className={`-mx-1.5 mb-1 block overflow-hidden rounded-xl ${m.text ? '' : '-mb-0.5'} ${focusRing}`}>
-                <ChatPhoto src={m.image} onLoad={onImageLoad} />
-              </a>
-            )}
-            {m.text && <p className="whitespace-pre-line">{m.text}</p>}
-            {m.editedAt && <span className={`mt-0.5 block text-right text-[10px] ${mine ? 'text-white/70' : 'text-slate-500'}`}>Edited</span>}
-          </div>
-        )}
+        {clickable
+          ? <ActionMenu label="Message options" items={actions} align={mine ? 'end' : 'start'} className="max-w-full" trigger={bubble} />
+          : bubble()}
         {last && (m.pending
           ? <span className="mt-1 flex items-center gap-1 px-1 text-[11px] text-slate-500"><Spinner className="h-3 w-3" /> Sending…</span>
           : <span className="mt-1 px-1 text-[11px] text-slate-500">{clock(m.createdAt)}</span>)}
       </div>
-      {!mine && menu}
     </div>
   );
 }
@@ -235,6 +262,8 @@ export default function Messages() {
   const scrolled = useRef({ id: null, count: 0 });
   const busyIn = useRef({}); // { [conversationId]: changes in flight }: polls wait, so nothing flickers back
   const messages = activeId ? chats[activeId] : undefined;
+  const chatsRef = useRef(chats);
+  chatsRef.current = chats; // read by the polling timer, which outlives a single render
 
   const setChat = (id, update) => setChats((prev) => ({ ...prev, [id]: update(prev[id]) }));
   const updateConvo = (id, fields) => setConvos((prev) => prev?.map((c) => (c._id === id ? { ...c, ...fields } : c)));
@@ -245,12 +274,25 @@ export default function Messages() {
     try { return await work(); } finally { busyIn.current[id] -= 1; }
   };
 
-  // Serverless hosting (Vercel) can't hold open sockets, so new messages arrive by polling (paused while the tab is hidden)
+  // Serverless hosting (Vercel) can't hold open sockets, so changes arrive by polling. Checks pause while the tab is
+  // hidden, run again the moment you come back, and never overlap (a slow reply isn't asked for twice).
   useEffect(() => {
-    const load = () => api.get('/messages/conversations').then((r) => setConvos(r.data)).catch(() => setConvos((prev) => prev ?? []));
+    let running = false;
+    const load = () => {
+      if (running || document.hidden) return;
+      running = true;
+      api.get('/messages/conversations').then((r) => setConvos(r.data)).catch(() => setConvos((prev) => prev ?? []))
+        .finally(() => { running = false; });
+    };
     load();
-    const timer = setInterval(() => { if (!document.hidden) load(); }, POLL_MS * 3);
-    return () => clearInterval(timer);
+    const timer = setInterval(load, LIST_POLL_MS);
+    window.addEventListener('focus', load);
+    document.addEventListener('visibilitychange', load);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('focus', load);
+      document.removeEventListener('visibilitychange', load);
+    };
   }, []);
 
   // Open a conversation: load its history (a chat opened before shows straight away), then keep checking for changes.
@@ -261,29 +303,43 @@ export default function Messages() {
     setEditing(null);
     updateConvo(activeId, { unread: false });
     let alive = true;
-    let first = true;
+    let first = true; // the first check after opening loads the whole chat; later ones only fetch what changed
+    let running = false;
     const load = () => {
-      if (busyIn.current[activeId]) return;
-      api.get(`/messages/conversations/${activeId}/messages`)
+      if (running || busyIn.current[activeId] || (!first && document.hidden)) return;
+      const since = first ? null : newestChange((chatsRef.current[activeId] || []).filter((m) => !m.pending));
+      running = true;
+      api.get(`/messages/conversations/${activeId}/messages`, { params: since ? { since } : {} })
         .then((r) => {
           if (!alive || busyIn.current[activeId]) return;
           setChat(activeId, (prev) => {
             const saved = (prev || []).filter((m) => !m.pending);
-            // nothing changed: keep the old array so the list doesn't re-render every poll
+            const pending = (prev || []).filter((m) => m.pending);
+            if (since) return r.data.length ? [...mergeChanges(saved, r.data), ...pending] : prev;
+            // full load that changed nothing: keep the old array so the list doesn't re-render
             if (prev && fingerprint(saved) === fingerprint(r.data)) return prev;
-            return [...r.data, ...(prev || []).filter((m) => m.pending)];
+            return [...r.data, ...pending];
           });
+          first = false;
         })
         .catch((e) => {
           if (!alive || !first) return;
+          first = false;
           setError(errMsg(e));
           setChat(activeId, (prev) => prev ?? []);
         })
-        .finally(() => { first = false; });
+        .finally(() => { running = false; });
     };
     load();
-    const timer = setInterval(() => { if (!document.hidden) load(); }, POLL_MS);
-    return () => { alive = false; clearInterval(timer); };
+    const timer = setInterval(load, CHAT_POLL_MS);
+    window.addEventListener('focus', load);
+    document.addEventListener('visibilitychange', load);
+    return () => {
+      alive = false;
+      clearInterval(timer);
+      window.removeEventListener('focus', load);
+      document.removeEventListener('visibilitychange', load);
+    };
   }, [activeId]);
 
   // Keep the Messages badge in the header in step (the open chat counts as read; muted chats never count)

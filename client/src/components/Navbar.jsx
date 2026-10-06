@@ -8,7 +8,7 @@ import Avatar from './Avatar.jsx';
 import UserMenu from './UserMenu.jsx';
 import { showsHelpChat } from './HelpChat.jsx';
 
-// Number of chats with unread messages (muted chats don't count). Checked every 30 seconds while the tab is visible,
+// Number of chats with unread messages (muted chats don't count). Checked every 15 seconds while the tab is visible,
 // and updated straight away by the Messages page (a 'sueps:unread' event) as chats are read, muted or deleted.
 function useUnreadCount(userId) {
   const [count, setCount] = useState(0);
@@ -19,7 +19,7 @@ function useUnreadCount(userId) {
     };
     const onUpdate = (e) => setCount(e.detail);
     load();
-    const timer = setInterval(load, 30000);
+    const timer = setInterval(load, 15000);
     window.addEventListener('sueps:unread', onUpdate);
     document.addEventListener('visibilitychange', load);
     return () => {

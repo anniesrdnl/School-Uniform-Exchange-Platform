@@ -1,7 +1,7 @@
 // Loading placeholders: grey blocks shaped like the real layout, with a soft shimmer (.skeleton in index.css).
 // Every loading state on the site uses these. Spinners are kept only inside buttons, to show an action is running.
 
-// Card-grid page body (title, subtitle, listing cards), shared by the app and page placeholders below
+// Card-grid page body (title, subtitle, listing cards) for pages without a placeholder of their own
 function PageBody() {
   return (
     <>
@@ -16,32 +16,7 @@ function PageBody() {
   );
 }
 
-// Whole-app placeholder while the saved login is checked: the floating header, then a page of cards.
-// Matches the boot screen in index.html, so the hand-off from plain HTML to React is seamless.
-export function AppSkeleton() {
-  return (
-    <div role="status" aria-label="Loading" className="fixed inset-0 z-50 overflow-hidden bg-mist">
-      <div className="px-3 pt-[calc(0.5rem+env(safe-area-inset-top))] sm:px-4 sm:pt-[calc(0.75rem+env(safe-area-inset-top))] lg:px-8" aria-hidden="true">
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 rounded-2xl bg-white px-3 shadow-lg shadow-navy/5 ring-1 ring-navy/5 sm:h-16 sm:px-5 lg:px-6 2xl:max-w-[88rem]">
-          <div className="flex items-center gap-3">
-            <div className="skeleton h-10 w-10 rounded-xl" />
-            <div className="hidden space-y-1.5 sm:block"><div className="skeleton h-3.5 w-48" /><div className="skeleton h-2.5 w-32" /></div>
-          </div>
-          <div className="hidden gap-8 md:flex">{[0, 1, 2].map((i) => <div key={i} className="skeleton h-3.5 w-16" />)}</div>
-          <div className="flex items-center gap-2">
-            <div className="skeleton h-10 w-10 rounded-full" />
-            <div className="skeleton hidden h-11 w-24 rounded-full md:block" />
-          </div>
-        </div>
-      </div>
-      <div className="mx-auto max-w-7xl space-y-6 px-4 pt-3 sm:pt-6 lg:px-8 2xl:max-w-[88rem]" aria-hidden="true">
-        <PageBody />
-      </div>
-    </div>
-  );
-}
-
-// Placeholder for a page whose data (or login check) isn't ready yet
+// Generic page placeholder; page-shaped ones are in PageSkeletons.jsx
 export function PageSkeleton({ label = 'Loading page' }) {
   return (
     <div className="space-y-6" role="status" aria-label={label}>

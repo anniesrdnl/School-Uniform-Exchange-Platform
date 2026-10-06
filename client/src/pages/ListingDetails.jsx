@@ -9,6 +9,7 @@ import Avatar from '../components/Avatar.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import ListingCard from '../components/ListingCard.jsx';
 import PageBackdrop from '../components/PageBackdrop.jsx';
+import { DetailsSkeleton } from '../components/PageSkeletons.jsx';
 import { CONDITION_HINTS, formatPrice, timeAgo } from '../constants.js';
 
 // Which request types a listing's exchange option allows
@@ -25,28 +26,6 @@ const LAYOUT = {
 const focusRing = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy';
 // Breadcrumb link: an underline grows in from the left on hover
 const crumbLink = `relative whitespace-nowrap font-semibold text-navy transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-navy after:transition-transform after:duration-300 hover:text-navy-deep hover:after:scale-x-100 ${focusRing}`;
-
-function DetailsSkeleton() {
-  return (
-    <div className="space-y-5" role="status" aria-label="Loading listing">
-      <div className="skeleton h-5 w-56" />
-      <div className="grid gap-6 lg:grid-cols-12 lg:gap-10">
-        <div className="space-y-3 lg:col-span-7">
-          <div className="skeleton aspect-square rounded-3xl sm:aspect-[4/3]" />
-          <div className="flex gap-2">{[0, 1, 2].map((i) => <div key={i} className="skeleton h-16 w-16 rounded-xl sm:h-20 sm:w-20" />)}</div>
-        </div>
-        <div className="card space-y-4 p-6 lg:col-span-5">
-          <div className="skeleton h-5 w-40 rounded-full" />
-          <div className="skeleton h-8 w-3/4" />
-          <div className="skeleton h-9 w-1/3" />
-          <div className="grid grid-cols-2 gap-2">{[0, 1, 2, 3].map((i) => <div key={i} className="skeleton h-16 rounded-xl" />)}</div>
-          <div className="skeleton h-16 w-full rounded-2xl" />
-          <div className="skeleton h-12 w-full rounded-xl" />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function Gallery({ images, title }) {
   const [active, setActive] = useState(0);

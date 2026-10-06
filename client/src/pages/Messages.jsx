@@ -6,6 +6,7 @@ import Icon from '../components/Icon.jsx';
 import Avatar from '../components/Avatar.jsx';
 import PageBackdrop from '../components/PageBackdrop.jsx';
 import PresenceDot from '../components/PresenceDot.jsx';
+import { ChatBubblesSkeleton, ChatHeaderSkeleton, ConversationListSkeleton, MESSAGES_CARD } from '../components/PageSkeletons.jsx';
 import { presence } from '../constants.js';
 import { Spinner } from '../components/Loader.jsx';
 import shrinkImage from '../shrinkImage.js';
@@ -56,43 +57,6 @@ function ChatBackground() {
     <div className="chat-bg" aria-hidden="true">
       <span className="chat-bg-glow chat-bg-glow-1" />
       <span className="chat-bg-glow chat-bg-glow-2" />
-    </div>
-  );
-}
-
-function ListSkeleton() {
-  return (
-    <div className="space-y-1 p-2" role="status" aria-label="Loading conversations">
-      {[0, 1, 2, 3].map((i) => (
-        <div key={i} className="flex items-center gap-3 px-3 py-3">
-          <div className="skeleton h-11 w-11 shrink-0 rounded-full" />
-          <div className="flex-1 space-y-2"><div className="skeleton h-3.5 w-2/3" /><div className="skeleton h-3 w-11/12" /></div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// Placeholder chat while its messages load: bubbles on both sides, like a real conversation
-const BUBBLE_SKELETON = [['in', 'w-44'], ['in', 'w-60'], ['out', 'w-52'], ['in', 'w-36'], ['out', 'w-64'], ['out', 'w-40'], ['in', 'w-56']];
-function MessagesSkeleton() {
-  return (
-    <div className="flex min-h-full flex-col justify-end gap-2.5" role="status" aria-label="Loading messages">
-      {BUBBLE_SKELETON.map(([side, width], i) => (
-        <div key={i} className={`flex items-end gap-2 ${side === 'out' ? 'justify-end' : ''}`}>
-          {side === 'in' && <div className="skeleton h-7 w-7 shrink-0 rounded-full" />}
-          <div className={`skeleton h-9 max-w-[70%] rounded-2xl ${width}`} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function HeaderSkeleton() {
-  return (
-    <div className="flex flex-1 items-center gap-3" aria-hidden="true">
-      <div className="skeleton h-10 w-10 shrink-0 rounded-full" />
-      <div className="flex-1 space-y-1.5"><div className="skeleton h-3.5 w-36" /><div className="skeleton h-3 w-24" /></div>
     </div>
   );
 }
@@ -311,7 +275,7 @@ export default function Messages() {
   return (
     <>
       <PageBackdrop />
-      <div className="card -mx-4 grid h-[calc(100dvh-11.4rem-env(safe-area-inset-bottom))] overflow-hidden rounded-none border-x-0 sm:mx-0 sm:rounded-3xl sm:border-x md:h-[min(calc(100dvh-12.5rem),52rem)] md:min-h-[30rem] md:grid-cols-[320px_1fr] lg:grid-cols-[360px_1fr]">
+      <div className={MESSAGES_CARD}>
         {/* conversation list: hidden on phones once a chat is open */}
         <section aria-label="Conversations" className={`min-h-0 flex-col border-aqua/70 bg-white md:flex md:border-r ${activeId ? 'hidden' : 'flex'}`}>
           <div className="space-y-3 border-b border-aqua/70 p-4">
@@ -330,7 +294,7 @@ export default function Messages() {
           </div>
 
           <div className="scroll-thin min-h-0 flex-1 overflow-y-auto">
-            {convos === null ? <ListSkeleton /> : convos.length === 0 ? (
+            {convos === null ? <ConversationListSkeleton /> : convos.length === 0 ? (
               <div className="flex flex-col items-center gap-3 px-6 py-12 text-center animate-fade-up">
                 <span className="icon-tile h-12 w-12"><Icon name="chat" className="h-6 w-6" /></span>
                 <div>
@@ -373,7 +337,7 @@ export default function Messages() {
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-navy transition hover:bg-frost active:scale-95 md:hidden ${focusRing}`}>
                   <Icon name="arrow-left" className="h-5 w-5" />
                 </button>
-                {!active ? <HeaderSkeleton /> : <>
+                {!active ? <ChatHeaderSkeleton /> : <>
                 <span className="relative shrink-0">
                   <Avatar name={person?.fullName} src={person?.avatar} className="h-10 w-10 text-sm" />
                   <PresenceDot {...status} className="bottom-0 right-0 h-3 w-3" />
@@ -408,7 +372,7 @@ export default function Messages() {
               </header>
 
               <div ref={listRef} role="log" aria-live="polite" aria-label="Messages" className="scroll-thin relative min-h-0 flex-1 overflow-y-auto px-3 py-4 sm:px-5">
-                {messages === undefined ? <MessagesSkeleton /> : messages.length === 0 ? (
+                {messages === undefined ? <ChatBubblesSkeleton /> : messages.length === 0 ? (
                   <div className="flex h-full flex-col items-center justify-center gap-3 px-4 text-center animate-fade-up">
                     <Avatar name={person?.fullName} src={person?.avatar} className="h-14 w-14 text-lg ring-4 ring-white" />
                     <div>

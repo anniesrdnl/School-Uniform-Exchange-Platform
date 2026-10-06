@@ -6,12 +6,12 @@ import SearchBar from '../components/SearchBar.jsx';
 import Icon from '../components/Icon.jsx';
 import Reveal from '../components/Reveal.jsx';
 import { EmptyState, ListingGridSkeleton } from '../components/Loader.jsx';
-import { CATEGORIES, CATEGORY_STYLES, CONDITIONS, CONDITION_HINTS, SIZES, formatPrice } from '../constants.js';
+import { BROWSE_GRID, CATEGORIES, CATEGORY_STYLES, CONDITIONS, CONDITION_HINTS, SIZES, formatPrice } from '../constants.js';
 
 // Everything lives in the URL (?q=&category=&size=&condition=&minPrice=&maxPrice=&sort=&page=) so results can be shared
 const FILTER_KEYS = ['category', 'size', 'condition', 'minPrice', 'maxPrice'];
 const SORTS = [['newest', 'Newest first'], ['price-asc', 'Price: low to high'], ['price-desc', 'Price: high to low']];
-const GRID = 'grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4 2xl:grid-cols-5';
+const GRID = BROWSE_GRID;
 
 // One-tap price ranges; a custom min/max form sits under them
 const PRICE_RANGES = [

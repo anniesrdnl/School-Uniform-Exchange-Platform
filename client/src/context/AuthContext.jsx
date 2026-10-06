@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import api from '../api.js';
-import { AppSkeleton } from '../components/Loader.jsx';
+import { AppSkeleton } from '../components/PageSkeletons.jsx';
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -48,7 +48,7 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  // Show the app's skeleton (header + page of cards) while the saved login is checked
+  // While the saved login is checked, show the header and a placeholder shaped like the page being opened
   if (loading) {
     return <AppSkeleton />;
   }

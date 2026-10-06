@@ -30,7 +30,7 @@
       .boot .ar { aspect-ratio: 1; width: 100%; border-radius: 24px; }
       .boot .bcb { padding: 12px; display: grid; gap: 8px; }
       .boot .g2-4, .boot .g-browse, .boot .g-cat { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-      .boot .split-detail, .boot .split-browse, .boot .split-hero, .boot .split-2, .boot .split-chat { display: grid; gap: 20px; }
+      .boot .split-detail, .boot .split-browse, .boot .split-hero, .boot .split-2, .boot .split-chat, .boot .split-sell { display: grid; gap: 20px; }
       .boot .hero { background: #0e3661; border-radius: 24px; padding: 24px 16px; }
       .boot .tabs { display: flex; gap: 24px; height: 40px; align-items: center; box-shadow: inset 0 -1px 0 #dde3e9; overflow: hidden; }
       .boot .chat { height: calc(100dvh - 11.4rem); margin: 0 -16px; border-radius: 0; border-left: 0; border-right: 0; }
@@ -52,7 +52,7 @@
         .boot-head { padding: 12px 32px 0; } .boot-nav { padding: 0 24px; } .boot-main { padding: 24px 32px 0; }
         .boot .g-cat { grid-template-columns: repeat(4, minmax(0, 1fr)); } .boot .show-lg { display: block !important; } .boot .hide-lg { display: none !important; }
         .boot .split-detail { grid-template-columns: 7fr 5fr; gap: 40px; } .boot .split-browse { grid-template-columns: 17rem 1fr; gap: 32px; align-items: start; }
-        .boot .split-hero { grid-template-columns: minmax(0, 1fr) 22rem; gap: 40px; align-items: center; } .boot .split-2 { grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+        .boot .split-hero { grid-template-columns: minmax(0, 1fr) 22rem; gap: 40px; align-items: center; } .boot .split-2 { grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; } .boot .split-sell { grid-template-columns: minmax(0, 1fr) 20rem; gap: 24px; align-items: start; }
         .boot .hero { padding: 56px; } .boot .split-chat { grid-template-columns: 360px 1fr; }
       }
       @media (min-width: 1024px) { .boot .g-browse { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
@@ -127,8 +127,10 @@
             profile: '<div class="card">' + '<div style="height:88px;background:#dde3e9"></div><div class="col" style="align-items:center;padding:0 20px 20px;gap:10px">' + b('80px', '80px', 'margin-top:-40px;border-radius:99px;box-shadow:0 0 0 4px #fff')
               + b('192px', '28px') + b('256px', '16px') + '<div class="row" style="gap:8px">' + b('112px', '20px', 'border-radius:99px') + b('128px', '20px', 'border-radius:99px') + '</div></div></div>'
               + times(3, b('208px', '24px', 'margin:32px 0 12px') + '<div class="card" style="margin-top:0">' + rows(2).replace('border-top:1px solid rgb(221 227 233 / 0.6)', 'border-top:0') + '</div>'),
-            sell: '<div style="max-width:42rem;margin:0 auto">' + title('208px', '100%') + '<div class="card" style="margin-top:20px"><div class="pad">' + b('80px', '24px') + b('100%', '152px', 'margin-top:12px;border-radius:16px') + '</div>'
-              + '<div class="pad col" style="gap:16px;border-top:1px solid #dde3e9">' + b('80px', '24px') + field('48px') + field('80px') + field('80px') + field('96px', '112px') + '</div></div></div>',
+            sell: '<div style="max-width:72rem;margin:0 auto">' + title('208px', '100%') + '<div class="split-sell" style="margin-top:20px">'
+              + '<div class="col" style="gap:16px">' + times(3, '<div class="card pad"><div class="row">' + b('32px', '32px', 'border-radius:99px') + '<div class="col" style="gap:6px">' + b('96px', '20px') + b('224px', '14px') + '</div></div>' + b('100%', '120px', 'margin-top:20px;border-radius:16px') + '</div>') + '</div>'
+              + '<div class="show-lg">' + b('176px', '16px') + '<div class="card" style="margin-top:8px"><div class="b sq"></div><div class="bcb">' + b('75%', '16px') + b('50%', '12px') + b('33%', '20px') + '</div></div>'
+              + '<div class="card pad" style="margin-top:16px">' + b('112px', '16px') + b('100%', '6px', 'margin-top:10px;border-radius:99px') + '</div></div></div></div>',
             auth: '<div class="split-2"><div class="show-lg">' + b('176px', '24px', 'border-radius:99px') + b('100%', '44px', 'margin-top:20px;max-width:32rem') + b('80%', '44px', 'margin-top:12px;max-width:28rem') + b('100%', '296px', 'margin-top:48px;max-width:36rem;border-radius:24px') + '</div>'
               + '<div style="max-width:28rem;width:100%;margin:0 auto;padding-top:36px"><div class="card col" style="gap:18px;padding:44px 20px 20px;border-radius:24px"><div class="col" style="align-items:center">' + b('160px', '28px') + b('224px', '16px') + '</div>'
               + times(path === '/register' ? 5 : 2, field('112px')) + b('100%', '48px', 'border-radius:12px') + b('192px', '16px', 'margin:0 auto') + '</div></div></div>',

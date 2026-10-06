@@ -341,34 +341,41 @@ export function ProfileSkeleton() {
 /* ---------------------------------------------------------------- Sell */
 
 export function SellSkeleton() {
+  const step = (titleWidth, body) => (
+    <section className="card p-4 sm:p-6">
+      <div className="mb-5 flex items-start gap-3">
+        <Bone className="h-8 w-8 shrink-0 rounded-full" />
+        <div className="space-y-1.5"><Bone className={`h-5 ${titleWidth}`} /><Bone className="h-3.5 w-56 max-w-full" /></div>
+      </div>
+      <div className="space-y-5">{body}</div>
+    </section>
+  );
   return (
-    <Shell label="Loading form" className="mx-auto max-w-2xl space-y-4 sm:space-y-5">
+    <Shell label="Loading form" className="mx-auto max-w-6xl space-y-5 sm:space-y-6">
       <TitleBlock title="w-52" subtitle="w-full max-w-md" />
-      <div className="card divide-y divide-aqua/70">
-        <section className="space-y-3 p-4 sm:p-6">
-          <div className="flex justify-between"><Bone className="h-6 w-20" /><Bone className="h-3 w-8" /></div>
-          <Bone className="h-[9.5rem] rounded-2xl" />
-        </section>
-        <section className="space-y-3.5 p-4 sm:space-y-4 sm:p-6">
-          <Bone className="h-6 w-20" />
-          <Field label="w-12" />
-          <div className="grid gap-4 sm:grid-cols-2"><Field label="w-20" /><Field label="w-10" /></div>
-          <div>
-            <Bone className="mb-1.5 h-4 w-20" />
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{[0, 1, 2, 3].map((i) => <Bone key={i} className="h-10 rounded-full" />)}</div>
+      <div className="grid gap-5 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="space-y-4 sm:space-y-5">
+          {step('w-20', <Bone className="h-40 rounded-2xl" />)}
+          {step('w-20', (
+            <>
+              <Field label="w-12" />
+              <div><Bone className="mb-1.5 h-4 w-20" /><div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{[0, 1, 2, 3].map((i) => <Bone key={i} className="h-14 rounded-xl" />)}</div></div>
+              <div><Bone className="mb-1.5 h-4 w-10" /><div className="flex flex-wrap gap-2">{[0, 1, 2, 3, 4, 5, 6].map((i) => <Bone key={i} className="h-10 w-12 rounded-lg" />)}</div></div>
+            </>
+          ))}
+          {step('w-36', <div className="grid gap-2 sm:grid-cols-3">{[0, 1, 2].map((i) => <Bone key={i} className="h-14 rounded-xl" />)}</div>)}
+        </div>
+        <div className="space-y-4">
+          <Bone className="h-4 w-44" />
+          <div className="card mx-auto max-w-xs overflow-hidden lg:max-w-none">
+            <Bone className="aspect-square rounded-none" />
+            <div className="space-y-2 p-3.5"><Bone className="h-4 w-3/4" /><Bone className="h-3 w-1/2" /><Bone className="h-5 w-1/3" /></div>
           </div>
-          <Field label="w-24" input="h-28 rounded-xl" />
-        </section>
-        <section className="space-y-3.5 p-4 sm:space-y-4 sm:p-6">
-          <Bone className="h-6 w-36" />
-          <div className="grid gap-4 sm:grid-cols-2"><Field label="w-16" /><Field label="w-16" /></div>
-          <div>
-            <Bone className="mb-1.5 h-4 w-14" />
-            <div className="grid gap-2 sm:grid-cols-3">{[0, 1, 2].map((i) => <Bone key={i} className="h-10 rounded-full" />)}</div>
+          <div className="card space-y-3 p-4">
+            <div className="flex justify-between"><Bone className="h-4 w-28" /><Bone className="h-4 w-8" /></div>
+            <Bone className="h-1.5 rounded-full" />
+            {[0, 1, 2, 3, 4].map((i) => <div key={i} className="flex items-center gap-2"><Bone className="h-5 w-5 rounded-full" /><Bone className="h-3.5 w-32" /></div>)}
           </div>
-        </section>
-        <div className="flex flex-col-reverse gap-2 p-4 sm:flex-row sm:justify-end sm:p-6">
-          <Bone className="h-11 rounded-xl sm:w-24" /><Bone className="h-11 rounded-xl sm:w-36" />
         </div>
       </div>
     </Shell>

@@ -244,39 +244,61 @@
     animation: dots-pan 9s linear infinite;
   }
 
-  /* Listing page background (ListingDetails.jsx), layered over the site backdrop: three soft glows sweep slowly
-     across the screen and a faint pinstripe, like uniform fabric, glides sideways under the top of the page */
-  .detail-bg { position: fixed; inset: 0; z-index: -9; overflow: hidden; pointer-events: none; }
-  .detail-bg-glow { position: absolute; border-radius: 9999px; will-change: transform; }
-  .detail-bg-glow-1 { width: 52rem; height: 52rem; top: -20rem; left: -16rem; background: radial-gradient(closest-side, rgb(14 54 97 / 0.2), transparent); animation: detail-glow-a 22s ease-in-out infinite; }
-  .detail-bg-glow-2 { width: 46rem; height: 46rem; top: 12%; right: -18rem; background: radial-gradient(closest-side, rgb(72 102 135 / 0.24), transparent); animation: detail-glow-b 26s ease-in-out infinite; }
-  .detail-bg-glow-3 { width: 38rem; height: 38rem; bottom: -16rem; left: 28%; background: radial-gradient(closest-side, rgb(183 195 208 / 0.7), transparent); animation: detail-glow-a 30s ease-in-out -12s infinite reverse; }
-  .detail-bg-weave {
+  /* Page background (PageBackdrop.jsx, used by the listing and messages pages), layered over the site backdrop:
+     three soft glows sweep slowly across the screen and a faint pinstripe, like uniform fabric, glides sideways
+     under the top of the page */
+  .page-bg { position: fixed; inset: 0; z-index: -9; overflow: hidden; pointer-events: none; }
+  .page-bg-glow { position: absolute; border-radius: 9999px; will-change: transform; }
+  .page-bg-glow-1 { width: 52rem; height: 52rem; top: -20rem; left: -16rem; background: radial-gradient(closest-side, rgb(14 54 97 / 0.2), transparent); animation: page-glow-a 22s ease-in-out infinite; }
+  .page-bg-glow-2 { width: 46rem; height: 46rem; top: 12%; right: -18rem; background: radial-gradient(closest-side, rgb(72 102 135 / 0.24), transparent); animation: page-glow-b 26s ease-in-out infinite; }
+  .page-bg-glow-3 { width: 38rem; height: 38rem; bottom: -16rem; left: 28%; background: radial-gradient(closest-side, rgb(183 195 208 / 0.7), transparent); animation: page-glow-a 30s ease-in-out -12s infinite reverse; }
+  .page-bg-weave {
     position: absolute;
     inset: 0 -48px 0 -48px;
     /* 1px line every 16px at 135deg repeats every 22.627px horizontally, so the pan below loops seamlessly */
     background-image: repeating-linear-gradient(135deg, rgb(14 54 97 / 0.055) 0 1px, transparent 1px 16px);
     -webkit-mask-image: radial-gradient(ellipse 75% 55% at 50% 0%, #000 10%, transparent 75%);
     mask-image: radial-gradient(ellipse 75% 55% at 50% 0%, #000 10%, transparent 75%);
-    animation: detail-weave 6s linear infinite;
+    animation: page-weave 6s linear infinite;
   }
+
+  /* Chat pane background (Messages.jsx): the same pinstripe and two glows, kept inside the pane and fainter
+     so message bubbles stay easy to read. Sits behind the pane's content (which is position: relative). */
+  .chat-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: linear-gradient(180deg, #f6f8fa, #ffffff 70%); }
+  .chat-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0 -48px 0 -48px;
+    background-image: repeating-linear-gradient(135deg, rgb(14 54 97 / 0.04) 0 1px, transparent 1px 16px);
+    -webkit-mask-image: linear-gradient(180deg, #000, transparent 85%);
+    mask-image: linear-gradient(180deg, #000, transparent 85%);
+    animation: page-weave 6s linear infinite;
+  }
+  .chat-bg-glow { position: absolute; border-radius: 9999px; will-change: transform; }
+  .chat-bg-glow-1 { width: 26rem; height: 26rem; top: -10rem; right: -8rem; background: radial-gradient(closest-side, rgb(14 54 97 / 0.12), transparent); animation: chat-glow 20s ease-in-out infinite; }
+  .chat-bg-glow-2 { width: 22rem; height: 22rem; bottom: -9rem; left: -7rem; background: radial-gradient(closest-side, rgb(72 102 135 / 0.14), transparent); animation: chat-glow 24s ease-in-out -9s infinite reverse; }
 
   /* Thin, quiet scrollbars for chat and tables */
   .scroll-thin { scrollbar-width: thin; scrollbar-color: #b7c3d0 transparent; }
 }
 
-/* Listing page background loops (plain keyframes, used only by the .detail-bg classes above) */
-@keyframes detail-glow-a {
+/* Page background loops (plain keyframes, used by the .page-bg and .chat-bg classes) */
+@keyframes page-glow-a {
   0%, 100% { transform: translate(0, 0) scale(1); }
   35% { transform: translate(26vw, 14vh) scale(1.15); }
   70% { transform: translate(8vw, 30vh) scale(0.92); }
 }
-@keyframes detail-glow-b {
+@keyframes page-glow-b {
   0%, 100% { transform: translate(0, 0) scale(1); }
   50% { transform: translate(-30vw, 22vh) scale(1.2); }
 }
-@keyframes detail-weave {
+@keyframes page-weave {
   to { transform: translateX(22.627px); }
+}
+/* Chat pane glows move by their own size (not the screen's), so they stay inside the pane */
+@keyframes chat-glow {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-60%, 45%) scale(1.2); }
 }
 
 @media (prefers-reduced-motion: reduce) {

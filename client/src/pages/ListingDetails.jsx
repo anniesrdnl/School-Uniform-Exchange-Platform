@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import api, { errMsg } from '../api.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -9,6 +8,7 @@ import Reveal from '../components/Reveal.jsx';
 import Avatar from '../components/Avatar.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import ListingCard from '../components/ListingCard.jsx';
+import PageBackdrop from '../components/PageBackdrop.jsx';
 import { CONDITION_HINTS, formatPrice, timeAgo } from '../constants.js';
 
 // Which request types a listing's exchange option allows
@@ -25,20 +25,6 @@ const LAYOUT = {
 const focusRing = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy';
 // Breadcrumb link: an underline grows in from the left on hover
 const crumbLink = `relative whitespace-nowrap font-semibold text-navy transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-navy after:transition-transform after:duration-300 hover:text-navy-deep hover:after:scale-x-100 ${focusRing}`;
-
-// Moving background for this page only. Portalled to <body>: the page wrapper in App.jsx animates with a
-// transform, which would otherwise pin this fixed layer to the wrapper instead of the whole screen.
-function DetailsBackdrop() {
-  return createPortal(
-    <div className="detail-bg" aria-hidden="true">
-      <span className="detail-bg-glow detail-bg-glow-1" />
-      <span className="detail-bg-glow detail-bg-glow-2" />
-      <span className="detail-bg-glow detail-bg-glow-3" />
-      <span className="detail-bg-weave" />
-    </div>,
-    document.body,
-  );
-}
 
 function DetailsSkeleton() {
   return (
@@ -240,7 +226,7 @@ export default function ListingDetails() {
   if (!listing) {
     return (
       <>
-        <DetailsBackdrop />
+        <PageBackdrop />
         {error
           ? <EmptyState icon={<Icon name="warning" className="h-6 w-6" />} title="Listing unavailable">
               <p>{error}</p>
@@ -278,8 +264,8 @@ export default function ListingDetails() {
     setBusy('message');
     setError('');
     try {
-      await api.post('/messages/conversations', { userId: seller._id, listingId: id });
-      navigate('/messages');
+      const { data } = await api.post('/messages/conversations', { userId: seller._id, listingId: id });
+      navigate(`/messages?c=${data._id}`); // open this chat straight away
     } catch (e) {
       setError(errMsg(e));
       setBusy('');
@@ -303,7 +289,7 @@ export default function ListingDetails() {
 
   return (
     <div className="space-y-5 sm:space-y-6">
-      <DetailsBackdrop />
+      <PageBackdrop />
 
       <nav aria-label="Breadcrumb">
         <ol className="flex min-w-0 items-center gap-1.5 text-sm text-slate-600">

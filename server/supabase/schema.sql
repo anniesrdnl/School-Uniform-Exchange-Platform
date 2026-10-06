@@ -37,6 +37,8 @@ alter table public.profiles add column if not exists verified     boolean not nu
 alter table public.profiles add column if not exists banned       boolean not null default false;
 alter table public.profiles add column if not exists rating_avg   numeric(2,1) not null default 0;
 alter table public.profiles add column if not exists rating_count integer not null default 0;
+-- last time the user made a signed-in request (updated at most once a minute); drives the "Active now" indicator
+alter table public.profiles add column if not exists last_seen_at timestamptz;
 alter table public.profiles add column if not exists created_at   timestamptz not null default now();
 alter table public.profiles add column if not exists updated_at   timestamptz not null default now();
 

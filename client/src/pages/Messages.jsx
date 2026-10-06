@@ -5,6 +5,8 @@ import { useAuth } from '../context/AuthContext.jsx';
 import Icon from '../components/Icon.jsx';
 import Avatar from '../components/Avatar.jsx';
 import PageBackdrop from '../components/PageBackdrop.jsx';
+import PresenceDot from '../components/PresenceDot.jsx';
+import { presence } from '../constants.js';
 import { Spinner } from '../components/Loader.jsx';
 import shrinkImage from '../shrinkImage.js';
 
@@ -105,6 +107,7 @@ function ConversationRow({ convo, person, active, onOpen }) {
           : 'hover:bg-frost'}`}>
         <span className="relative shrink-0">
           <Avatar name={person?.fullName} src={person?.avatar} className="h-11 w-11 text-base" />
+          <PresenceDot {...presence(person?.lastSeenAt)} ring={active ? 'ring-navy' : 'ring-white'} className="-right-0.5 -top-0.5 h-3 w-3" />
           {thumb && (
             <img src={thumb} alt="" className={`absolute -bottom-1 -right-1 h-5 w-5 rounded-md object-cover ring-2 ${active ? 'ring-navy' : 'ring-white'}`} />
           )}
@@ -299,6 +302,7 @@ export default function Messages() {
   const other = (c) => c?.participants.find((p) => p._id !== user._id);
   const active = convos?.find((c) => c._id === activeId);
   const person = other(active);
+  const status = presence(person?.lastSeenAt); // refreshed with the chat list every few seconds
   const term = search.trim().toLowerCase();
   const shown = (convos || []).filter((c) => !term
     || other(c)?.fullName?.toLowerCase().includes(term)
@@ -370,14 +374,22 @@ export default function Messages() {
                   <Icon name="arrow-left" className="h-5 w-5" />
                 </button>
                 {!active ? <HeaderSkeleton /> : <>
-                <Avatar name={person?.fullName} src={person?.avatar} className="h-10 w-10 text-sm" />
+                <span className="relative shrink-0">
+                  <Avatar name={person?.fullName} src={person?.avatar} className="h-10 w-10 text-sm" />
+                  <PresenceDot {...status} className="bottom-0 right-0 h-3 w-3" />
+                </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold text-ink">{person?.fullName}</p>
-                  {active?.listing && (
-                    <Link to={`/listings/${active.listing._id}`} className="block truncate text-xs font-medium text-navy hover:underline sm:hidden">
-                      {active.listing.title}
-                    </Link>
-                  )}
+                  {/* status in words; on phones the uniform's link shares this line */}
+                  <p className="flex min-w-0 items-center gap-1.5 text-xs">
+                    <span className={`shrink-0 ${status.online ? 'font-medium text-green-700' : 'text-slate-500'}`}>{status.label}</span>
+                    {active?.listing && (<>
+                      <span className="text-slate-300 sm:hidden" aria-hidden="true">·</span>
+                      <Link to={`/listings/${active.listing._id}`} className="truncate font-medium text-navy hover:underline sm:hidden">
+                        {active.listing.title}
+                      </Link>
+                    </>)}
+                  </p>
                 </div>
                 {active?.listing && (
                   <Link to={`/listings/${active.listing._id}`}

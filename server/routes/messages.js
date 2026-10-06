@@ -39,10 +39,13 @@ router.get('/conversations', async (req, res, next) => {
       .contains('participants', [req.user.id])
       .order('last_message_at', { ascending: false }));
 
-    // participants is a uuid[] column, so load those profiles separately
+    // participants is a uuid[] column, so load those profiles separately. select('*') and pick the public fields,
+    // so this keeps working on a database that doesn't have the last_seen_at column yet.
     const ids = [...new Set(convos.flatMap((c) => c.participants))];
-    const people = ids.length ? check(await supabase.from('profiles').select('id, full_name, avatar').in('id', ids)) : [];
-    const byId = Object.fromEntries(people.map((p) => [p.id, p]));
+    const people = ids.length ? check(await supabase.from('profiles').select('*').in('id', ids)) : [];
+    const byId = Object.fromEntries(people.map((p) => [p.id, {
+      id: p.id, full_name: p.full_name, avatar: p.avatar, last_seen_at: p.last_seen_at ?? null,
+    }]));
 
     res.json(toClient(convos.map((c) => ({ ...c, participants: c.participants.map((id) => byId[id] || { id }) }))));
   } catch (err) {

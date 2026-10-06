@@ -26,3 +26,16 @@ export const timeAgo = (date) => {
   const [unit, size] = STEPS.find(([, s]) => Math.abs(seconds) >= s) || ['minute', 60];
   return RELATIVE.format(Math.round(seconds / size), unit);
 };
+
+// Online indicator: someone counts as active if they used the site in the last 2 minutes (the server records
+// activity at most once a minute, and open chats keep polling). Returns { online, label }.
+const ACTIVE_MS = 2 * 60 * 1000;
+export const presence = (lastSeenAt) => {
+  const ago = lastSeenAt ? Date.now() - new Date(lastSeenAt) : Infinity;
+  if (ago < ACTIVE_MS) return { online: true, label: 'Active now' };
+  if (ago < 86400000) {
+    const minutes = Math.round(ago / 60000);
+    return { online: false, label: `Active ${minutes < 60 ? `${minutes}m` : `${Math.round(minutes / 60)}h`} ago` };
+  }
+  return { online: false, label: 'Offline' };
+};

@@ -21,18 +21,34 @@ const VO = {
 };
 
 /** Recorded voice-overs (public/vo/sceneN.mp3). Scenes without a recording keep their subtitles only. */
-const VO_AT = 10; // frames after the scene starts
-const VO_FILES: Record<number, { frames: number }> = { 3: { frames: 254 }, 4: { frames: 275 }, 5: { frames: 263 } };
-const sec = (s: number) => Math.round(VO_AT + s * 30); // seconds into the recording -> scene frame
+const VO_FILES: Record<number, { frames: number; at: number }> = {
+  2: { frames: 225, at: 4 },
+  3: { frames: 254, at: 10 },
+  4: { frames: 275, at: 10 },
+  5: { frames: 263, at: 10 },
+  6: { frames: 261, at: 10 },
+};
+const sec = (s: number, at = 10) => Math.round(at + s * 30); // seconds into the recording -> scene frame
 
 const VoiceTrack: React.FC<{ n: number; on: boolean }> = ({ n, on }) =>
   on && VO_FILES[n] ? (
-    <Sequence from={VO_AT} durationInFrames={VO_FILES[n].frames + 20} layout="none">
+    <Sequence from={VO_FILES[n].at} durationInFrames={VO_FILES[n].frames + 20} layout="none">
       <Audio src={staticFile(`vo/scene${n}.mp3`)} volume={1} />
     </Sequence>
   ) : null;
 
 // Sentence timing measured from the recordings
+const INTRO_SEGS: Segment[] = [
+  { text: "Introducing School Uniform Exchange, a smarter way for students to buy, sell, and", start: sec(0.16, 4), end: sec(5.38, 4) },
+  { text: "exchange pre-loved uniforms.", start: sec(5.73, 4), end: sec(7.3, 4) },
+];
+const CTA_SEGS: Segment[] = [
+  { text: "School Uniform Exchange.", start: sec(0.35), end: sec(1.17) },
+  { text: "Making uniforms more affordable,", start: sec(1.55), end: sec(3.05) },
+  { text: "accessible, and sustainable.", start: sec(3.34), end: sec(5.39) },
+  { text: "Start", start: sec(5.77), end: sec(6.18) },
+  { text: "exchanging today!", start: sec(6.52), end: sec(8.1) },
+];
 const BROWSE_SEGS: Segment[] = [
   { text: "Looking for an affordable uniform?", start: sec(0.65), end: sec(2.49) },
   { text: "Browse available listings, explore your options, and find what fits your needs and budget.", start: sec(2.75), end: sec(7.52) },
@@ -49,7 +65,7 @@ const IMPACT_SEGS: Segment[] = [
 ];
 // Global frame ranges where a voice-over plays, so the music can duck under them
 const VO_RANGES = Object.entries(VO_FILES).map(([n, v]) => {
-  const start = [S.hook, S.intro, S.browse, S.sell, S.impact, S.cta][Number(n) - 1] + VO_AT;
+  const start = [S.hook, S.intro, S.browse, S.sell, S.impact, S.cta][Number(n) - 1] + v.at;
   return [start, start + v.frames] as const;
 });
 
@@ -153,7 +169,7 @@ const Intro: React.FC = () => {
         <HomeView f={f} wiggle={wiggle} search={search} />
         <Cursor keys={introKeys} clicks={[124, 200]} />
       </Window>
-      <Caption text={VO.intro} to={200} duration={S.browse - S.intro} />
+      <Caption text={VO.intro} from={INTRO_SEGS[0].start - 4} to={200} duration={S.browse - S.intro} segments={INTRO_SEGS} />
       <Sfx at={124} name="click" />
       <Sfx at={132} name="typing" dur={22} volume={0.5} />
       <Sfx at={152} name="tick" />
@@ -376,7 +392,7 @@ const Closing: React.FC = () => {
   const { fps } = useVideoConfig();
   const logo = spring({ frame: f - 6, fps, config: { damping: 12, stiffness: 100 } });
   const t = (a: number) => prog(f, a, a + 18);
-  const press = f >= 138 && f < 146 ? 0.94 : 1;
+  const press = f >= 148 && f < 156 ? 0.94 : 1;
   const sheen = interpolate(f, [30, 60], [-120, 260], clamp);
   const minis: [number, number, number, number][] = [[110, 190, -8, 0], [250, 420, 6, 1], [100, 650, 5, 2], [1650, 170, 8, 3], [1520, 400, -6, 4], [1690, 640, -9, 5]];
   return (
@@ -401,8 +417,8 @@ const Closing: React.FC = () => {
       <div style={{ marginTop: 36, padding: "16px 40px", borderRadius: 999, background: C.white, color: C.navy, fontSize: 34, fontWeight: 700, opacity: t(56), transform: `translateY(${(1 - t(56)) * 30}px)`, boxShadow: "0 18px 40px rgba(0,0,0,.35)" }}>
         school-uniform-exchange-platform.vercel.app
       </div>
-      <div style={{ marginTop: 30, height: 76, minWidth: 560, justifyContent: "center", padding: "0 46px", borderRadius: 20, background: f >= 140 ? C.cream : C.navy, color: f >= 140 ? C.navy : C.white, boxShadow: f >= 140 ? "0 0 0 0 transparent" : `0 0 0 ${3 + ((f % 40) / 40) * 14}px rgba(255,255,255,${0.35 * (1 - (f % 40) / 40)}), inset 0 0 0 2px rgba(255,255,255,.5)`, fontSize: 32, fontWeight: 700, display: "flex", alignItems: "center", opacity: t(78), transform: `translateY(${(1 - t(78)) * 30}px) scale(${press})` }}>
-        {f >= 140 ? "✓ Let's go!" : "Start exchanging today! →"}
+      <div style={{ marginTop: 30, height: 76, minWidth: 560, justifyContent: "center", padding: "0 46px", borderRadius: 20, background: f >= 150 ? C.cream : C.navy, color: f >= 150 ? C.navy : C.white, boxShadow: f >= 150 ? "0 0 0 0 transparent" : `0 0 0 ${3 + ((f % 40) / 40) * 14}px rgba(255,255,255,${0.35 * (1 - (f % 40) / 40)}), inset 0 0 0 2px rgba(255,255,255,.5)`, fontSize: 32, fontWeight: 700, display: "flex", alignItems: "center", opacity: t(78), transform: `translateY(${(1 - t(78)) * 30}px) scale(${press})` }}>
+        {f >= 150 ? "✓ Let's go!" : "Start exchanging today! →"}
       </div>
     </AbsoluteFill>
   );
@@ -413,7 +429,7 @@ const ctaKeys: Key[] = [
   { f: 80, x: 1100, y: 560 },
   { f: 110, x: 1100, y: 560 },
   { f: 170, x: 1250, y: 880 },
-  { f: 228, x: 960, y: 786 },
+  { f: 234, x: 960, y: 786 },
   { f: 300, x: 1000, y: 880 },
 ];
 const Cta: React.FC = () => {
@@ -433,11 +449,11 @@ const Cta: React.FC = () => {
         <Closing />
       </AbsoluteFill>
       <Confetti at={118} x={960} y={420} n={70} seed={31} power={1.3} />
-      <Confetti at={236} x={960} y={780} n={110} seed={32} power={1.5} />
-      <Cursor keys={ctaKeys} clicks={[236]} scale={1.5} />
-      <Caption text={VO.cta} to={250} duration={S.end - S.cta} />
-      <Sfx at={236} name="click" />
-      <Sfx at={238} name="chime" volume={0.7} />
+      <Confetti at={246} x={960} y={780} n={110} seed={32} power={1.5} />
+      <Cursor keys={ctaKeys} clicks={[246]} scale={1.5} />
+      <Caption text={VO.cta} from={CTA_SEGS[0].start - 8} to={250} duration={S.end - S.cta} segments={CTA_SEGS} />
+      <Sfx at={246} name="click" />
+      <Sfx at={248} name="chime" volume={0.7} />
       <Sfx at={110} name="chime" volume={0.4} />
     </AbsoluteFill>
   );

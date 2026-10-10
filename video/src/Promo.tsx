@@ -22,7 +22,7 @@ const VO = {
 
 /** Recorded voice-overs (public/vo/sceneN.mp3). Scenes without a recording keep their subtitles only. */
 const VO_FILES: Record<number, { frames: number; at: number }> = {
-  2: { frames: 231, at: 2 },
+  2: { frames: 234, at: 2 },
   3: { frames: 254, at: 10 },
   4: { frames: 275, at: 10 },
   5: { frames: 263, at: 10 },
@@ -38,13 +38,13 @@ const VoiceTrack: React.FC<{ n: number; on: boolean }> = ({ n, on }) =>
   ) : null;
 
 // Sentence timing measured from the recordings
-// Scene 2: "Introducing School Uniform Exchange, a smarter way for students to buy, sell, and exchange pre-loved uniforms." (recording sped up 12% to fit the 8 s scene)
+// Scene 2: "Introducing School Uniform Exchange, a smarter way for students to buy, sell, and exchange pre-loved uniforms." (recording sped up 15% to fit the 8 s scene)
 const INTRO_SEGS: Segment[] = [
-  { text: "Introducing School", start: sec(0.07, 2), end: sec(0.82, 2) },
-  { text: "Uniform Exchange,", start: sec(1.31, 2), end: sec(2.52, 2) },
-  { text: "a smarter way for students to buy,", start: sec(2.76, 2), end: sec(4.63, 2) },
-  { text: "sell,", start: sec(5.04, 2), end: sec(5.32, 2) },
-  { text: "and exchange pre-loved uniforms.", start: sec(5.81, 2), end: sec(7.14, 2) },
+  { text: "Introducing School", start: sec(0.1, 2), end: sec(0.88, 2) },
+  { text: "Uniform Exchange,", start: sec(1.27, 2), end: sec(2.85, 2) },
+  { text: "a smarter way for students to buy,", start: sec(3.1, 2), end: sec(4.85, 2) },
+  { text: "sell,", start: sec(5.15, 2), end: sec(5.55, 2) },
+  { text: "and exchange pre-loved uniforms.", start: sec(5.82, 2), end: sec(7.3, 2) },
 ];
 // Scene 6: "School Uniform Exchange. Making uniforms more affordable, accessible, and sustainable. Start exchanging today!"
 const CTA_SEGS: Segment[] = [

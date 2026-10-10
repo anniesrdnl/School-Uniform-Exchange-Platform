@@ -22,6 +22,7 @@ const VO = {
 
 /** Recorded voice-overs (public/vo/sceneN.mp3). Scenes without a recording keep their subtitles only. */
 const VO_FILES: Record<number, { frames: number; at: number }> = {
+  1: { frames: 203, at: 4 },
   2: { frames: 234, at: 2 },
   3: { frames: 254, at: 10 },
   4: { frames: 275, at: 10 },
@@ -38,6 +39,12 @@ const VoiceTrack: React.FC<{ n: number; on: boolean }> = ({ n, on }) =>
   ) : null;
 
 // Sentence timing measured from the recordings
+// Scene 1: "Got a school uniform you no longer use? Or need one without spending too much?" (background noise removed)
+const HOOK_SEGS: Segment[] = [
+  { text: "Got a school uniform you no longer use?", start: sec(0.25, 4), end: sec(2.94, 4) },
+  { text: "Or", start: sec(3.23, 4), end: sec(4.04, 4) },
+  { text: "need one without spending too much?", start: sec(4.31, 4), end: sec(6.34, 4) },
+];
 // Scene 2: "Introducing School Uniform Exchange, a smarter way for students to buy, sell, and exchange pre-loved uniforms." (recording sped up 15% to fit the 8 s scene)
 const INTRO_SEGS: Segment[] = [
   { text: "Introducing School", start: sec(0.1, 2), end: sec(0.88, 2) },
@@ -132,11 +139,11 @@ const Hook: React.FC = () => {
           );
         })}
       </AbsoluteFill>
-      <Caption text={VO.hook} to={185} duration={S.intro - S.hook} />
-      <Sfx at={8} name="pop" volume={0.5} />
-      <Sfx at={62} name="pop" volume={0.5} />
-      <Sfx at={116} name="pop" volume={0.5} />
-      <Sfx at={152} name="thud" volume={0.5} />
+      <Caption text={VO.hook} from={HOOK_SEGS[0].start - 6} to={185} duration={S.intro - S.hook} segments={HOOK_SEGS} />
+      <Sfx at={8} name="pop" volume={0.3} />
+      <Sfx at={62} name="pop" volume={0.3} />
+      <Sfx at={116} name="pop" volume={0.3} />
+      <Sfx at={152} name="thud" volume={0.3} />
     </AbsoluteFill>
   );
 };

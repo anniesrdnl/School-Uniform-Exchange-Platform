@@ -27,7 +27,7 @@ python3 scripts/sfx.py                        # regenerate public/sfx/*.wav
   as `client/`). The listing photos are crops of `client/src/assets/uniforms.jpg`. To use real screen recordings instead,
   drop the clips into `public/` and swap the `<Window>` contents in `src/Promo.tsx` for `<OffthreadVideo src={staticFile("clip.mp4")} />`.
 - **Music** is a synthesized 60 s bed (`scripts/music.py`) with a hit on every scene change.
-- **Voice-over:** recordings are in `public/vo/` (scenes 2 to 6 (all except the hook), polished with `scripts/vo.sh`). Scene 1 has no recording yet and shows subtitles only. For a new recording, run `scripts/vo.sh in.m4a public/vo/sceneN.mp3`, add it to `VO_FILES` in `src/Promo.tsx` and set the sentence timings. Subtitles follow the measured speech timing; the music ducks under the voice.
+- **Voice-over:** recordings are in `public/vo/` (all six scenes, polished with `scripts/vo.sh` (`STRONG_DENOISE=1` for the noisy Scene 1 recording)). All six scenes have recordings. For a new recording, run `scripts/vo.sh in.m4a public/vo/sceneN.mp3`, add it to `VO_FILES` in `src/Promo.tsx` and set the sentence timings. Subtitles follow the measured speech timing; the music ducks under the voice.
   (`public/vo/scene1.mp3` … `scene6.mp3`, scripts are in `VO` in `src/Promo.tsx`), then render with
   `npx remotion render Promo out/promo.mp4 --props='{"useVoiceover":true}'` (music ducks automatically).
 

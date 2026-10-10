@@ -22,7 +22,7 @@ const VO = {
 
 /** Recorded voice-overs (public/vo/sceneN.mp3). Scenes without a recording keep their subtitles only. */
 const VO_AT = 10; // frames after the scene starts
-const VO_FILES: Record<number, { frames: number }> = { 3: { frames: 254 }, 4: { frames: 275 } };
+const VO_FILES: Record<number, { frames: number }> = { 3: { frames: 254 }, 4: { frames: 275 }, 5: { frames: 263 } };
 const sec = (s: number) => Math.round(VO_AT + s * 30); // seconds into the recording -> scene frame
 
 const VoiceTrack: React.FC<{ n: number; on: boolean }> = ({ n, on }) =>
@@ -34,12 +34,18 @@ const VoiceTrack: React.FC<{ n: number; on: boolean }> = ({ n, on }) =>
 
 // Sentence timing measured from the recordings
 const BROWSE_SEGS: Segment[] = [
-  { text: "Looking for an affordable uniform?", start: sec(0.64), end: sec(2.4) },
-  { text: "Browse available listings, explore your options, and find what fits your needs and budget.", start: sec(2.72), end: sec(7.49) },
+  { text: "Looking for an affordable uniform?", start: sec(0.65), end: sec(2.49) },
+  { text: "Browse available listings, explore your options, and find what fits your needs and budget.", start: sec(2.75), end: sec(7.52) },
 ];
 const SELL_SEGS: Segment[] = [
   { text: "Have uniforms you no longer need?", start: sec(0.95), end: sec(3.7) },
   { text: "Give them a second life by listing them for other students to buy or exchange.", start: sec(4.1), end: sec(8.82) },
+];
+const IMPACT_SEGS: Segment[] = [
+  { text: "Because every uniform deserves another chance.", start: sec(0.32), end: sec(2.92) },
+  { text: "Spend less,", start: sec(3.32), end: sec(4.34) },
+  { text: "reduce clothing waste,", start: sec(4.63), end: sec(5.6) },
+  { text: "and help fellow students along the way.", start: sec(5.97), end: sec(8.2) },
 ];
 // Global frame ranges where a voice-over plays, so the music can duck under them
 const VO_RANGES = Object.entries(VO_FILES).map(([n, v]) => {
@@ -296,19 +302,19 @@ const Icon: React.FC<{ kind: "savings" | "waste" | "students"; p: number; f: num
 
 const impactKeys: Key[] = [
   { f: 0, x: 1250, y: 940 },
-  { f: 62, x: 404, y: 620 },
-  { f: 122, x: 960, y: 620 },
-  { f: 182, x: 1516, y: 620 },
-  { f: 250, x: 1700, y: 900 },
+  { f: 150, x: 404, y: 620 },
+  { f: 184, x: 960, y: 620 },
+  { f: 222, x: 1516, y: 620 },
+  { f: 290, x: 1700, y: 900 },
 ];
-const impactClicks = [70, 130, 190];
+const impactClicks = [160, 194, 236];
 const Impact: React.FC = () => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
   const cards = [
-    { kind: "savings" as const, t: "Savings", s: "Pre-loved costs a fraction of new", at: 24 },
-    { kind: "waste" as const, t: "Sustainability", s: "Every reuse keeps clothing out of landfill", at: 84 },
-    { kind: "students" as const, t: "Community", s: "Uniforms passed to classmates who need them", at: 144 },
+    { kind: "savings" as const, t: "Savings", s: "Pre-loved costs a fraction of new", at: 112 },
+    { kind: "waste" as const, t: "Sustainability", s: "Every reuse keeps clothing out of landfill", at: 146 },
+    { kind: "students" as const, t: "Community", s: "Uniforms passed to classmates who need them", at: 180 },
   ];
   const blur = interpolate(f, [0, 24], [0, 16], clamp);
   const cur = cursorAt(impactKeys, f);
@@ -322,10 +328,15 @@ const Impact: React.FC = () => {
         </div>
       </AbsoluteFill>
       <AbsoluteFill style={{ background: `linear-gradient(180deg, ${C.deep}cc, ${C.navy}bb)` }} />
+      <div style={{ position: "absolute", left: 0, right: 0, top: 400, textAlign: "center", fontSize: 92, fontWeight: 800, letterSpacing: -2, color: C.white, opacity: prog(f, 14, 34) * (1 - prog(f, 92, 108)), transform: `translateY(${(1 - prog(f, 14, 34)) * 40 - prog(f, 92, 108) * 30}px)` }}>
+        Every uniform deserves
+        <br />
+        <span style={{ color: C.cream }}>another chance.</span>
+      </div>
       <Headline
         top={70}
         size={50}
-        words={[{ t: "Save Money", at: 24 }, { t: "•", at: 60 }, { t: "Reduce Waste", at: 84 }, { t: "•", at: 120 }, { t: "Help Students", at: 144 }]}
+        words={[{ t: "Save Money", at: 112 }, { t: "•", at: 130 }, { t: "Reduce Waste", at: 146 }, { t: "•", at: 164 }, { t: "Help Students", at: 180 }]}
       />
       <div style={{ position: "absolute", left: 0, right: 0, top: 290, display: "flex", justifyContent: "center", gap: 56 }}>
         {cards.map((c, i) => {
@@ -351,9 +362,9 @@ const Impact: React.FC = () => {
       </div>
       {impactClicks.map((c, i) => <Confetti key={c} at={c} x={404 + 556 * i} y={420} n={26} seed={20 + i} power={0.7} size={0.8} />)}
       <Cursor keys={impactKeys} clicks={impactClicks} scale={1.4} />
-      <Caption text={VO.impact} to={290} duration={S.cta - S.impact} />
+      <Caption text={VO.impact} from={IMPACT_SEGS[0].start - 8} to={290} duration={S.cta - S.impact} segments={IMPACT_SEGS} />
       {impactClicks.map((c) => <Sfx key={c} at={c} name="click" />)}
-      {[24, 84, 144].map((c) => <Sfx key={c} at={c} name="pop" volume={0.4} />)}
+      {[112, 146, 180].map((c) => <Sfx key={c} at={c} name="pop" volume={0.4} />)}
       {impactClicks.map((c) => <Sfx key={`c${c}`} at={c + 2} name="tick" volume={0.5} />)}
     </AbsoluteFill>
   );

@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, interpolate, random, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { C, LISTINGS, POLO, Photo, clamp, ease, fontFamily, prog, typed } from "./theme";
-import { Background, Caption, Cursor, Headline, Key, Window, cursorAt, followCam } from "./Stage";
+import { Background, Caption, Cursor, Headline, Key, Segment, Window, cursorAt, followCam } from "./Stage";
 import { Confetti, Sfx } from "./Fx";
 import { BrowseView, CARD_H, CARD_W, DetailView, GRID_TOP, HomeView, LogoTile, SearchState, SellView } from "./Site";
 
@@ -20,7 +20,32 @@ const VO = {
   cta: "School Uniform Exchange. Making uniforms more affordable, accessible, and sustainable. Start exchanging today!",
 };
 
-const VoiceTrack: React.FC<{ n: number; on: boolean }> = ({ n, on }) => (on ? <Audio src={staticFile(`vo/scene${n}.mp3`)} /> : null);
+/** Recorded voice-overs (public/vo/sceneN.mp3). Scenes without a recording keep their subtitles only. */
+const VO_AT = 10; // frames after the scene starts
+const VO_FILES: Record<number, { frames: number }> = { 3: { frames: 254 }, 4: { frames: 275 } };
+const sec = (s: number) => Math.round(VO_AT + s * 30); // seconds into the recording -> scene frame
+
+const VoiceTrack: React.FC<{ n: number; on: boolean }> = ({ n, on }) =>
+  on && VO_FILES[n] ? (
+    <Sequence from={VO_AT} durationInFrames={VO_FILES[n].frames + 20} layout="none">
+      <Audio src={staticFile(`vo/scene${n}.mp3`)} volume={1} />
+    </Sequence>
+  ) : null;
+
+// Sentence timing measured from the recordings
+const BROWSE_SEGS: Segment[] = [
+  { text: "Looking for an affordable uniform?", start: sec(0.64), end: sec(2.4) },
+  { text: "Browse available listings, explore your options, and find what fits your needs and budget.", start: sec(2.72), end: sec(7.49) },
+];
+const SELL_SEGS: Segment[] = [
+  { text: "Have uniforms you no longer need?", start: sec(0.95), end: sec(3.7) },
+  { text: "Give them a second life by listing them for other students to buy or exchange.", start: sec(4.1), end: sec(8.82) },
+];
+// Global frame ranges where a voice-over plays, so the music can duck under them
+const VO_RANGES = Object.entries(VO_FILES).map(([n, v]) => {
+  const start = [S.hook, S.intro, S.browse, S.sell, S.impact, S.cta][Number(n) - 1] + VO_AT;
+  return [start, start + v.frames] as const;
+});
 
 /* ------------------------------ 1. Hook ------------------------------ */
 const Shirts: React.FC = () => {
@@ -165,7 +190,7 @@ const Browse: React.FC = () => {
         <Cursor keys={browseKeys} clicks={browseClicks} />
         <Confetti at={328} x={910} y={524} n={55} seed={4} />
       </Window>
-      <Caption text={VO.browse} to={310} duration={S.sell - S.browse} />
+      <Caption text={VO.browse} from={BROWSE_SEGS[0].start - 8} to={310} duration={S.sell - S.browse} segments={BROWSE_SEGS} />
       {browseClicks.map((c) => <Sfx key={c} at={c} name="click" />)}
       <Sfx at={246} name="pop" />
       <Sfx at={276} name="typing" dur={42} volume={0.5} />
@@ -213,7 +238,7 @@ const Sell: React.FC = () => {
         <Cursor keys={sellKeys} clicks={sellClicks} />
         <Confetti at={268} x={1035} y={590} n={80} seed={9} power={1.1} />
       </Window>
-      <Caption text={VO.sell} to={320} duration={S.impact - S.sell} />
+      <Caption text={VO.sell} from={SELL_SEGS[0].start - 8} to={320} duration={S.impact - S.sell} segments={SELL_SEGS} />
       <Sfx at={38} name="thud" volume={0.6} />
       {sellClicks.map((c) => <Sfx key={c} at={c} name="click" />)}
       <Sfx at={58} name="typing" dur={64} volume={0.5} />
@@ -447,8 +472,8 @@ export const Promo: React.FC<PromoProps> = ({ useVoiceover }) => {
       <Audio
         src={staticFile("music.mp3")}
         volume={(f) => {
-          const base = useVoiceover ? 0.22 : 0.6;
-          return base * interpolate(f, [0, 20, TOTAL - 60, TOTAL], [0, 1, 1, 0], clamp);
+          const duck = VO_RANGES.reduce((m, [a, b]) => Math.max(m, useVoiceover ? interpolate(f, [a - 12, a + 6, b, b + 20], [0, 1, 1, 0], clamp) : 0), 0);
+          return 0.6 * (1 - 0.7 * duck) * interpolate(f, [0, 20, TOTAL - 60, TOTAL], [0, 1, 1, 0], clamp);
         }}
       />
     </AbsoluteFill>

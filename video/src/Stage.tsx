@@ -33,11 +33,27 @@ export const Headline: React.FC<{ words: { t: string; at: number }[]; top?: numb
 };
 
 /** Voice-over text as subtitles; words light up as the line is "spoken" */
-export const Caption: React.FC<{ text: string; from?: number; to: number; duration: number }> = ({ text, from = 10, to, duration }) => {
+export type Segment = { text: string; start: number; end: number };
+
+export const Caption: React.FC<{ text: string; from?: number; to: number; duration: number; segments?: Segment[] }> = ({ text, from = 10, to, duration, segments }) => {
   const f = useCurrentFrame();
   const words = text.split(" ");
   const opacity = interpolate(f, [from, from + 10, duration - 12, duration - 2], [0, 1, 1, 0], clamp);
-  const spoken = interpolate(f, [from + 6, to], [0, words.length], clamp);
+  // With a recording, each sentence is paced by when it is actually spoken (frames), weighted by word length
+  const segSpoken = (segments ?? []).reduce((n, s) => {
+    const w = s.text.split(" ");
+    const weights = w.map((x) => x.length + 2);
+    const total = weights.reduce((a, b) => a + b, 0);
+    const p = interpolate(f, [s.start, s.end], [0, 1], clamp) * total;
+    let acc = 0;
+    let count = 0;
+    weights.forEach((wt) => {
+      count += Math.min(1, Math.max(0, (p - acc) / wt));
+      acc += wt;
+    });
+    return n + count;
+  }, 0);
+  const spoken = segments ? segSpoken : interpolate(f, [from + 6, to], [0, words.length], clamp);
   return (
     <div style={{ position: "absolute", left: 0, right: 0, bottom: 14, display: "flex", justifyContent: "center", opacity, fontFamily }}>
       <div style={{ maxWidth: 1480, padding: "10px 28px", borderRadius: 18, background: "rgba(6,22,40,.72)", backdropFilter: "blur(6px)", textAlign: "center", fontSize: 25, lineHeight: 1.35, fontWeight: 500 }}>

@@ -30,3 +30,12 @@ python3 scripts/sfx.py                        # regenerate public/sfx/*.wav
 - **Voice-over:** recordings are in `public/vo/` (scenes 2 to 6 (all except the hook), polished with `scripts/vo.sh`). Scene 1 has no recording yet and shows subtitles only. For a new recording, run `scripts/vo.sh in.m4a public/vo/sceneN.mp3`, add it to `VO_FILES` in `src/Promo.tsx` and set the sentence timings. Subtitles follow the measured speech timing; the music ducks under the voice.
   (`public/vo/scene1.mp3` … `scene6.mp3`, scripts are in `VO` in `src/Promo.tsx`), then render with
   `npx remotion render Promo out/promo.mp4 --props='{"useVoiceover":true}'` (music ducks automatically).
+
+## Blurred backgrounds
+
+Blurred backgrounds are pre-rendered images, because live CSS blur filters rendered unreliably (torn frames) in headless video export:
+
+```bash
+npx remotion still FrozenBrowse /tmp/frozen.png && ffmpeg -y -i /tmp/frozen.png -vf gblur=sigma=14 -q:v 3 public/impact-bg.jpg
+ffmpeg -y -i public/uniforms.jpg -vf "scale=2880:-1,crop=1920:1080,gblur=sigma=10" -q:v 3 public/hook-bg.jpg
+```

@@ -33,25 +33,14 @@ export const prog = (f: number, a: number, b: number) =>
 export const typed = (s: string, f: number, start: number, cps = 2) =>
   s.slice(0, Math.max(0, Math.floor((f - start) * cps)));
 
-/** Crops a region of the stock uniform photo, so one image can stand in for many listing photos.
- *  crop = [x, y, zoom]: the point (x, y) of the photo (0-1) is centred, magnified to `zoom` x container width. */
+/** A square crop of the stock uniform photo (pre-cropped by scripts/crops.py), so one image can stand in for many listing photos.
+ *  crop = [x, y, zoom] identifies the file in public/crops. */
 export const Photo: React.FC<{
   crop: readonly [number, number, number];
   style?: React.CSSProperties;
 }> = ({ crop: [fx, fy, zoom], style }) => (
   <div style={{ position: "relative", overflow: "hidden", ...style }}>
-    <Img
-      src={staticFile("uniforms.jpg")}
-      style={{
-        position: "absolute",
-        left: "50%",
-        top: "50%",
-        width: `${zoom * 100}%`,
-        height: "auto",
-        maxWidth: "none",
-        transform: `translate(${-fx * 100}%, ${-fy * 100}%)`,
-      }}
-    />
+    <Img src={staticFile(`crops/${fx}_${fy}_${zoom}.jpg`)} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
   </div>
 );
 

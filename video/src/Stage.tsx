@@ -2,12 +2,13 @@ import React from "react";
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { C, clamp, ease, fontFamily, prog } from "./theme";
 
-export const Background: React.FC<{ dim?: boolean }> = ({ dim }) => {
+export const Background: React.FC = () => {
   const f = useCurrentFrame();
+  // Soft glows are radial gradients (no CSS blur filters, which render unreliably in headless video exports)
   return (
     <AbsoluteFill style={{ background: `linear-gradient(160deg, ${C.navy} 0%, ${C.deep} 70%, #061628 100%)` }}>
-      <div style={{ position: "absolute", right: -200, top: -260, width: 900, height: 900, borderRadius: "50%", background: `${C.denim}59`, filter: "blur(120px)", transform: `translate(${Math.sin(f / 70) * 50}px, ${Math.cos(f / 70) * 40}px)`, opacity: dim ? 0.5 : 1 }} />
-      <div style={{ position: "absolute", left: -240, bottom: -320, width: 800, height: 800, borderRadius: "50%", background: `${C.cream}1a`, filter: "blur(120px)", transform: `translate(${Math.cos(f / 80) * 50}px, ${Math.sin(f / 80) * 40}px)` }} />
+      <div style={{ position: "absolute", right: -400, top: -460, width: 1300, height: 1300, background: `radial-gradient(circle, ${C.denim}66 0%, transparent 68%)`, transform: `translate(${Math.sin(f / 70) * 50}px, ${Math.cos(f / 70) * 40}px)` }} />
+      <div style={{ position: "absolute", left: -440, bottom: -520, width: 1200, height: 1200, background: `radial-gradient(circle, ${C.cream}1f 0%, transparent 68%)`, transform: `translate(${Math.cos(f / 80) * 50}px, ${Math.sin(f / 80) * 40}px)` }} />
       <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(rgba(255,255,255,.07) 1.5px, transparent 1.5px)", backgroundSize: "34px 34px" }} />
     </AbsoluteFill>
   );
@@ -56,9 +57,9 @@ export const Caption: React.FC<{ text: string; from?: number; to: number; durati
   const spoken = segments ? segSpoken : interpolate(f, [from + 6, to], [0, words.length], clamp);
   return (
     <div style={{ position: "absolute", left: 0, right: 0, bottom: 14, display: "flex", justifyContent: "center", opacity, fontFamily }}>
-      <div style={{ maxWidth: 1480, padding: "10px 28px", borderRadius: 18, background: "rgba(6,22,40,.72)", backdropFilter: "blur(6px)", textAlign: "center", fontSize: 25, lineHeight: 1.35, fontWeight: 500 }}>
+      <div style={{ maxWidth: 1480, padding: "10px 28px", textAlign: "center", fontSize: 26, lineHeight: 1.35, fontWeight: 600, textShadow: "0 2px 4px rgba(4,16,32,.95), 0 0 14px rgba(4,16,32,.85), 0 0 2px rgba(4,16,32,1)" }}>
         {words.map((w, i) => (
-          <span key={i} style={{ color: i < spoken ? C.white : "rgba(255,255,255,.45)" }}>{w}{i < words.length - 1 ? " " : ""}</span>
+          <span key={i} style={{ color: i < spoken ? C.white : "rgba(255,255,255,.6)" }}>{w}{i < words.length - 1 ? " " : ""}</span>
         ))}
       </div>
     </div>

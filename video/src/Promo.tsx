@@ -1,7 +1,7 @@
 import React from "react";
-import { AbsoluteFill, Audio, Easing, interpolate, random, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Audio, Easing, Img, interpolate, random, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { C, LISTINGS, POLO, Photo, clamp, ease, fontFamily, prog, typed } from "./theme";
-import { Background, Caption, Cursor, Headline, Key, Segment, Window, cursorAt, followCam } from "./Stage";
+import { Background, Caption, Cursor, Headline, Key, Segment, Window, cursorAt } from "./Stage";
 import { Confetti, Sfx } from "./Fx";
 import { BrowseView, CARD_H, CARD_W, DetailView, GRID_TOP, HomeView, LogoTile, SearchState, SellView } from "./Site";
 
@@ -106,8 +106,8 @@ const Hook: React.FC = () => {
   return (
     <AbsoluteFill style={{ fontFamily }}>
       <Background />
-      <AbsoluteFill style={{ opacity: 0.2, filter: "blur(10px)", transform: `scale(${drift})` }}>
-        <Photo crop={[0.5, 0.5, 1.5]} style={{ width: "100%", height: "100%" }} />
+      <AbsoluteFill style={{ opacity: 0.2, transform: `scale(${drift})` }}>
+        <Img src={staticFile("hook-bg.jpg")} style={{ width: "100%", height: "100%" }} />
       </AbsoluteFill>
       <Shirts />
       <AbsoluteFill style={{ background: `radial-gradient(circle at 50% 50%, transparent 20%, ${C.deep}f2 85%)` }} />
@@ -192,7 +192,8 @@ const browseKeys: Key[] = [
   { f: 0, x: 900, y: 520 },
   { f: 44, x: 671, y: 102 },
   { f: 70, x: 722, y: 195 },
-  { f: 100, x: 700, y: 300 },
+  { f: 92, x: 722, y: 195 },
+  { f: 112, x: 700, y: 300 },
   { f: 196, x: CARD_X, y: CARD_Y },
   { f: 222, x: 620, y: 300 },
   { f: 240, x: 502, y: 160 },
@@ -205,12 +206,11 @@ const browseScroll = (f: number) => interpolate(f, [112, 190], [0, 330], { ...cl
 const Browse: React.FC = () => {
   const f = useCurrentFrame();
   const detail = prog(f, 212, 228);
-  const cam = followCam(browseKeys, browseClicks, f, 0.05);
   return (
     <AbsoluteFill>
       <Background />
       <Headline words={[{ t: "Browse.", at: 14 }, { t: "Discover.", at: 100 }, { t: "Save.", at: 230 }]} />
-      <Window delay={4} cam={cam}>
+      <Window delay={4}>
         <BrowseView f={f} scrollAt={browseScroll} curAt={(x) => cursorAt(browseKeys, x)} menuAt={50} filterAt={78} />
         <div style={{ position: "absolute", inset: 0, zIndex: 20, background: C.white, opacity: detail, transform: `scale(${1.05 - 0.05 * detail})`, transformOrigin: "40% 50%", display: detail > 0 ? "block" : "none" }}>
           <DetailView f={f - 212} heartAt={34} msgAt={60} typeAt={64} sentAt={116} />
@@ -249,13 +249,12 @@ const sellClicks = [56, 152, 164, 176, 214, 228, 268];
 const Sell: React.FC = () => {
   const f = useCurrentFrame();
   const cur = cursorAt(sellKeys, f);
-  const cam = followCam(sellKeys, sellClicks, f, 0.05);
   const ghost = f < 44 ? interpolate(f, [38, 44], [1, 0], clamp) : 0;
   return (
     <AbsoluteFill>
       <Background />
       <Headline words={[{ t: "List it.", at: 14 }, { t: "Sell it.", at: 120 }, { t: "Exchange it.", at: 205 }]} />
-      <Window delay={4} cam={cam}>
+      <Window delay={4}>
         <SellView f={f} scroll={scroll4(f)} />
         {ghost > 0 ? (
           <div style={{ position: "absolute", left: cur.x - 30, top: cur.y - 30, zIndex: 70, width: 96, padding: 5, borderRadius: 12, background: C.white, boxShadow: `0 18px 30px ${C.deep}66`, transform: `rotate(${-7 * ghost}deg) scale(${ghost})` }}>
@@ -344,10 +343,8 @@ const Impact: React.FC = () => {
     <AbsoluteFill style={{ fontFamily }}>
       <Background />
       {/* frozen + blurred site recording */}
-      <AbsoluteFill style={{ filter: `blur(${blur}px)`, opacity: 0.55 }}>
-        <div style={{ width: 1280, height: 680, transformOrigin: "0 0", transform: "scale(1.5)" }}>
-          <BrowseView f={400} scrollAt={() => 330} curAt={() => ({ x: -999, y: -999 })} menuAt={9999} filterAt={9999} />
-        </div>
+      <AbsoluteFill style={{ opacity: 0.55 * (blur / 16) }}>
+        <Img src={staticFile("impact-bg.jpg")} style={{ width: "100%", height: "100%" }} />
       </AbsoluteFill>
       <AbsoluteFill style={{ background: `linear-gradient(180deg, ${C.deep}cc, ${C.navy}bb)` }} />
       <div style={{ position: "absolute", left: 0, right: 0, top: 400, textAlign: "center", fontSize: 92, fontWeight: 800, letterSpacing: -2, color: C.white, opacity: prog(f, 14, 34) * (1 - prog(f, 92, 108)), transform: `translateY(${(1 - prog(f, 14, 34)) * 40 - prog(f, 92, 108) * 30}px)` }}>
@@ -370,7 +367,7 @@ const Impact: React.FC = () => {
           const since = f - impactClicks[i];
           const clickPop = since >= 0 && since < 14 ? Math.sin((since / 14) * Math.PI) * 0.05 : 0;
           return (
-            <div key={c.t} style={{ width: 500, height: 520, borderRadius: 36, background: `linear-gradient(160deg, rgba(255,255,255,${0.17 + 0.12 * hover}), rgba(255,255,255,${0.06 + 0.06 * hover}))`, boxShadow: `inset 0 0 0 ${1.5 + hover}px rgba(255,255,255,${0.25 + 0.3 * hover}), 0 ${30 + 20 * hover}px ${60 + 30 * hover}px rgba(0,0,0,.35)`, backdropFilter: "blur(10px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 18, opacity: Math.min(1, sp * 1.5), transform: `translateY(${(1 - sp) * 120 + Math.sin(f / 30 + i * 2) * 6 - 14 * hover}px) scale(${0.8 + 0.2 * sp + 0.04 * hover + clickPop})` }}>
+            <div key={c.t} style={{ width: 500, height: 520, borderRadius: 36, background: `linear-gradient(160deg, rgba(255,255,255,${0.17 + 0.12 * hover}), rgba(255,255,255,${0.06 + 0.06 * hover}))`, boxShadow: `inset 0 0 0 ${1.5 + hover}px rgba(255,255,255,${0.25 + 0.3 * hover}), 0 ${30 + 20 * hover}px ${60 + 30 * hover}px rgba(0,0,0,.35)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 18, opacity: Math.min(1, sp * 1.5), transform: `translateY(${(1 - sp) * 120 + Math.sin(f / 30 + i * 2) * 6 - 14 * hover}px) scale(${0.8 + 0.2 * sp + 0.04 * hover + clickPop})` }}>
               <div style={{ position: "relative", width: 250, height: 250, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <span style={{ position: "absolute", inset: 0, borderRadius: "50%", background: `${C.denim}66` }} />
                 {f >= c.at ? <span style={{ position: "absolute", inset: 0, borderRadius: "50%", border: "3px solid rgba(255,255,255,.5)", opacity: 1 - pulse, transform: `scale(${1 + pulse * 0.5})` }} /> : null}

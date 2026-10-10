@@ -22,8 +22,8 @@ export const LogoTile: React.FC<{ size?: number; style?: React.CSSProperties }> 
     }}
   >
     <Img
-      src={staticFile("logo.png")}
-      style={{ width: size * 0.78, height: size * 0.78, objectFit: "contain", filter: "brightness(0) invert(1)" }}
+      src={staticFile("logo-white.png")}
+      style={{ width: size * 0.78, height: size * 0.78, objectFit: "contain", }}
     />
   </div>
 );
@@ -203,7 +203,7 @@ export const HomeView: React.FC<{ f: number; wiggle?: number; search?: SearchSta
     <div style={{ width: 1280, height: 680, background: C.white, overflow: "hidden", position: "relative" }}>
       <Navbar active="Home" wiggle={wiggle} />
       <div style={{ position: "absolute", left: 40, top: 84, width: 1200, height: 320, borderRadius: 28, background: C.navy, overflow: "hidden", boxShadow: `0 20px 40px ${C.navy}33` }}>
-        <div style={{ position: "absolute", right: -120, top: -160, width: 450, height: 450, borderRadius: "50%", background: `${C.denim}73`, filter: "blur(60px)", transform: `translate(${Math.sin(f / 40) * 20}px, ${Math.cos(f / 40) * 14}px)` }} />
+        <div style={{ position: "absolute", right: -330, top: -370, width: 900, height: 900, background: `radial-gradient(circle, ${C.denim}80 0%, transparent 66%)`, transform: `translate(${Math.sin(f / 40) * 20}px, ${Math.cos(f / 40) * 14}px)` }} />
         <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(rgba(255,255,255,.1) 1px, transparent 1px)", backgroundSize: "22px 22px", WebkitMaskImage: "linear-gradient(100deg, transparent 45%, #000)" }} />
         <div style={{ position: "absolute", left: 48, top: 36, fontSize: 14, fontWeight: 600, color: C.cream }}>Good morning, Maria</div>
         <div style={{ position: "absolute", left: 48, top: 58, width: 800, whiteSpace: "nowrap", fontSize: 44, fontWeight: 700, lineHeight: 1.2, letterSpacing: -0.9, color: C.white }}>
@@ -285,8 +285,9 @@ export const BrowseView: React.FC<{
   menuAt: number;
   filterAt: number;
 }> = ({ f, scrollAt, curAt, menuAt, filterAt }) => {
-  const filtered = f >= filterAt;
-  const items = filtered ? FILTERED : ALL;
+  const filtered = f >= filterAt; // chip + counter update on the click
+  const swapped = f >= filterAt + 10; // grid swaps once the old cards have faded out
+  const items = swapped ? FILTERED : ALL;
   const scroll = scrollAt(f);
   const cur = curAt(f);
   // hover amount per card, smoothed over the last few frames
@@ -319,9 +320,9 @@ export const BrowseView: React.FC<{
       </div>
       <div style={{ position: "absolute", left: 40, top: GRID_TOP - scroll, display: "grid", gridTemplateColumns: `repeat(4, ${CARD_W}px)`, gap: 16 }}>
         {items.map((l, i) => {
-          const t0 = filtered ? filterAt + 6 : 2;
-          const enter = prog(f, t0 + i * 3, t0 + 16 + i * 3);
-          const exit = filtered ? 1 : 1 - prog(f, filterAt - 8, filterAt);
+          const t0 = swapped ? filterAt + 10 : 2;
+          const enter = prog(f, t0 + i * 2, t0 + 14 + i * 2);
+          const exit = swapped ? 1 : 1 - prog(f, filterAt + 2, filterAt + 10);
           const o = enter * exit;
           const h = hoverOf(i);
           return (
@@ -353,7 +354,7 @@ export const DetailView: React.FC<{ f: number; heartAt: number; msgAt: number; t
   const msg = typed("Hi! Is this still available?", f, typeAt, 0.65);
   const sent = f >= sentAt;
   const btn = interpolate(f, [sentAt - 2, sentAt + 2, sentAt + 10], [1, 0.95, 1], clamp);
-  const toast = interpolate(f, [sentAt + 2, sentAt + 16, sentAt + 56, sentAt + 70], [-20, 80, 80, -20], { ...clamp, easing: ease });
+  const toast = interpolate(f, [sentAt + 2, sentAt + 16, sentAt + 56, sentAt + 70], [-90, 80, 80, -90], { ...clamp, easing: ease });
   const th = f - heartAt;
   return (
     <div style={{ width: 1280, height: 680, background: C.white, overflow: "hidden", position: "relative" }}>
@@ -395,7 +396,7 @@ export const DetailView: React.FC<{ f: number; heartAt: number; msgAt: number; t
       <Btn style={{ position: "absolute", left: 580, top: 498, width: 660, height: 52, fontSize: 16, transform: `scale(${btn})`, background: sent ? C.deep : C.navy }}>
         {sent ? "✓ Request sent" : "Request to buy →"}
       </Btn>
-      <div style={{ position: "absolute", left: 800, top: toast, zIndex: 40, padding: "14px 24px", borderRadius: 14, background: C.deep, color: C.white, fontSize: 15, fontWeight: 600, boxShadow: `0 14px 30px ${C.deep}66` }}>
+      <div style={{ display: f >= sentAt + 2 && f <= sentAt + 70 ? "block" : "none", position: "absolute", left: 800, top: toast, zIndex: 40, padding: "14px 24px", borderRadius: 14, background: C.deep, color: C.white, fontSize: 15, fontWeight: 600, boxShadow: `0 14px 30px ${C.deep}66` }}>
         ✓ Request sent to Mika. You can chat in Messages.
       </div>
     </div>
@@ -432,7 +433,7 @@ export const SellView: React.FC<{ f: number; scroll: number }> = ({ f, scroll })
   const posted = f >= 270;
   const done = (b: boolean) => (b ? C.navy : C.s400);
   const photoPop = prog(f, 54, 68);
-  const toast = interpolate(f, [272, 288, 340, 354], [-20, 76, 76, -20], { ...clamp, easing: ease });
+  const toast = interpolate(f, [272, 288, 340, 354], [-90, 76, 76, -90], { ...clamp, easing: ease });
   return (
     <div style={{ width: 1280, height: 680, background: C.frost, overflow: "hidden", position: "relative" }}>
       <div style={{ position: "absolute", left: 0, top: 84 - scroll, width: 1280 }}>
@@ -497,7 +498,7 @@ export const SellView: React.FC<{ f: number; scroll: number }> = ({ f, scroll })
         {posted ? "✓ Posted" : "Post listing"}
       </div>
       <div style={{ position: "absolute", left: 0, top: 0, width: 1280, zIndex: 5 }}><Navbar active="Sell" /></div>
-      <div style={{ position: "absolute", left: 340, top: toast, zIndex: 9, padding: "14px 26px", borderRadius: 14, background: C.deep, color: C.white, fontSize: 16, fontWeight: 600, boxShadow: `0 14px 30px ${C.deep}66` }}>
+      <div style={{ display: f >= 272 && f <= 354 ? "block" : "none", position: "absolute", left: 340, top: toast, zIndex: 9, padding: "14px 26px", borderRadius: 14, background: C.deep, color: C.white, fontSize: 16, fontWeight: 600, boxShadow: `0 14px 30px ${C.deep}66` }}>
         ✓ Listing posted. Students can now find it!
       </div>
     </div>

@@ -93,20 +93,32 @@ export const Window: React.FC<{ children: React.ReactNode; cam?: { s: number; x:
 
 export type Key = { f: number; x: number; y: number };
 
-/** Mouse cursor in viewport coordinates, with click ripples */
-export const Cursor: React.FC<{ keys: Key[]; clicks: number[] }> = ({ keys, clicks }) => {
+export const cursorAt = (keys: Key[], f: number) => ({
+  x: interpolate(f, keys.map((k) => k.f), keys.map((k) => k.x), { ...clamp, easing: ease }),
+  y: interpolate(f, keys.map((k) => k.f), keys.map((k) => k.y), { ...clamp, easing: ease }),
+});
+
+/** Camera that pushes in on the cursor around each click and eases back out */
+export const followCam = (keys: Key[], clicks: number[], f: number, amount = 0.1) => {
+  const p = clicks.reduce((m, c) => Math.max(m, interpolate(f, [c - 16, c - 3, c + 20, c + 42], [0, 1, 1, 0], clamp)), 0);
+  const { x, y } = cursorAt(keys, f);
+  const s = 1 + amount * p;
+  return { s, x: 1.2 * x * (1 - s), y: 1.2 * y * (1 - s) };
+};
+
+/** Mouse cursor in the parent's coordinate space, with click ripples */
+export const Cursor: React.FC<{ keys: Key[]; clicks: number[]; scale?: number }> = ({ keys, clicks, scale = 1 }) => {
   const f = useCurrentFrame();
-  const x = interpolate(f, keys.map((k) => k.f), keys.map((k) => k.x), { ...clamp, easing: ease });
-  const y = interpolate(f, keys.map((k) => k.f), keys.map((k) => k.y), { ...clamp, easing: ease });
+  const { x, y } = cursorAt(keys, f);
   const press = clicks.some((c) => f >= c - 2 && f < c + 3);
   return (
-    <div style={{ position: "absolute", left: 0, top: 0, zIndex: 50, pointerEvents: "none" }}>
+    <div style={{ position: "absolute", left: 0, top: 0, zIndex: 80, pointerEvents: "none" }}>
       {clicks.map((c) => {
         const p = interpolate(f, [c, c + 16], [0, 1], clamp);
         if (f < c || p >= 1) return null;
-        return <span key={c} style={{ position: "absolute", left: x - 22, top: y - 22, width: 44, height: 44, borderRadius: "50%", border: `3px solid ${C.denim}`, opacity: 1 - p, transform: `scale(${0.3 + p * 1.1})` }} />;
+        return <span key={c} style={{ position: "absolute", left: x - 22 * scale, top: y - 22 * scale, width: 44 * scale, height: 44 * scale, borderRadius: "50%", border: `3px solid ${C.denim}`, opacity: 1 - p, transform: `scale(${0.3 + p * 1.1})` }} />;
       })}
-      <svg width="30" height="34" viewBox="0 0 24 28" style={{ position: "absolute", left: x - 3, top: y - 2, transform: `scale(${press ? 0.85 : 1})`, transformOrigin: "3px 2px", filter: "drop-shadow(0 3px 4px rgba(0,0,0,.35))" }}>
+      <svg width={30 * scale} height={34 * scale} viewBox="0 0 24 28" style={{ position: "absolute", left: x - 3 * scale, top: y - 2 * scale, transform: `scale(${press ? 0.85 : 1})`, transformOrigin: "3px 2px", filter: "drop-shadow(0 3px 4px rgba(0,0,0,.35))" }}>
         <path d="M3 2v20l5.4-5 3.6 8 3.4-1.5-3.6-7.8H20Z" fill="#fff" stroke={C.deep} strokeWidth="1.6" strokeLinejoin="round" />
       </svg>
     </div>

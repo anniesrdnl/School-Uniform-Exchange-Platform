@@ -18,6 +18,7 @@ npm install
 npm run dev                                   # Remotion Studio
 npx remotion render Promo out/promo.mp4       # final render
 python3 scripts/music.py                      # regenerate public/music.mp3
+python3 scripts/sfx.py                        # regenerate public/sfx/*.wav
 ```
 
 ## What's in the video
